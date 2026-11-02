@@ -31,3 +31,7 @@ phishquest-export.json
 
 # Freebuff workspace metadata
 .freebuff/
+
+# Berkas kerja sementara
+.tmp-*
+.tmp/
