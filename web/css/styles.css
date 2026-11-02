@@ -306,7 +306,7 @@ a {
 }
 
 .pack__best {
-  color: var(--pq-warning);
+  color: #b45309;
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;

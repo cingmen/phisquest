@@ -65,7 +65,7 @@ export function renderLevelBar(progress) {
       <span>${LEVEL_EMOJI[level] || '🐣'} ${escapeHtml(LEVEL_NAMES[level] || level)}</span>
       <span>${escapeHtml(label)}</span>
     </div>
-    <div class="level-bar__track" role="progressbar" aria-valuemin="0" aria-valuemax="${needed || current}" aria-valuenow="${current}">
+    <div class="level-bar__track" role="progressbar" aria-label="Progres level" aria-valuemin="0" aria-valuemax="${needed || current}" aria-valuenow="${current}">
       <div class="level-bar__fill" style="width:${percent}%"></div>
     </div>
   </div>`;
@@ -265,7 +265,7 @@ export function renderGame({
       </span>
     </div>
     <div class="progress">
-      <div class="progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${position}">
+      <div class="progress__track" role="progressbar" aria-label="Progres soal" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${position}">
         <div class="progress__fill" style="width:${percent}%"></div>
       </div>
       <span class="progress__label">Soal ${position} dari ${total}</span>
