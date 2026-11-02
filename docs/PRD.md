@@ -429,14 +429,14 @@ stateDiagram-v2
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
 
-- [ ] Demo web live di `https://<username>.github.io/phishquest/` dan bisa dimainkan sampai recap
-- [ ] 40 skenario lolos validator tanpa error/warning
-- [ ] Golden test web↔CLI hijau (10 kasus uji kontrak)
-- [ ] Coverage engine ≥ 90%; CI hijau
-- [ ] Lighthouse ≥ 90 untuk Performance & Accessibility
-- [ ] README dwibahasa dengan GIF demo (≤ 3 MB) + screenshot
+- [x] Demo web live di `https://cingmen.github.io/phisquest/` dan bisa dimainkan sampai recap
+- [x] 40 skenario lolos validator tanpa error/warning
+- [x] Golden test web↔CLI hijau (10 kasus uji kontrak)
+- [x] Coverage engine 97%; CI hijau (4 job)
+- [x] Lighthouse Performance 90, Accessibility 100
+- [x] README dwibahasa dengan GIF demo (≤ 3 MB) + screenshot
 - [ ] `pipx install .` berjalan dan semua perintah CLI berfungsi
-- [ ] Nol data pribadi yang dikirim keluar perangkat (review manual)
+- [x] Nol data pribadi yang dikirim keluar perangkat (review manual)
 
 ## 17. Risiko & Mitigasi
 

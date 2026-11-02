@@ -158,15 +158,15 @@ fondasi  konten  engine  CLI    web    rilis
 ## 11. Checklist Rilis v1.0.0
 
 - [ ] CI hijau di commit rilis
-- [ ] `python scripts/validate_content.py content/` exit 0
-- [ ] Golden test Python & JS hijau
-- [ ] Semua domain contoh dicek tidak aktif (kunjugsi manual)
-- [ ] Disclaimer etika tampil di: footer web, header CLI, README (dua bahasa)
-- [ ] Lighthouse ≥ 90 (Performance & Accessibility)
-- [ ] GIF demo < 3 MB ter-embed di kedua README
+- [x] `python scripts/validate_content.py content/` exit 0
+- [x] Golden test Python & JS hijau
+- [x] Semua domain contoh dicek tidak aktif (kunjugsi manual)
+- [x] Disclaimer etika tampil di: footer web, header CLI, README (dua bahasa)
+- [x] Lighthouse ≥ 90 (Performance & Accessibility)
+- [x] GIF demo < 3 MB ter-embed di kedua README
 - [ ] `pipx install .` sukses di Linux + Windows
 - [ ] Tag `v1.0.0` + GitHub Release
-- [ ] Pages live + link di README (badge "Play Demo")
+- [x] Pages live + link di README (badge "Play Demo")
 
 ## 12. Alokasi Waktu Total
 
