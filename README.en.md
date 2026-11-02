@@ -16,6 +16,8 @@ build step) and a **Python CLI** built with Rich.
 
 ---
 
+![PhishQuest demo: pick a pack, read the message, answer, see the feedback](docs/assets/web-demo.gif)
+
 ## Play
 
 ### Web

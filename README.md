@@ -16,6 +16,8 @@ plus XP, streak, level, dan lencana. Satu sumber konten JSON dipakai dua antarmu
 
 ---
 
+![Demo PhishQuest: memilih pack, membaca pesan, menjawab, lalu melihat umpan balik](docs/assets/web-demo.gif)
+
 ## Cara main
 
 ### Web (tanpa install)
