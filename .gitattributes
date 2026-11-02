@@ -1,0 +1,16 @@
+# Normalisasi line ending agar CI (Linux) dan Windows konsisten.
+* text=auto eol=lf
+
+# Biner — jangan pernah diubah git.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Skrip khusus Windows tetap CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
