@@ -1,0 +1,14 @@
+#!/bin/sh
+# Bersihkan atribusi otomatis dari pesan commit sebelum disimpan.
+# Aktifkan sekali per klon: git config core.hooksPath .githooks
+set -e
+
+file="$1"
+
+sed -i \
+  -e '/^[Cc]o-[Aa]uthored-[Bb]y:.*[Cc]odebuff.*$/d' \
+  -e '/^[Gg]enerated with [Cc]odebuff.*$/d' \
+  -e '/Generated with Codebuff/d' \
+  "$file"
+
+sed -i -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' "$file"
