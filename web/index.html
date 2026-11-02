@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PhishQuest — Kenali umpan sebelum kamu terhook.</title>
+    <meta
+      name="description"
+      content="Game edukasi anti-phishing berbahasa Indonesia. Kenali red flag email, SMS, dan WhatsApp penipuan dalam kuis arcade yang seru."
+    />
+    <meta name="theme-color" content="#7C3AED" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <a class="brand" href="#menu" data-action="tab" data-tab="menu">
+          <img class="brand__logo" src="assets/logo.svg" alt="" width="40" height="40" />
+          <span class="brand__text">
+            <strong>PhishQuest</strong>
+            <small>Kenali umpan sebelum kamu terhook.</small>
+          </span>
+        </a>
+        <div class="topbar__stats" id="player-stats">
+          <span class="chip chip--xp" id="stat-xp">0 XP</span>
+          <span class="chip chip--level" id="stat-level">🐣 Amatir</span>
+          <span class="chip chip--streak" id="stat-streak">🔥 0</span>
+        </div>
+      </header>
+
+      <nav class="tabs" role="tablist" aria-label="Navigasi utama">
+        <button class="tab tab--active" data-action="tab" data-tab="menu" role="tab" aria-selected="true">
+          🎮 Main
+        </button>
+        <button class="tab" data-action="tab" data-tab="badges" role="tab" aria-selected="false">
+          🏅 Lencana
+        </button>
+        <button class="tab" data-action="tab" data-tab="about" role="tab" aria-selected="false">
+          ℹ️ Tentang
+        </button>
+      </nav>
+
+      <main id="app">
+        <section id="screen-menu" class="screen" data-screen="menu" aria-label="Menu utama"></section>
+        <section
+          id="screen-game"
+          class="screen screen--hidden"
+          data-screen="game"
+          aria-label="Permainan"
+        ></section>
+        <section
+          id="screen-recap"
+          class="screen screen--hidden"
+          data-screen="recap"
+          aria-label="Ringkasan sesi"
+        ></section>
+        <section
+          id="screen-badges"
+          class="screen screen--hidden"
+          data-screen="badges"
+          aria-label="Lencana"
+        ></section>
+        <section
+          id="screen-about"
+          class="screen screen--hidden"
+          data-screen="about"
+          aria-label="Tentang"
+        ></section>
+      </main>
+
+      <footer class="footer">
+        <p class="footer__notice">
+          PhishQuest adalah simulasi edukasi. Semua email, brand, dan domain di dalamnya fiktif.
+          Tidak ada data yang dikumpulkan.
+        </p>
+        <p class="footer__meta">
+          Data progres hanya tersimpan di perangkat ini · <span id="footer-version">v1.0.0</span>
+        </p>
+      </footer>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="live-region" class="visually-hidden" aria-live="polite"></div>
+      <div id="confetti" class="confetti" aria-hidden="true"></div>
+    </div>
+
+    <noscript>
+      <p class="noscript">PhishQuest membutuhkan JavaScript untuk dimainkan.</p>
+    </noscript>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

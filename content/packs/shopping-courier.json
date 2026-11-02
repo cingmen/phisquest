@@ -1,0 +1,345 @@
+{
+  "schema_version": "1.0",
+  "pack_id": "shopping-courier",
+  "name": "Belanja & Kurir",
+  "description": "Notifikasi pesanan, resi paket tertahan, kurir minta biaya tambahan, dan refund yang terlalu manis.",
+  "emoji": "📦",
+  "scenarios": [
+    {
+      "id": "sc-001",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "sms",
+      "sender": {
+        "name": "KargoCepat",
+        "address": "+62 859-2233-9911"
+      },
+      "subject": null,
+      "datetime": "2026-11-01T09:12:00+07:00",
+      "body": "Paket Anda KARGO-7712 tertahan di gudang karena alamat kurang lengkap. Konfirmasi dalam 24 jam atau paket akan dikembalikan ke pengirim. Lengkapi alamat dan bayar biaya penyimpanan Rp15.000 di http://kargocepat-resi.xyz/lacak",
+      "link": {
+        "text": "kargocepat-resi.xyz/lacak",
+        "href": "http://kargocepat-resi.xyz/lacak"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "DOMAIN_MIRIP",
+        "TEKANAN_WAKTU",
+        "LINK_MENCURIGAKAN"
+      ],
+      "explanation": "Domain resmi KargoCepat adalah kargocepat.id; kargocepat-resi.xyz hanya meniru namanya. Kurir tidak menagih biaya penyimpanan lewat tautan http, apalagi dengan ancaman paket dikembalikan dalam 24 jam.",
+      "teach": {
+        "tip": "Lacak paket selalu dari aplikasi atau situs resmi kurir, bukan dari tautan SMS.",
+        "verify_how": "Buka aplikasi KargoCepat dan masukkan nomor pesanan Anda sendiri untuk melihat status sebenarnya."
+      }
+    },
+    {
+      "id": "sc-002",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "whatsapp",
+      "sender": {
+        "name": "Kurir Pak Andi",
+        "address": "+62 857-8899-2210"
+      },
+      "subject": null,
+      "datetime": "2026-10-31T15:26:00+07:00",
+      "body": "Halo kak, saya kurir yang mengantar paket kakak. Paketnya kena bea masuk Rp265.000 karena dari luar negeri. Transfer ke rekening saya 7712-3344-5566 a.n. Andi Saputra ya kak, nanti langsung saya antar hari ini juga. Jangan lewat aplikasi, ribet prosesnya.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "PENGIRIM_TIDAK_WAJAR",
+        "SALURAN_TIDAK_WAJAR",
+        "TEKANAN_WAKTU"
+      ],
+      "explanation": "Bea masuk dibayar ke kas negara lewat kanal resmi, bukan ke rekening pribadi kurir. Permintaan menghindari aplikasi dan tekanan agar cepat mentransfer adalah tanda penipuan.",
+      "teach": {
+        "tip": "Biaya resmi pengiriman tidak pernah masuk ke rekening pribadi orang.",
+        "verify_how": "Tanyakan status dan biaya ke call center KargoCepat atau cek di aplikasi sebelum membayar apa pun."
+      }
+    },
+    {
+      "id": "sc-003",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "sms",
+      "sender": {
+        "name": "TokoKilat",
+        "address": "0811-2000-4455"
+      },
+      "subject": null,
+      "datetime": "2026-11-01T12:30:00+07:00",
+      "body": "Pesanan TK-99120 sudah dikirim lewat KargoCepat. Estimasi tiba 3 November 2026. Status dan nomor resi dapat dilihat di menu Pesanan pada aplikasi TokoKilat.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Pesan hanya memberi kabar pengiriman, tanpa tautan, tanpa biaya tambahan, dan tanpa permintaan data. Rujukannya adalah menu Pesanan di aplikasi resmi.",
+      "teach": {
+        "tip": "Notifikasi pengiriman yang wajar tidak meminta pembayaran tambahan.",
+        "verify_how": "Cocokkan nomor pesanan dan resi di aplikasi TokoKilat sebelum mengonfirmasi apa pun."
+      }
+    },
+    {
+      "id": "sc-004",
+      "type": "best_action",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": {
+        "name": "TokoKilat",
+        "address": "promo@tokokilat.co.id"
+      },
+      "subject": "Cashback Belanja Anda Bulan Ini Sudah Masuk",
+      "datetime": "2026-10-30T10:00:00+07:00",
+      "body": "Halo Sari,\n\nCashback belanja bulan Oktober sebesar Rp12.000 sudah masuk ke saldo TokoKilat Anda. Saldo berlaku 90 hari dan otomatis terpakai pada pembelian berikutnya. Tidak ada data yang perlu Anda kirimkan.\n\nRincian ada di menu Saldo pada aplikasi TokoKilat.",
+      "link": null,
+      "attachment": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "Simpan email dan cek saldo di menu Saldo aplikasi TokoKilat"
+        },
+        {
+          "id": "B",
+          "text": "Balas email dengan nomor rekening agar cashback bisa dicairkan"
+        },
+        {
+          "id": "C",
+          "text": "Laporkan sebagai phishing karena menyebut nominal uang"
+        },
+        {
+          "id": "D",
+          "text": "Kirim data diri ke promo@tokokilat.co.id untuk klaim cepat"
+        }
+      ],
+      "is_phish": false,
+      "correct_option": "A",
+      "red_flags": [],
+      "explanation": "Pengirim memakai domain resmi tokokilat.co.id dan tidak meminta data apa pun. Tindakan aman adalah memeriksa saldo di aplikasi, bukan mengirim informasi pribadi lewat email.",
+      "teach": {
+        "tip": "Cashback yang sah selalu tampak di saldo aplikasi, bukan lewat permintaan data.",
+        "verify_how": "Buka aplikasi TokoKilat dan cek menu Saldo serta riwayat transaksi, tanpa mengirim data apa pun."
+      }
+    },
+    {
+      "id": "sc-005",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": {
+        "name": "KargoCepat Customer Service",
+        "address": "cs@kargocepat-resmi.id"
+      },
+      "subject": "Paket Anda Gagal Diantar - Mohon Konfirmasi Alamat",
+      "datetime": "2026-10-29T17:05:00+07:00",
+      "body": "Yth Pelanggan Yth,\n\nPaket dengan nomor KARGO-5521 gagal diantar karena alamat tidak ditemukan. Mohon konfirmasi alamat dan nomor telepon Anda melalui tautan berikut agar paket dapat dikirim ulang hari ini.\n\nKonfirmasi: http://kargocepat-resmi.id/konfirmasi\n\nTerima kasih,\nCustomer Service",
+      "link": {
+        "text": "kargocepat-resmi.id/konfirmasi",
+        "href": "http://kargocepat-resmi.id/konfirmasi"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "DOMAIN_MIRIP",
+        "SAPAAN_GENERIK",
+        "LINK_MENCURIGAKAN",
+        "TEKANAN_WAKTU"
+      ],
+      "explanation": "KargoCepat memakai kargocepat.id, bukan kargocepat-resmi.id yang justru menambahkan kata resmi. Sapaan generik dan tautan http dengan tenggat hari ini menandakan pesan massal penipu.",
+      "teach": {
+        "tip": "Kata tambahan seperti -resmi atau -secure pada domain adalah taktik peniru.",
+        "verify_how": "Buka aplikasi KargoCepat dan periksa nomor pesanan; hubungi call center resmi bila statusnya memang bermasalah."
+      }
+    },
+    {
+      "id": "sc-006",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": {
+        "name": "KargoCepat Tagihan",
+        "address": "tagihan@kargocepat.id"
+      },
+      "subject": "Invoice Pengiriman Korporat KC-2026-9911",
+      "datetime": "2026-10-28T14:00:00+07:00",
+      "body": "Halo Sari,\n\nBerikut invoice pengiriman korporat periode Oktober 2026 sebesar Rp3.120.000. Rincian pengiriman dan pajak ada pada lampiran PDF. Pembayaran dapat dilakukan melalui akun tagihan Anda di https://kargocepat.id/invoice/KC-2026-9911.\n\nTerima kasih,\nBagian Tagihan KargoCepat",
+      "link": {
+        "text": "kargocepat.id/invoice/KC-2026-9911",
+        "href": "https://kargocepat.id/invoice/KC-2026-9911"
+      },
+      "attachment": {
+        "name": "Invoice-KC-2026-9911.pdf",
+        "size_kb": 184
+      },
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Semua rujukan memakai domain resmi kargocepat.id dengan https, lampirannya PDF biasa, dan tidak ada permintaan kata sandi. Nominal yang besar saja bukan alasan menuduh phishing.",
+      "teach": {
+        "tip": "Lampiran PDF yang wajar tetap harus dicek domain pengirimnya.",
+        "verify_how": "Bandingkan nomor invoice dengan data pengiriman di akun korporat Anda sebelum membayar."
+      }
+    },
+    {
+      "id": "sc-007",
+      "type": "spot_redflag",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": {
+        "name": "TokoKilat",
+        "address": "notifikasi@tokokilat-payment.com"
+      },
+      "subject": "Struk Pembayaran Berhasil - Pesanan TK-99120",
+      "datetime": "2026-10-27T20:15:00+07:00",
+      "body": "Halo Kak,\n\nPembayaran pesanan TK-99120 sebesar Rp249.000 telah kami terima. Silahkan buka lampiran struk untuk melihat rincian transaksi dan mencetaknya sebagai bukti.\n\nTerima kasih sudah berbelanja.",
+      "link": null,
+      "attachment": {
+        "name": "struk-pembayaran.html.exe",
+        "size_kb": 512
+      },
+      "options": [
+        {
+          "id": "A",
+          "text": "Subjek yang menyebut nomor pesanan TK-99120"
+        },
+        {
+          "id": "B",
+          "text": "Lampiran struk-pembayaran.html.exe"
+        },
+        {
+          "id": "C",
+          "text": "Nominal Rp249.000 yang wajar untuk belanja daring"
+        },
+        {
+          "id": "D",
+          "text": "Sapaan \"Halo Kak\" di awal pesan"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "B",
+      "red_flags": [
+        "LAMPIRAN_BERBAHAYA",
+        "DOMAIN_MIRIP",
+        "GRAMATIKA_AJANG"
+      ],
+      "explanation": "Ekstensi ganda .html.exe membuat file dijalankan sebagai program, bukan struk. Domain tokokilat-payment.com bukan tokokilat.co.id, dan ejaan \"Silahkan\" yang tidak baku menambah kejanggalan.",
+      "teach": {
+        "tip": "Struk belanja tidak pernah berupa file yang bisa dijalankan.",
+        "verify_how": "Cek riwayat pesanan di aplikasi TokoKilat; bukti pembayaran resmi selalu bisa diunduh dari sana."
+      }
+    },
+    {
+      "id": "sc-008",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "whatsapp",
+      "sender": {
+        "name": "LapakRia Penjual",
+        "address": "+62 812-3344-5567"
+      },
+      "subject": null,
+      "datetime": "2026-11-01T16:40:00+07:00",
+      "body": "Halo kak, pesanan batiknya sudah saya kemas. Warna yang dipesan ready, saya kirim besok pagi lewat KargoCepat. Kalau ada permintaan khusus untuk kemasan hadiah, kabari saya sebelum jam 8 ya kak. Pembayaran sudah tercatat di aplikasi, terima kasih.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Penjual hanya mengonfirmasi pesanan dan jadwal kirim, tanpa tautan dan tanpa meminta pembayaran di luar aplikasi. Pembayaran disebut sudah tercatat di LapakRia.",
+      "teach": {
+        "tip": "Transaksi yang tetap di dalam aplikasi marketplace adalah pola yang aman.",
+        "verify_how": "Pastikan status pesanan dan pembayaran tetap tercatat di aplikasi LapakRia, bukan hanya di chat."
+      }
+    },
+    {
+      "id": "sc-009",
+      "type": "best_action",
+      "difficulty": "sulit",
+      "channel": "sms",
+      "sender": {
+        "name": "CS TokoKilat",
+        "address": "+62 895-6600-1122"
+      },
+      "subject": null,
+      "datetime": "2026-10-31T21:10:00+07:00",
+      "body": "Halo, kami dari CS TokoKilat. Pesanan Anda ditahan sistem karena terdeteksi pembayaran ganda. Untuk membatalkan salah satu transaksi, kami memerlukan kode OTP yang baru saja dikirim ke SMS Anda. Mohon balas kode tersebut sekarang agar dana tidak tertahan.",
+      "link": null,
+      "attachment": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "Balas kode OTP agar pembayaran ganda segera dibatalkan"
+        },
+        {
+          "id": "B",
+          "text": "Minta petugas mengirim ulang OTP lalu kirim kode barunya"
+        },
+        {
+          "id": "C",
+          "text": "Jangan bagikan kode; cek status pesanan di aplikasi TokoKilat dan hubungi CS resmi dari sana"
+        },
+        {
+          "id": "D",
+          "text": "Abaikan pesan lalu blokir semua nomor TokoKilat"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "C",
+      "red_flags": [
+        "MEMINTA_DATA_SENSITIF",
+        "SALURAN_TIDAK_WAJAR",
+        "PENGIRIM_TIDAK_WAJAR"
+      ],
+      "explanation": "Kode OTP adalah kunci akun Anda; tidak ada CS resmi yang memintanya lewat SMS. Nomor pengirim juga bukan kanal resmi TokoKilat, sehingga verifikasi harus lewat aplikasi.",
+      "teach": {
+        "tip": "OTP hanya untuk Anda sendiri; permintaan OTP selalu penipuan.",
+        "verify_how": "Buka aplikasi TokoKilat untuk melihat status pesanan, lalu hubungi CS di dalam aplikasi bila perlu."
+      }
+    },
+    {
+      "id": "sc-010",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": {
+        "name": "LapakRia Pengembalian Dana",
+        "address": "refund@lapakria-refund.web.id"
+      },
+      "subject": "Pengembalian Dana Rp1.250.000 Disetujui - Klaim Dalam 24 Jam",
+      "datetime": "2026-10-26T11:45:00+07:00",
+      "body": "Yth Pelanggan Yth,\n\nPengajuan pengembalian dana Anda sebesar Rp1.250.000 telah DISETUJUI. Dana akan dikirim setelah Anda memverifikasi data berikut: nama lengkap, nomor rekening, NIK, dan foto KTP. Klaim hanya berlaku 24 jam; setelah itu dana dikembalikan ke kas platform.\n\nKlaim sekarang: http://lapakria-refund.web.id/klaim\n\nTim Pengembalian Dana",
+      "link": {
+        "text": "lapakria-refund.web.id/klaim",
+        "href": "http://lapakria-refund.web.id/klaim"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "IMBALAN_BERLEBIHAN",
+        "MEMINTA_DATA_SENSITIF",
+        "SAPAAN_GENERIK",
+        "LINK_MENCURIGAKAN",
+        "TEKANAN_WAKTU"
+      ],
+      "explanation": "Marketplace tidak pernah meminta NIK dan foto KTP untuk pengembalian dana; dana kembali ke rekening yang sudah terdaftar. Domain lapakria-refund.web.id bukan lapakria.id, tautannya http, dan tenggat 24 jam adalah tekanan artifisial.",
+      "teach": {
+        "tip": "Refund selalu kembali ke rekening yang sudah terdaftar, tanpa unggah KTP.",
+        "verify_how": "Cek status pengembalian di menu Pesanan aplikasi LapakRia dan jangan mengunggah dokumen identitas ke tautan mana pun."
+      }
+    }
+  ]
+}

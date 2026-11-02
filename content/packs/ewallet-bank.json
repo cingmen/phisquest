@@ -1,0 +1,352 @@
+{
+  "schema_version": "1.0",
+  "pack_id": "ewallet-bank",
+  "name": "E-Wallet & Bank",
+  "description": "Pesan dari bank dan dompet digital: transaksi mencurigakan, OTP, refund, dan pembaruan data.",
+  "emoji": "🏦",
+  "scenarios": [
+    {
+      "id": "ew-001",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": {
+        "name": "BankNusa Care",
+        "address": "care@banknusa-secure.com"
+      },
+      "subject": "⚠️ Transaksi Mencurigakan Rp2.400.000 - Akun Akan Diblokir",
+      "datetime": "2026-11-02T09:15:00+07:00",
+      "body": "Yth Pelanggan Yth,\n\nKami mendeteksi transaksi mencurigakan sebesar Rp2.400.000 pada rekening Anda. Segera verifikasi identitas Anda dalam 1x24 JAM atau akun Anda akan DIBLOKIR PERMANEN dan denda Rp500.000 akan dikenakan.\n\nVerifikasi sekarang: http://banknusa-secure.com/verifikasi\n\nHormat kami,\nTim Keamanan BankNusa",
+      "link": {
+        "text": "banknusa-secure.com/verifikasi",
+        "href": "http://banknusa-secure.com/verifikasi"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "DOMAIN_MIRIP",
+        "TEKANAN_WAKTU",
+        "ANCAMAN",
+        "SAPAAN_GENERIK",
+        "LINK_MENCURIGAKAN"
+      ],
+      "explanation": "Domain asli BankNusa adalah banknusa.co.id, bukan banknusa-secure.com. Batas waktu 1×24 jam dan ancaman denda adalah tekanan klasik agar korban panik. Tautan memakai http, bukan https.",
+      "teach": {
+        "tip": "Email soal masalah rekening selalu bisa ditunda: tutup pesannya, lalu buka aplikasi m-banking resmi.",
+        "verify_how": "Cek alamat pengirim dan domain tautan huruf demi huruf; selesaikan transaksi lewat aplikasi resmi, bukan lewat tautan di email."
+      }
+    },
+    {
+      "id": "ew-002",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "sms",
+      "sender": {
+        "name": "DompetKu",
+        "address": "+62 812-8899-1043"
+      },
+      "subject": null,
+      "datetime": "2026-11-01T20:42:00+07:00",
+      "body": "DompetKu: akun Anda terdeteksi login dari perangkat baru. Verifikasi dalam 1x24 jam atau saldo dibekukan sementara. Kirim kode OTP 6 digit ke nomor ini, atau buka http://dompetku-kyc.top/otp",
+      "link": {
+        "text": "dompetku-kyc.top/otp",
+        "href": "http://dompetku-kyc.top/otp"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "DOMAIN_PALSU",
+        "MEMINTA_DATA_SENSITIF",
+        "SALURAN_TIDAK_WAJAR",
+        "TEKANAN_WAKTU",
+        "LINK_MENCURIGAKAN"
+      ],
+      "explanation": "DompetKu tidak pernah meminta kode OTP melalui SMS atau WhatsApp; kode itu justru kunci akun Anda. Domain dompetku-kyc.top bukan domain resmi dompetku.id, dan tautannya tidak memakai https.",
+      "teach": {
+        "tip": "Kode OTP hanya untuk Anda sendiri—tidak ada petugas resmi yang boleh memintanya.",
+        "verify_how": "Buka aplikasi DompetKu langsung dan cek riwayat perangkat; jika ragu, telepon call center di dalam aplikasi."
+      }
+    },
+    {
+      "id": "ew-003",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": {
+        "name": "BankNusa",
+        "address": "noreply@banknusa.co.id"
+      },
+      "subject": "Laporan Rekening Periode Oktober 2026",
+      "datetime": "2026-11-01T07:05:00+07:00",
+      "body": "Halo Sari,\n\nLaporan rekening Anda untuk periode Oktober 2026 sudah tersedia. Ringkasan bisa dilihat setelah Anda masuk ke aplikasi BankNusa.\n\nBuka aplikasi atau kunjungi https://banknusa.co.id/ringkasan untuk melihat rincian transaksi dan bunga tabungan.\n\nTerima kasih,\nBankNusa",
+      "link": {
+        "text": "banknusa.co.id/ringkasan",
+        "href": "https://banknusa.co.id/ringkasan"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Domain pengirim dan tautan sama-sama banknusa.co.id dengan https. Pesan menyebut nama pemilik rekening dan tidak meminta data sensitif apa pun.",
+      "teach": {
+        "tip": "Pesan resmi boleh berisi tautan—yang menentukan adalah domainnya persis sama dengan domain resmi.",
+        "verify_how": "Ketik sendiri alamat bank di browser atau buka aplikasi resmi, jangan hanya mengandalkan tautan di email."
+      }
+    },
+    {
+      "id": "ew-004",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": {
+        "name": "AsurKita Layanan Klaim",
+        "address": "klaim@asurkita-id.com"
+      },
+      "subject": "🎉 Pengembalian Premi Rp1.850.000 Menunggu Konfirmasi",
+      "datetime": "2026-10-30T14:20:00+07:00",
+      "body": "Halo Bapak/Ibu,\n\nSelamat! Anda terpilih menerima pengembalian premi sebesar Rp1.850.000 karena kelebihan bayar tahun lalu. Dana hanya dapat dicairkan bila dikonfirmasi dalam 24 jam, setelah itu akan dialihkan ke peserta lain.\n\nKonfirmasi di http://asurkita-id.com/refund/klaim\n\nTim Layanan AsurKita",
+      "link": {
+        "text": "asurkita-id.com/refund/klaim",
+        "href": "http://asurkita-id.com/refund/klaim"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "DOMAIN_MIRIP",
+        "IMBALAN_BERLEBIHAN",
+        "TEKANAN_WAKTU",
+        "LINK_MENCURIGAKAN"
+      ],
+      "explanation": "Domain resmi AsurKita adalah asurkita.co.id; asurkita-id.com hanya menirunya dengan tanda hubung. Pengembalian premi tidak pernah diumumkan lewat email mendadak dengan batas 24 jam, dan tautannya http.",
+      "teach": {
+        "tip": "Uang yang benar-benar menjadi hak Anda tidak akan hangus dalam 24 jam.",
+        "verify_how": "Hubungi call center AsurKita dari situs resmi atau temui agen resmi, lalu tanyakan apakah ada pengembalian premi atas nama Anda."
+      }
+    },
+    {
+      "id": "ew-005",
+      "type": "best_action",
+      "difficulty": "sedang",
+      "channel": "whatsapp",
+      "sender": {
+        "name": "DompetKu Notifikasi",
+        "address": "+62 811-1500-2019"
+      },
+      "subject": null,
+      "datetime": "2026-11-02T08:10:00+07:00",
+      "body": "Halo Sari, akun DompetKu Anda baru saja masuk dari perangkat Android di Bandung pukul 08.04. Jika itu bukan Anda, segera amankan akun lewat aplikasi DompetKu. Kami tidak pernah meminta PIN atau kode OTP melalui chat.",
+      "link": null,
+      "attachment": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "Balas chat dengan PIN 6 digit agar petugas bisa memblokir perangkat asing"
+        },
+        {
+          "id": "B",
+          "text": "Buka aplikasi DompetKu resmi, cek perangkat aktif, lalu ganti PIN dari sana"
+        },
+        {
+          "id": "C",
+          "text": "Klik tautan yang nanti dikirim admin lewat chat"
+        },
+        {
+          "id": "D",
+          "text": "Abaikan saja; login dari perangkat lain bukan masalah"
+        }
+      ],
+      "is_phish": false,
+      "correct_option": "B",
+      "red_flags": [],
+      "explanation": "Pesan ini wajar: tanpa tautan, tanpa permintaan data, dan justru mengingatkan agar tidak membagikan PIN. Menindaklanjutinya paling aman dari dalam aplikasi resmi.",
+      "teach": {
+        "tip": "Notifikasi keamanan yang asli selalu mengarahkan Anda ke aplikasi, bukan ke chat balasan.",
+        "verify_how": "Periksa daftar perangkat aktif di aplikasi dan ganti PIN bila ada perangkat yang tidak Anda kenali."
+      }
+    },
+    {
+      "id": "ew-006",
+      "type": "best_action",
+      "difficulty": "sulit",
+      "channel": "sms",
+      "sender": {
+        "name": "BankNusa",
+        "address": "0888-1020-3344"
+      },
+      "subject": null,
+      "datetime": "2026-10-29T22:31:00+07:00",
+      "body": "PEMBERITAHUAN: transfer Rp7.500.000 ke rekening 7712xxxx a/n ANDI sedang menunggu konfirmasi Anda. Batalkan sekarang dengan mengirim PIN Anda, atau hubungi 0888-1020-3344. Cek status: http://103.22.14.8/btl",
+      "link": {
+        "text": "cek status transfer",
+        "href": "http://103.22.14.8/btl"
+      },
+      "attachment": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "Kirim PIN lewat SMS supaya transfer dibatalkan"
+        },
+        {
+          "id": "B",
+          "text": "Telepon balik nomor 0888-1020-3344 untuk konfirmasi"
+        },
+        {
+          "id": "C",
+          "text": "Buka aplikasi BankNusa resmi atau telepon call center di belakang kartu ATM"
+        },
+        {
+          "id": "D",
+          "text": "Teruskan SMS ke grup keluarga agar semua waspada"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "C",
+      "red_flags": [
+        "PENGIRIM_TIDAK_WAJAR",
+        "MEMINTA_DATA_SENSITIF",
+        "LINK_MENCURIGAKAN",
+        "TEKANAN_WAKTU"
+      ],
+      "explanation": "Bank tidak pernah meminta PIN, dan nomor pengirim bukan nomor resmi BankNusa. Tautan memakai alamat IP mentah dengan http, ciri khas halaman pencuri data.",
+      "teach": {
+        "tip": "PIN hanya untuk Anda; petugas bank sungguhan tidak akan pernah menanyakannya.",
+        "verify_how": "Cek mutasi dari aplikasi resmi atau telepon nomor call center yang tercetak di kartu, bukan nomor dari pesan."
+      }
+    },
+    {
+      "id": "ew-007",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "whatsapp",
+      "sender": {
+        "name": "DompetKu",
+        "address": "+62 811-1500-2019"
+      },
+      "subject": null,
+      "datetime": "2026-11-02T11:02:00+07:00",
+      "body": "Halo Sari, pembayaran Rp150.000 ke TokoKilat berhasil. Saldo DompetKu Anda sekarang Rp412.500. Rincian transaksi tersedia di menu Riwayat pada aplikasi DompetKu.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Isinya hanya konfirmasi transaksi yang menyebut nama pemilik akun, tanpa tautan dan tanpa permintaan data. Semua tindak lanjut diarahkan ke aplikasi resmi.",
+      "teach": {
+        "tip": "Konfirmasi transaksi yang tenang dan tanpa tautan adalah pola pesan resmi.",
+        "verify_how": "Bandingkan nominal dan saldo di menu Riwayat aplikasi DompetKu setelah menerima pesan seperti ini."
+      }
+    },
+    {
+      "id": "ew-008",
+      "type": "spot_redflag",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": {
+        "name": "AsurKita",
+        "address": "cs@asurkita-polis.com"
+      },
+      "subject": "Polis Baru Anda Sudah Terbit",
+      "datetime": "2026-10-28T10:45:00+07:00",
+      "body": "Halo Bapak/Ibu,\n\nTerima kasih telah memperpanjang polis AsurKita. Nomor polis AS-2026-1188 sudah aktif per 1 November 2026 dengan masa berlaku 12 bulan. E-sertifikat terlampir; silakan simpan sebagai bukti kepesertaan.\n\nSalam,\nLayanan Nasabah AsurKita",
+      "link": null,
+      "attachment": {
+        "name": "polis-baru.pdf.exe",
+        "size_kb": 742
+      },
+      "options": [
+        {
+          "id": "A",
+          "text": "Alamat pengirim cs@asurkita-polis.com"
+        },
+        {
+          "id": "B",
+          "text": "Lampiran bernama polis-baru.pdf.exe"
+        },
+        {
+          "id": "C",
+          "text": "Sapaan \"Halo Bapak/Ibu\" tanpa nama lengkap"
+        },
+        {
+          "id": "D",
+          "text": "Nomor polis AS-2026-1188"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "B",
+      "red_flags": [
+        "LAMPIRAN_BERBAHAYA",
+        "DOMAIN_MIRIP",
+        "SAPAAN_GENERIK"
+      ],
+      "explanation": "Lampiran .pdf.exe adalah file program yang menyamar sebagai PDF; itulah bagian paling berbahaya. Domain asurkita-polis.com juga bukan asurkita.co.id, meski isi pesannya terlihat rapi.",
+      "teach": {
+        "tip": "Ekstensi ganda seperti .pdf.exe berarti file yang akan berjalan saat dibuka.",
+        "verify_how": "Jangan buka lampirannya; cek status polis lewat aplikasi atau call center AsurKita yang Anda hubungi sendiri."
+      }
+    },
+    {
+      "id": "ew-009",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "sms",
+      "sender": {
+        "name": "BankNusa",
+        "address": "0811-1000-7788"
+      },
+      "subject": null,
+      "datetime": "2026-11-02T06:30:00+07:00",
+      "body": "Kode OTP BankNusa Anda 482913. Berlaku 3 menit untuk transaksi Rp150.000. JANGAN bagikan kode ini kepada siapa pun, termasuk yang mengaku petugas BankNusa.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Pesan hanya mengirim kode milik pemain sendiri dan tidak meminta apa pun. Tidak ada tautan, dan peringatan agar kode tidak dibagikan justru tanda pesan resmi.",
+      "teach": {
+        "tip": "SMS OTP resmi memberi kode, bukan meminta kode.",
+        "verify_how": "Cocokkan transaksi dengan yang sedang Anda lakukan; jika tidak pernah bertransaksi, hubungi call center dari nomor di kartu."
+      }
+    },
+    {
+      "id": "ew-010",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": {
+        "name": "BankNusa Verifikasi",
+        "address": "layanan@verifikasi-nasabah.id"
+      },
+      "subject": "PEMBARUAN DATA NASABAH WAJIB SEBELUM 30 NOVEMBER!!!",
+      "datetime": "2026-10-27T16:12:00+07:00",
+      "body": "Assalamualaikum Bapak/Ibu Yang Terhormat,\n\nDengan hormat, kami dari bagian verifikasi nasabah menghimbau Bapak/Ibu untuk melakukan PEMBARUAN data guna kelancaran transaksi. Mohon kirimkan NIK, nomor kartu ATM, dan foto KTP Anda melalui form yang tersedia.\n\nForm pembaruan: http://verifikasi-nasabah.id/form\n\nTerima kasih atas kerja samanya.",
+      "link": {
+        "text": "verifikasi-nasabah.id/form",
+        "href": "http://verifikasi-nasabah.id/form"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "DOMAIN_PALSU",
+        "MEMINTA_DATA_SENSITIF",
+        "GRAMATIKA_AJANG",
+        "TEKANAN_WAKTU"
+      ],
+      "explanation": "Bank tidak pernah meminta NIK, nomor kartu, atau foto KTP melalui email dan form daring. Domain verifikasi-nasabah.id bukan domain BankNusa, dan gaya suratnya kaku dengan kapital berlebihan serta tenggat mendesak.",
+      "teach": {
+        "tip": "Pembaruan data selalu bisa dilakukan di kantor cabang atau aplikasi resmi, bukan lewat form email.",
+        "verify_how": "Datang ke cabang atau buka aplikasi BankNusa; jangan pernah mengunggah foto KTP ke tautan yang dikirim lewat pesan."
+      }
+    }
+  ]
+}

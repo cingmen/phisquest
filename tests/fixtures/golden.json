@@ -1,0 +1,552 @@
+{
+  "schema_version": "1.0",
+  "_note": "Kontrak uji golden web ↔ CLI (api-specification §9). Skenario didefinisikan sekali di 'scenarios'; kasus menjawab merujuk scenario_id. Field 'expected' wajib identik di engine.py dan engine.js.",
+  "scenarios": {
+    "g-001": {
+      "id": "g-001",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": { "name": "BankNusa", "address": "care@banknusa-secure.com" },
+      "subject": "Verifikasi akun",
+      "datetime": "2026-11-01T09:00:00+07:00",
+      "body": "Segera verifikasi akun Anda.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"],
+      "explanation": "Domain palsu dan tekanan waktu.",
+      "teach": { "tip": "Tutup pesannya.", "verify_how": "Buka aplikasi resmi." }
+    },
+    "g-002": {
+      "id": "g-002",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "sms",
+      "sender": { "name": "DompetKu", "address": "0811-1500-2019" },
+      "subject": null,
+      "datetime": "2026-11-01T09:05:00+07:00",
+      "body": "Pembayaran Anda berhasil.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Hanya konfirmasi transaksi.",
+      "teach": { "tip": "Cek riwayat.", "verify_how": "Buka aplikasi resmi." }
+    },
+    "g-003": {
+      "id": "g-003",
+      "type": "best_action",
+      "difficulty": "sedang",
+      "channel": "whatsapp",
+      "sender": { "name": "CS TokoKilat", "address": "0895-6600-1122" },
+      "subject": null,
+      "datetime": "2026-11-01T09:10:00+07:00",
+      "body": "Mohon balas kode OTP Anda.",
+      "link": null,
+      "attachment": null,
+      "options": [
+        { "id": "A", "text": "Balas kode OTP" },
+        { "id": "B", "text": "Minta OTP baru lalu kirim" },
+        { "id": "C", "text": "Jangan bagikan; cek aplikasi resmi" },
+        { "id": "D", "text": "Teruskan ke teman" }
+      ],
+      "is_phish": true,
+      "correct_option": "C",
+      "red_flags": ["MEMINTA_DATA_SENSITIF"],
+      "explanation": "OTP tidak boleh dibagikan.",
+      "teach": { "tip": "OTP hanya untuk Anda.", "verify_how": "Buka aplikasi resmi." }
+    },
+    "g-004": {
+      "id": "g-004",
+      "type": "best_action",
+      "difficulty": "sulit",
+      "channel": "sms",
+      "sender": { "name": "Admin HRD", "address": "0899-7712-3344" },
+      "subject": null,
+      "datetime": "2026-11-01T09:15:00+07:00",
+      "body": "Isi absensi lewat tautan ini.",
+      "link": null,
+      "attachment": null,
+      "options": [
+        { "id": "A", "text": "Buka tautan dan isi data" },
+        { "id": "B", "text": "Abaikan tautan; buka sistem absensi resmi" },
+        { "id": "C", "text": "Balas dengan nomor induk" },
+        { "id": "D", "text": "Teruskan ke rekan kerja" }
+      ],
+      "is_phish": true,
+      "correct_option": "B",
+      "red_flags": ["SALURAN_TIDAK_WAJAR", "LINK_MENCURIGAKAN"],
+      "explanation": "HRD tidak memakai tautan shortener.",
+      "teach": { "tip": "Pakai sistem resmi.", "verify_how": "Konfirmasi ke HRD." }
+    },
+    "g-005": {
+      "id": "g-005",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": { "name": "KargoCepat", "address": "cs@kargocepat-resmi.id" },
+      "subject": "Paket gagal diantar",
+      "datetime": "2026-11-01T09:20:00+07:00",
+      "body": "Konfirmasi alamat Anda.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": ["DOMAIN_MIRIP"],
+      "explanation": "Domain meniru nama resmi.",
+      "teach": { "tip": "Cek domain.", "verify_how": "Buka aplikasi resmi." }
+    },
+    "g-006": {
+      "id": "g-006",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": { "name": "AsurKita", "address": "klaim@asurkita-id.com" },
+      "subject": "Klaim premi",
+      "datetime": "2026-11-01T09:25:00+07:00",
+      "body": "Klaim pengembalian premi Anda.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": ["DOMAIN_PALSU"],
+      "explanation": "Domain bukan milik AsurKita.",
+      "teach": { "tip": "Cek domain.", "verify_how": "Hubungi call center." }
+    },
+    "g-007": {
+      "id": "g-007",
+      "type": "spot_redflag",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": { "name": "AsurKita", "address": "cs@asurkita-polis.com" },
+      "subject": "Polis baru",
+      "datetime": "2026-11-01T09:30:00+07:00",
+      "body": "Polis baru Anda terlampir.",
+      "link": null,
+      "attachment": { "name": "polis.pdf.exe", "size_kb": 742 },
+      "options": [
+        { "id": "A", "text": "Alamat pengirim" },
+        { "id": "B", "text": "Lampiran polis.pdf.exe" },
+        { "id": "C", "text": "Subjek email" },
+        { "id": "D", "text": "Sapaan" }
+      ],
+      "is_phish": true,
+      "correct_option": "B",
+      "red_flags": ["MEMINTA_DATA_SENSITIF"],
+      "explanation": "Lampiran berbahaya.",
+      "teach": { "tip": "Jangan buka lampiran.", "verify_how": "Cek aplikasi resmi." }
+    },
+    "g-008": {
+      "id": "g-008",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "sms",
+      "sender": { "name": "SIBANTAR", "address": "0815-3300-7712" },
+      "subject": null,
+      "datetime": "2026-11-01T09:35:00+07:00",
+      "body": "Data KTP Anda dinonaktifkan dalam 24 jam.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": ["TEKANAN_WAKTU"],
+      "explanation": "Tekanan waktu artifisial.",
+      "teach": { "tip": "Cek kanal resmi.", "verify_how": "Datang ke kantor layanan." }
+    },
+    "g-009": {
+      "id": "g-009",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": { "name": "BankNusa", "address": "layanan@verifikasi-nasabah.id" },
+      "subject": "PEMBARUAN DATA",
+      "datetime": "2026-11-01T09:40:00+07:00",
+      "body": "Kirim NIK dan foto KTP Anda.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": ["GRAMATIKA_AJANG"],
+      "explanation": "Gaya surat janggal.",
+      "teach": { "tip": "Jangan kirim KTP.", "verify_how": "Datang ke cabang." }
+    },
+    "g-010": {
+      "id": "g-010",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": { "name": "KampusNusantara", "address": "pengumuman@kampusnusantara.ac.id" },
+      "subject": "Kalender akademik",
+      "datetime": "2026-11-01T09:45:00+07:00",
+      "body": "Kalender akademik sudah terbit.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Pesan resmi tanpa permintaan data.",
+      "teach": { "tip": "Cek portal kampus.", "verify_how": "Buka portal resmi." }
+    }
+  },
+  "answer_cases": [
+    {
+      "name": "benar pertama kali",
+      "scenario_id": "g-001",
+      "option_id": "PHISH",
+      "progress": {
+        "total_xp": 0,
+        "current_streak": 0,
+        "counters": { "answered": 0, "correct": 0, "wrong": 0, "correct_redflag": {} },
+        "badges": {}
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 0,
+        "xp_gained": 10,
+        "streak_after": 1,
+        "badges_earned": ["first_catch"],
+        "level_up": null,
+        "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"]
+      }
+    },
+    {
+      "name": "salah memutus streak",
+      "scenario_id": "g-002",
+      "option_id": "PHISH",
+      "progress": {
+        "total_xp": 40,
+        "current_streak": 6,
+        "counters": { "answered": 10, "correct": 8, "wrong": 2, "correct_redflag": {} },
+        "badges": { "first_catch": "2026-10-30T10:00:00+07:00", "streak_5": "2026-10-30T10:05:00+07:00" }
+      },
+      "expected": {
+        "correct": false,
+        "xp_base": 0,
+        "xp_bonus": 0,
+        "xp_gained": 0,
+        "streak_after": 0,
+        "badges_earned": [],
+        "level_up": null,
+        "red_flags": []
+      }
+    },
+    {
+      "name": "best_action benar dengan bonus streak",
+      "scenario_id": "g-003",
+      "option_id": "C",
+      "progress": {
+        "total_xp": 30,
+        "current_streak": 4,
+        "counters": {
+          "answered": 6,
+          "correct": 5,
+          "wrong": 1,
+          "correct_redflag": { "MEMINTA_DATA_SENSITIF": 2 }
+        },
+        "badges": { "first_catch": "2026-10-30T10:00:00+07:00" }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 8,
+        "xp_gained": 18,
+        "streak_after": 5,
+        "badges_earned": ["streak_5"],
+        "level_up": null,
+        "red_flags": ["MEMINTA_DATA_SENSITIF"]
+      }
+    },
+    {
+      "name": "best_action salah",
+      "scenario_id": "g-004",
+      "option_id": "A",
+      "progress": {
+        "total_xp": 260,
+        "current_streak": 3,
+        "counters": { "answered": 20, "correct": 16, "wrong": 4, "correct_redflag": {} },
+        "badges": { "first_catch": "2026-10-30T10:00:00+07:00", "streak_5": "2026-10-30T10:05:00+07:00" }
+      },
+      "expected": {
+        "correct": false,
+        "xp_base": 0,
+        "xp_bonus": 0,
+        "xp_gained": 0,
+        "streak_after": 0,
+        "badges_earned": [],
+        "level_up": null,
+        "red_flags": ["SALURAN_TIDAK_WAJAR", "LINK_MENCURIGAKAN"]
+      }
+    },
+    {
+      "name": "tepat melewati ambang analis muda",
+      "scenario_id": "g-005",
+      "option_id": "PHISH",
+      "progress": {
+        "total_xp": 92,
+        "current_streak": 2,
+        "counters": {
+          "answered": 8,
+          "correct": 7,
+          "wrong": 1,
+          "correct_redflag": { "DOMAIN_MIRIP": 3, "DOMAIN_PALSU": 5 }
+        },
+        "badges": { "first_catch": "2026-10-30T10:00:00+07:00" }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 4,
+        "xp_gained": 14,
+        "streak_after": 3,
+        "badges_earned": [],
+        "level_up": "analis_muda",
+        "red_flags": ["DOMAIN_MIRIP"]
+      }
+    },
+    {
+      "name": "domain guard tepat di ambang sepuluh",
+      "scenario_id": "g-006",
+      "option_id": "PHISH",
+      "progress": {
+        "total_xp": 300,
+        "current_streak": 0,
+        "counters": {
+          "answered": 20,
+          "correct": 18,
+          "wrong": 2,
+          "correct_redflag": { "DOMAIN_PALSU": 6, "DOMAIN_MIRIP": 3 }
+        },
+        "badges": {
+          "first_catch": "2026-10-30T10:00:00+07:00",
+          "streak_5": "2026-10-30T10:05:00+07:00",
+          "streak_10": "2026-10-30T10:10:00+07:00"
+        }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 0,
+        "xp_gained": 10,
+        "streak_after": 1,
+        "badges_earned": ["domain_guard"],
+        "level_up": null,
+        "red_flags": ["DOMAIN_PALSU"]
+      }
+    },
+    {
+      "name": "otp guard tepat di ambang lima",
+      "scenario_id": "g-007",
+      "option_id": "B",
+      "progress": {
+        "total_xp": 200,
+        "current_streak": 1,
+        "counters": {
+          "answered": 15,
+          "correct": 12,
+          "wrong": 3,
+          "correct_redflag": { "MEMINTA_DATA_SENSITIF": 4 }
+        },
+        "badges": { "first_catch": "2026-10-30T10:00:00+07:00", "streak_5": "2026-10-30T10:05:00+07:00" }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 2,
+        "xp_gained": 12,
+        "streak_after": 2,
+        "badges_earned": ["otp_guard"],
+        "level_up": null,
+        "red_flags": ["MEMINTA_DATA_SENSITIF"]
+      }
+    },
+    {
+      "name": "streak sepuluh dan urgency guard bersamaan",
+      "scenario_id": "g-008",
+      "option_id": "PHISH",
+      "progress": {
+        "total_xp": 500,
+        "current_streak": 9,
+        "counters": {
+          "answered": 30,
+          "correct": 26,
+          "wrong": 4,
+          "correct_redflag": { "TEKANAN_WAKTU": 4 }
+        },
+        "badges": {
+          "first_catch": "2026-10-30T10:00:00+07:00",
+          "streak_5": "2026-10-30T10:05:00+07:00",
+          "domain_guard": "2026-10-30T10:10:00+07:00",
+          "level_detective": "2026-10-30T10:15:00+07:00"
+        }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 10,
+        "xp_gained": 20,
+        "streak_after": 10,
+        "badges_earned": ["streak_10", "urgency_guard"],
+        "level_up": null,
+        "red_flags": ["TEKANAN_WAKTU"]
+      }
+    },
+    {
+      "name": "naik ke phishhunter dari 649 XP",
+      "scenario_id": "g-009",
+      "option_id": "PHISH",
+      "progress": {
+        "total_xp": 649,
+        "current_streak": 0,
+        "counters": { "answered": 40, "correct": 38, "wrong": 2, "correct_redflag": {} },
+        "badges": {
+          "first_catch": "2026-10-30T10:00:00+07:00",
+          "level_detective": "2026-10-30T10:15:00+07:00"
+        }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 0,
+        "xp_gained": 10,
+        "streak_after": 1,
+        "badges_earned": [],
+        "level_up": "phishhunter",
+        "red_flags": ["GRAMATIKA_AJANG"]
+      }
+    },
+    {
+      "name": "pesan legit dinilai benar",
+      "scenario_id": "g-010",
+      "option_id": "LEGIT",
+      "progress": {
+        "total_xp": 100,
+        "current_streak": 0,
+        "counters": { "answered": 11, "correct": 9, "wrong": 2, "correct_redflag": {} },
+        "badges": { "first_catch": "2026-10-30T10:00:00+07:00" }
+      },
+      "expected": {
+        "correct": true,
+        "xp_base": 10,
+        "xp_bonus": 0,
+        "xp_gained": 10,
+        "streak_after": 1,
+        "badges_earned": [],
+        "level_up": null,
+        "red_flags": []
+      }
+    }
+  ],
+  "session_cases": [
+    {
+      "name": "tiga soal benar beruntun",
+      "pack_id": "golden",
+      "scenario_ids": ["g-001", "g-003", "g-010"],
+      "seed": 7,
+      "count": 3,
+      "progress": {
+        "total_xp": 0,
+        "current_streak": 0,
+        "counters": { "answered": 0, "correct": 0, "wrong": 0, "correct_redflag": {} },
+        "badges": {}
+      },
+      "answers": { "g-010": "LEGIT", "g-001": "PHISH", "g-003": "C" },
+      "expected_order": ["g-010", "g-001", "g-003"],
+      "expected": {
+        "pack_id": "golden",
+        "score": 36,
+        "max_score": 30,
+        "accuracy": 1.0,
+        "xp_gained": 36,
+        "best_streak_in_session": 3,
+        "badges_earned": ["first_catch", "perfect_pack"],
+        "level_before": "amatir",
+        "level_after": "amatir",
+        "mistakes": [],
+        "recovered": false
+      }
+    },
+    {
+      "name": "empat benar satu salah",
+      "pack_id": "golden",
+      "scenario_ids": ["g-002", "g-004", "g-006", "g-008", "g-009"],
+      "seed": 11,
+      "count": 5,
+      "progress": {
+        "total_xp": 80,
+        "current_streak": 0,
+        "counters": { "answered": 10, "correct": 9, "wrong": 1, "correct_redflag": {} },
+        "badges": {}
+      },
+      "answers": {
+        "g-002": "LEGIT",
+        "g-004": "B",
+        "g-006": "PHISH",
+        "g-008": "LEGIT",
+        "g-009": "PHISH"
+      },
+      "expected_order": ["g-006", "g-002", "g-009", "g-004", "g-008"],
+      "expected": {
+        "pack_id": "golden",
+        "score": 52,
+        "max_score": 50,
+        "accuracy": 0.8,
+        "xp_gained": 52,
+        "best_streak_in_session": 4,
+        "badges_earned": ["first_catch"],
+        "level_before": "amatir",
+        "level_after": "analis_muda",
+        "mistakes": [{ "scenario_id": "g-008", "chosen": "LEGIT", "correct_answer": "PHISH" }],
+        "recovered": false
+      }
+    },
+    {
+      "name": "tiga salah lalu bangkit",
+      "pack_id": "golden",
+      "scenario_ids": ["g-002", "g-004", "g-006", "g-008", "g-009"],
+      "seed": 3,
+      "count": 5,
+      "progress": {
+        "total_xp": 0,
+        "current_streak": 0,
+        "counters": { "answered": 0, "correct": 0, "wrong": 0, "correct_redflag": {} },
+        "badges": {}
+      },
+      "answers": {
+        "g-004": "A",
+        "g-009": "LEGIT",
+        "g-008": "LEGIT",
+        "g-002": "LEGIT",
+        "g-006": "PHISH"
+      },
+      "expected_order": ["g-004", "g-009", "g-008", "g-002", "g-006"],
+      "expected": {
+        "pack_id": "golden",
+        "score": 22,
+        "max_score": 50,
+        "accuracy": 0.4,
+        "xp_gained": 22,
+        "best_streak_in_session": 2,
+        "badges_earned": ["first_catch", "comeback"],
+        "level_before": "amatir",
+        "level_after": "amatir",
+        "mistakes": [
+          { "scenario_id": "g-004", "chosen": "A", "correct_answer": "B" },
+          { "scenario_id": "g-009", "chosen": "LEGIT", "correct_answer": "PHISH" },
+          { "scenario_id": "g-008", "chosen": "LEGIT", "correct_answer": "PHISH" }
+        ],
+        "recovered": true
+      }
+    }
+  ]
+}

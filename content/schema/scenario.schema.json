@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phishquest.example/content/schema/scenario.schema.json",
+  "title": "PhishQuest Scenario",
+  "description": "Satu skenario simulasi phishing edukatif. Field tambahan yang tidak dikenal diabaikan (toleran-ke-depan, schema_version MINOR).",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "difficulty",
+    "channel",
+    "sender",
+    "datetime",
+    "body",
+    "red_flags",
+    "explanation",
+    "teach"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(ew|of|sc|cg)-[0-9]{3}$",
+      "description": "Unik global: prefix 2 huruf pack + 3 digit."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["phish_or_legit", "best_action", "spot_redflag"]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["mudah", "sedang", "sulit"]
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["email", "sms", "whatsapp"]
+    },
+    "sender": {
+      "type": "object",
+      "required": ["name", "address"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "address": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Alamat email untuk kanal email; nomor telepon untuk SMS/WhatsApp."
+        }
+      }
+    },
+    "subject": {
+      "type": ["string", "null"],
+      "description": "Subjek email; null untuk SMS/WhatsApp."
+    },
+    "datetime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\+07:00$"
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 900
+    },
+    "link": {
+      "type": ["object", "null"],
+      "required": ["text", "href"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "href": { "type": "string", "minLength": 1 }
+      }
+    },
+    "attachment": {
+      "type": ["object", "null"],
+      "required": ["name", "size_kb"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "size_kb": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "options": {
+      "type": ["array", "null"],
+      "minItems": 3,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-D]$" },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "is_phish": {
+      "type": "boolean",
+      "description": "Wajib untuk phish_or_legit dan best_action; opsional (default true) untuk spot_redflag."
+    },
+    "correct_option": {
+      "type": "string",
+      "pattern": "^[A-D]$",
+      "description": "Wajib untuk best_action dan spot_redflag."
+    },
+    "red_flags": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/redFlag" },
+      "uniqueItems": true,
+      "maxItems": 5
+    },
+    "explanation": { "type": "string", "minLength": 1 },
+    "teach": {
+      "type": "object",
+      "required": ["tip", "verify_how"],
+      "properties": {
+        "tip": { "type": "string", "minLength": 1 },
+        "verify_how": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "phish_or_legit" } } },
+      "then": {
+        "required": ["is_phish", "subject"],
+        "properties": { "options": { "type": "null" } }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "enum": ["best_action", "spot_redflag"] } } },
+      "then": {
+        "required": ["options", "correct_option"],
+        "properties": { "options": { "type": "array", "minItems": 3, "maxItems": 4 } }
+      }
+    },
+    {
+      "if": { "required": ["is_phish"], "properties": { "is_phish": { "const": true } } },
+      "then": { "properties": { "red_flags": { "minItems": 2, "maxItems": 5 } } }
+    },
+    {
+      "if": { "required": ["is_phish"], "properties": { "is_phish": { "const": false } } },
+      "then": { "properties": { "red_flags": { "maxItems": 0 } } }
+    }
+  ],
+  "$defs": {
+    "redFlag": {
+      "type": "string",
+      "enum": [
+        "PENGIRIM_TIDAK_WAJAR",
+        "DOMAIN_PALSU",
+        "DOMAIN_MIRIP",
+        "TEKANAN_WAKTU",
+        "ANCAMAN",
+        "IMBALAN_BERLEBIHAN",
+        "MEMINTA_DATA_SENSITIF",
+        "LINK_MENCURIGAKAN",
+        "LAMPIRAN_BERBAHAYA",
+        "GRAMATIKA_AJANG",
+        "SAPAAN_GENERIK",
+        "SALURAN_TIDAK_WAJAR"
+      ]
+    }
+  }
+}

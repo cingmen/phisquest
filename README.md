@@ -1,0 +1,122 @@
+# 🎣 PhishQuest
+
+> **Kenali umpan sebelum kamu terhook.**
+
+PhishQuest adalah game edukasi anti-phishing berbahasa Indonesia. Pemain membaca pesan
+yang meniru email, SMS, dan WhatsApp — transaksi bank mencurigakan, paket tertahan,
+undangan beasiswa — lalu memutuskan apakah pesan itu **phishing atau legit**, memilih
+**tindakan terbaik**, atau menunjuk **red flag** yang paling mencurigakan.
+
+Setiap jawaban mendapat umpan balik seketika (penjelasan red flag + cara verifikasi),
+plus XP, streak, level, dan lencana. Satu sumber konten JSON dipakai dua antarmuka:
+**web statis** (tanpa build step) dan **CLI Python** (Rich).
+
+[English version](README.en.md) · [PRD](docs/PRD.md) · [API](docs/api-specification.md) ·
+[Skema data](docs/database-schema.md) · [Rencana implementasi](docs/implementation-plan.md)
+
+---
+
+## Cara main
+
+### Web (tanpa install)
+
+```bash
+python -m http.server 8000
+# buka http://localhost:8000/web/
+```
+
+Web hanya butuh HTML/CSS/JS murni: tidak ada framework, tidak ada bundler, tidak ada
+dependensi JavaScript eksternal (hanya Google Fonts). Untuk GitHub Pages, workflow
+`.github/workflows/pages.yml` menyalin `web/` + `content/` lalu menerbitkannya otomatis
+saat push ke `main`.
+
+### CLI
+
+```bash
+pipx install ./cli        # atau: pip install ./cli
+phishquest                # menu interaktif
+phishquest play --pack ewallet-bank
+phishquest play --jumlah 5 --difficulty sulit --seed 42
+phishquest stats
+phishquest badges
+phishquest export cadangan.json
+phishquest reset --yes
+```
+
+Progres CLI tersimpan di `~/.phishquest/progress.json` (tulis atomik). Tidak ada data
+yang dikirim ke jaringan.
+
+## Pack konten
+
+| Pack | Emoji | Isi | Skenario |
+|------|-------|-----|----------|
+| `ewallet-bank` | 🏦 | E-Wallet & Bank | 10 |
+| `office` | 🏢 | Kehidupan Kantor | 10 |
+| `shopping-courier` | 📦 | Belanja & Kurir | 10 |
+| `campus-gov` | 🎓 | Kampus & Pemerintahan | 10 |
+
+Empat puluh skenario, semua bahasa Indonesia, dengan 12 jenis red flag dan brand fiktif
+(BankNusa, DompetKu, TokoKilat, KargoCepat, KampusNusantara, SIBANTAR, AsurKita,
+LapakRia).
+
+## Aturan skor
+
+| Komponen | Nilai |
+|----------|-------|
+| Jawaban benar | +10 XP |
+| Bonus streak | +2 × (streak−1), maks +10 |
+| Jawaban salah | 0 XP, streak kembali 0 |
+| Level | Amatir 0 · Analis Muda 100 · Analis 250 · Detektif 450 · PhishHunter 650 |
+| Lencana | 10 lencana (lihat tab **Lencana**) |
+
+Streak, XP, dan lencana dihitung di engine (`cli/src/phishquest/engine.py` dan
+`web/js/engine.js`) — UI tidak pernah menghitung sendiri.
+
+## Struktur repo
+
+```text
+content/     satu-satunya sumber skenario (manifest, schema, 4 pack JSON)
+web/         aplikasi statis: index.html, css/, js/, test/, assets/
+cli/         paket Python `phishquest` (pyproject.toml, src/phishquest/)
+tests/       test pytest + fixtures/golden.json (kontrak web ↔ CLI)
+scripts/     validate_content.py (dijalankan CI)
+docs/        PRD, API, skema database, rencana implementasi, aturan kode
+```
+
+## Pengembangan
+
+Prasyarat: Python ≥ 3.10, Node ≥ 22 (hanya untuk test engine JS).
+
+```bash
+python scripts/validate_content.py content/         # validator konten
+pip install -e "cli/[test]"                          # paket + pytest
+ruff check --config cli/pyproject.toml cli/ scripts/ tests/
+python -m pytest tests/                              # unit + golden test Python
+node --test web/test/*.test.js                       # golden test JavaScript
+```
+
+`tests/fixtures/golden.json` dipakai **kedua** bahasa; nilai `expected` harus identik di
+`engine.py` dan `engine.js`. Golden test inilah yang mencegah aturan main bercabang.
+
+## Kontribusi konten
+
+1. Ubah atau tambah skenario di `content/packs/*.json` mengikuti
+   `content/schema/scenario.schema.json`.
+2. Gunakan brand fiktif dari whitelist (`docs/coding-rules.md` §6.2). Domain phishing
+   harus jelas palsu dan tidak boleh menyentuh domain resmi whitelist.
+3. Jalankan `python scripts/validate_content.py content/` — semua temuan `ERROR` wajib nol.
+4. Buka pull request; CI menjalankan lint, test, golden test, dan validasi konten.
+
+Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redflag`,
+3 mudah/4 sedang/3 sulit, dan keseimbangan 6 phishing : 4 legit.
+
+## Etika & legal
+
+> PhishQuest adalah simulasi edukasi. Semua email, brand, dan domain di dalamnya fiktif.
+> Tidak ada data yang dikumpulkan.
+
+- Tidak mengirim email/SMS/WhatsApp sungguhan dan tidak memanen kredensial.
+- Tidak ada akun, email, cookie pelacak, atau analytics; progres tersimpan lokal.
+- Konten hanya untuk mengenali pola penipuan — bukan template untuk membuat phishing.
+- Dirilis dengan lisensi [MIT](LICENSE), selaras semangat UU ITE dan UU PDP No. 27/2022
+  (data minimization, tanpa transfer data keluar perangkat).

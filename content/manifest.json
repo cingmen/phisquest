@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "packs": [
+    {
+      "pack_id": "ewallet-bank",
+      "file": "packs/ewallet-bank.json",
+      "name": "E-Wallet & Bank",
+      "emoji": "🏦",
+      "scenario_count": 10
+    },
+    {
+      "pack_id": "office",
+      "file": "packs/office.json",
+      "name": "Kehidupan Kantor",
+      "emoji": "🏢",
+      "scenario_count": 10
+    },
+    {
+      "pack_id": "shopping-courier",
+      "file": "packs/shopping-courier.json",
+      "name": "Belanja & Kurir",
+      "emoji": "📦",
+      "scenario_count": 10
+    },
+    {
+      "pack_id": "campus-gov",
+      "file": "packs/campus-gov.json",
+      "name": "Kampus & Pemerintahan",
+      "emoji": "🎓",
+      "scenario_count": 10
+    }
+  ]
+}
