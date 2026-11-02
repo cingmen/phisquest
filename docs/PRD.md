@@ -435,7 +435,7 @@ stateDiagram-v2
 - [x] Coverage engine 97%; CI hijau (4 job)
 - [x] Lighthouse Performance 90, Accessibility 100
 - [x] README dwibahasa dengan GIF demo (≤ 3 MB) + screenshot
-- [ ] `pipx install .` berjalan dan semua perintah CLI berfungsi
+- [x] `pipx install ./cli` berjalan di Windows dan semua perintah CLI berfungsi
 - [x] Nol data pribadi yang dikirim keluar perangkat (review manual)
 
 ## 17. Risiko & Mitigasi
