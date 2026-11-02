@@ -238,19 +238,19 @@ Konten **wajib** memakai brand fiktif dari tabel ini (tambahan brand = revisi do
 
 | Brand | Peran | Domain resmi (untuk pesan legit) |
 |-------|-------|----------------------------------|
-| **BankNusa** | Bank | `banknusa.co.id` |
-| **DompetKu** | E-wallet | `dompetku.id` |
-| **TokoKilat** | E-commerce | `tokokilat.co.id` |
-| **KargoCepat** | Logistik/kurir | `kargocepat.id` |
-| **KampusNusantara** | Universitas | `kampusnusantara.ac.id` |
-| **SIBANTAR** | Lembaga siber pemerintah (fiktif) | `sibantar.go.id` |
-| **AsurKita** | Asuransi | `asurkita.co.id` |
-| **LapakRia** | Marketplace UMKM | `lapakria.id` |
+| **BankNusa** | Bank | `banknusa.example` |
+| **DompetKu** | E-wallet | `dompetku.example` |
+| **TokoKilat** | E-commerce | `tokokilat.example` |
+| **KargoCepat** | Logistik/kurir | `kargocepat.example` |
+| **KampusNusantara** | Universitas | `kampusnusantara.example` |
+| **SIBANTAR** | Lembaga siber pemerintah (fiktif) | `sibantar.example` |
+| **AsurKita** | Asuransi | `asurkita.example` |
+| **LapakRia** | Marketplace UMKM | `lapakria.example` |
 
 Aturan domain:
 
 1. Pesan **legit** hanya boleh berlink ke domain whitelist di atas.
-2. Pesan **phishing** harus memakai domain jelas-jelas palsu — pola aman: hyphen/sufiks aneh/TLD murahan (`banknusa-secure.com`, `dompetku-kyc.top`, `kargocepat-resi.xyz`).
+2. Pesan **phishing** harus memakai domain jelas-jelas palsu — pola aman: hyphen/sufiks aneh/TLD murahan (`banknusa-secure.example`, `dompetku-kyc.example`, `kargocepat-resi.example`).
 3. Nama layanan shortener nyata (`bit.ly`, `s.id`) boleh sebagai **teks** karena tidak mengarah ke mana pun.
 4. Nama instansi nyata (Dukcapil, bank nyata, dll.) **tidak boleh** jadi pengirim; boleh disebut umum di `teach` ("pihak bank mana pun tidak pernah meminta OTP").
 5. Sebelum rilis: kunjugsi manual semua domain contoh — wajib tidak aktif.

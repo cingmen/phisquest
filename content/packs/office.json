@@ -44,7 +44,7 @@
       "channel": "email",
       "sender": {
         "name": "KargoCepat Billing",
-        "address": "billing@kargocepat-tagihan.xyz"
+        "address": "billing@kargocepat-tagihan.example"
       },
       "subject": "Revisi Nomor Rekening Invoice KC-2026-8841 - Pembayaran Ditunda",
       "datetime": "2026-10-30T09:48:00+07:00",
@@ -76,7 +76,7 @@
         "PENGIRIM_TIDAK_WAJAR",
         "TEKANAN_WAKTU"
       ],
-      "explanation": "Domain kargocepat-tagihan.xyz bukan domain resmi kargocepat.id, dan perubahan rekening lewat email adalah pola penipuan invoice klasik. Jangan pernah memverifikasi lewat email balasan—penipu mengendalikan alamat itu.",
+      "explanation": "Domain kargocepat-tagihan.example bukan domain resmi kargocepat.example, dan perubahan rekening lewat email adalah pola penipuan invoice klasik. Jangan pernah memverifikasi lewat email balasan—penipu mengendalikan alamat itu.",
       "teach": {
         "tip": "Perubahan nomor rekening wajib dikonfirmasi melalui telepon ke nomor vendor yang sudah Anda catat sebelumnya.",
         "verify_how": "Hubungi bagian keuangan KargoCepat dari kontrak atau situs resmi, lalu minta konfirmasi tertulis sebelum transfer."
@@ -142,21 +142,21 @@
       "channel": "email",
       "sender": {
         "name": "BankNusa Payroll",
-        "address": "noreply@banknusa.co.id"
+        "address": "noreply@banknusa.example"
       },
       "subject": "Slip Gaji Karyawan Oktober 2026 Telah Tersedia",
       "datetime": "2026-10-31T16:00:00+07:00",
-      "body": "Halo Budi,\n\nPayroll kantor Anda sudah diproses untuk periode Oktober 2026. Slip gaji bisa diunduh setelah Anda masuk ke portal payroll lewat aplikasi BankNusa.\n\nDetail: https://banknusa.co.id/payroll\n\nPesan ini tidak meminta kata sandi, PIN, atau kode OTP Anda.\n\nBankNusa",
+      "body": "Halo Budi,\n\nPayroll kantor Anda sudah diproses untuk periode Oktober 2026. Slip gaji bisa diunduh setelah Anda masuk ke portal payroll lewat aplikasi BankNusa.\n\nDetail: https://banknusa.example/payroll\n\nPesan ini tidak meminta kata sandi, PIN, atau kode OTP Anda.\n\nBankNusa",
       "link": {
-        "text": "banknusa.co.id/payroll",
-        "href": "https://banknusa.co.id/payroll"
+        "text": "banknusa.example/payroll",
+        "href": "https://banknusa.example/payroll"
       },
       "attachment": null,
       "options": null,
       "is_phish": false,
       "correct_option": null,
       "red_flags": [],
-      "explanation": "Domain pengirim dan tautan sama-sama banknusa.co.id dengan https. Pesan menyebut nama penerima, tidak meminta data sensitif, dan justru menegaskan hal itu.",
+      "explanation": "Domain pengirim dan tautan sama-sama banknusa.example dengan https. Pesan menyebut nama penerima, tidak meminta data sensitif, dan justru menegaskan hal itu.",
       "teach": {
         "tip": "Pesan gaji yang resmi tidak pernah meminta kata sandi atau OTP.",
         "verify_how": "Unduh slip gaji dari aplikasi atau portal payroll resmi, bukan dari tautan pesan yang tidak Anda kenali."
@@ -169,7 +169,7 @@
       "channel": "email",
       "sender": {
         "name": "LapakRia Dokumen",
-        "address": "dokumen@lapakria-share.com"
+        "address": "dokumen@lapakria-share.example"
       },
       "subject": "Daftar Hadir Rapat Koordinasi November",
       "datetime": "2026-10-29T11:20:00+07:00",
@@ -204,7 +204,7 @@
         "DOMAIN_MIRIP",
         "SAPAAN_GENERIK"
       ],
-      "explanation": "Lampiran .html yang harus dibuka di peramban bisa menjalankan skrip pencuri sesi; dokumen rapat normalnya PDF. Domain lapakria-share.com bukan lapakria.id, dan pesannya tidak menyebut nama penerima.",
+      "explanation": "Lampiran .html yang harus dibuka di peramban bisa menjalankan skrip pencuri sesi; dokumen rapat normalnya PDF. Domain lapakria-share.example bukan lapakria.example, dan pesannya tidak menyebut nama penerima.",
       "teach": {
         "tip": "Dokumen kantor tidak pernah berbentuk .html, .js, atau .exe.",
         "verify_how": "Minta ulang berkasnya lewat kanal internal kantor dan buka hanya dari penyimpanan resmi perusahaan."
@@ -217,21 +217,21 @@
       "channel": "email",
       "sender": {
         "name": "AsurKita Korporat",
-        "address": "korporat@asurkita.co.id"
+        "address": "korporat@asurkita.example"
       },
       "subject": "Ringkasan Manfaat Asuransi Kesehatan Karyawan 2027",
       "datetime": "2026-10-28T09:30:00+07:00",
-      "body": "Halo Budi,\n\nTerlampir ringkasan manfaat asuransi kesehatan karyawan untuk periode 2027, termasuk batas rawat inap dan layanan gigi. Tidak ada tindakan yang perlu Anda lakukan sekarang; rincian lengkap tersedia di https://asurkita.co.id/klaim setelah Anda masuk dengan akun kantor.\n\nSalam,\nAsurKita Korporat",
+      "body": "Halo Budi,\n\nTerlampir ringkasan manfaat asuransi kesehatan karyawan untuk periode 2027, termasuk batas rawat inap dan layanan gigi. Tidak ada tindakan yang perlu Anda lakukan sekarang; rincian lengkap tersedia di https://asurkita.example/klaim setelah Anda masuk dengan akun kantor.\n\nSalam,\nAsurKita Korporat",
       "link": {
-        "text": "asurkita.co.id/klaim",
-        "href": "https://asurkita.co.id/klaim"
+        "text": "asurkita.example/klaim",
+        "href": "https://asurkita.example/klaim"
       },
       "attachment": null,
       "options": null,
       "is_phish": false,
       "correct_option": null,
       "red_flags": [],
-      "explanation": "Domain pengirim dan tautan cocok dengan asurkita.co.id, dan tidak ada permintaan data maupun tenggat mendesak. Pesan yang menyebut nama penerima dan menyatakan tidak perlu tindakan adalah pola informasi resmi.",
+      "explanation": "Domain pengirim dan tautan cocok dengan asurkita.example, dan tidak ada permintaan data maupun tenggat mendesak. Pesan yang menyebut nama penerima dan menyatakan tidak perlu tindakan adalah pola informasi resmi.",
       "teach": {
         "tip": "Informasi manfaat asuransi tidak memerlukan data pribadi Anda lewat email.",
         "verify_how": "Masuk ke portal asuransi korporat kantor untuk melihat rincian manfaat, bukan lewat tautan yang tidak dikenal."
@@ -321,10 +321,10 @@
       },
       "subject": null,
       "datetime": "2026-10-30T19:40:00+07:00",
-      "body": "Nasabah Yth, rekening payroll kantor Anda akan dipindahkan ke kantor cabang baru. Konfirmasi data rekening dalam 1x24 jam atau gaji karyawan tidak dapat diproses bulan ini. Konfirmasi: http://banknusa-payroll.biz/ubah",
+      "body": "Nasabah Yth, rekening payroll kantor Anda akan dipindahkan ke kantor cabang baru. Konfirmasi data rekening dalam 1x24 jam atau gaji karyawan tidak dapat diproses bulan ini. Konfirmasi: http://banknusa-payroll.example/ubah",
       "link": {
-        "text": "banknusa-payroll.biz/ubah",
-        "href": "http://banknusa-payroll.biz/ubah"
+        "text": "banknusa-payroll.example/ubah",
+        "href": "http://banknusa-payroll.example/ubah"
       },
       "attachment": null,
       "options": null,
@@ -336,7 +336,7 @@
         "ANCAMAN",
         "SALURAN_TIDAK_WAJAR"
       ],
-      "explanation": "Bank tidak memindahkan rekening payroll lewat SMS dengan tautan dan tenggat 24 jam. Domain banknusa-payroll.biz bukan banknusa.co.id, dan pesan mengancam gaji tidak diproses agar korban bertindak cepat.",
+      "explanation": "Bank tidak memindahkan rekening payroll lewat SMS dengan tautan dan tenggat 24 jam. Domain banknusa-payroll.example bukan banknusa.example, dan pesan mengancam gaji tidak diproses agar korban bertindak cepat.",
       "teach": {
         "tip": "Perubahan rekening payroll hanya sah bila disampaikan lewat kanal resmi bank dan bagian keuangan kantor.",
         "verify_how": "Tanyakan ke bagian keuangan kantor dan cek mutasi di aplikasi BankNusa resmi, bukan lewat tautan SMS."

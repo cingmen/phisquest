@@ -103,7 +103,7 @@ Setiap putaran loop memakan waktu 30–60 detik; satu sesi (10 soal) selesai dal
 
 | Tipe | `type` | Cara menjawab | Contoh |
 |------|--------|---------------|--------|
-| Phishing atau Legit | `phish_or_legit` | Pilih **Phishing** 🎣 atau **Legit** ✅ | Email "akun akan diblokir 1×24 jam" dari `banknusa-secure.com` |
+| Phishing atau Legit | `phish_or_legit` | Pilih **Phishing** 🎣 atau **Legit** ✅ | Email "akun akan diblokir 1×24 jam" dari `banknusa-secure.example` |
 | Tindakan Terbaik | `best_action` | Pilih 1 dari 3–4 opsi tindakan | SMS Dukcapil palsu minta cek data via link → pilih "abaikan, verifikasi via kanal resmi" |
 | Temukan Red Flag | `spot_redflag` | Pilih 1 bagian pesan yang paling mencurigakan | Lampiran `invoice.pdf.exe` di antara bagian lain yang wajar |
 
@@ -217,7 +217,7 @@ Struktur field lengkap ada di `api-specification.md` §3. Ringkas: setiap skenar
 ### 9.3 Aturan Konten
 
 1. **Brand fiktif saja** — gunakan whitelist di `coding-rules.md` §6 (BankNusa, DompetKu, TokoKilat, KargoCepat, dst.). Nama brand nyata hanya boleh muncul di `teach` sebagai penjelasan umum ("pihak bank mana pun tidak pernah meminta OTP").
-2. **Domain penipu jelas-jelas palsu** (mis. `banknusa-secure.com`, `dompetku-kyc.top`) dan **tidak boleh** sama dengan domain resmi whitelist; nama layanan shortener nyata (mis. `bit.ly`) boleh karena tidak mengarah ke mana pun.
+2. **Domain penipu jelas-jelas palsu** (mis. `banknusa-secure.example`, `dompetku-kyc.example`) dan **tidak boleh** sama dengan domain resmi whitelist; nama layanan shortener nyata (mis. `bit.ly`) boleh karena tidak mengarah ke mana pun.
 3. Setiap skenario phishing memiliki **2–5 red flag**; skenario legit memiliki **0 red flag** (divalidasi otomatis).
 4. Isi pesan maksimal ±120 kata; `explanation` maksimal 3 kalimat; `teach.tip` satu kalimat padat.
 5. Bahasa Indonesia baku tapi natural — termasuk meniru gaya bahasa penipuan sungguhan (huruf kapital berlebihan, dsb.) karena itu bagian dari red flag `GRAMATIKA_AJANG`.
@@ -241,15 +241,15 @@ Struktur field lengkap ada di `api-specification.md` §3. Ringkas: setiap skenar
   "type": "phish_or_legit",
   "difficulty": "mudah",
   "channel": "email",
-  "sender": { "name": "BankNusa Care", "address": "care@banknusa-secure.com" },
+  "sender": { "name": "BankNusa Care", "address": "care@banknusa-secure.example" },
   "subject": "⚠️ Transaksi Mencurigakan Rp2.400.000 - Akun Akan Diblokir",
   "datetime": "2026-11-02T09:15:00+07:00",
-  "body": "Yth Pelanggan Yth,\n\nKami mendeteksi transaksi mencurigakan sebesar Rp2.400.000 pada rekening Anda. Segera verifikasi identitas Anda dalam 1x24 JAM atau akun Anda akan DIBLOKIR PERMANEN dan denda Rp500.000 akan dikenakan.\n\nVerifikasi sekarang: http://banknusa-secure.com/verifikasi\n\nHormat kami,\nTim Keamanan BankNusa",
-  "link": { "text": "banknusa-secure.com/verifikasi", "href": "http://banknusa-secure.com/verifikasi" },
+  "body": "Yth Pelanggan Yth,\n\nKami mendeteksi transaksi mencurigakan sebesar Rp2.400.000 pada rekening Anda. Segera verifikasi identitas Anda dalam 1x24 JAM atau akun Anda akan DIBLOKIR PERMANEN dan denda Rp500.000 akan dikenakan.\n\nVerifikasi sekarang: http://banknusa-secure.example/verifikasi\n\nHormat kami,\nTim Keamanan BankNusa",
+  "link": { "text": "banknusa-secure.example/verifikasi", "href": "http://banknusa-secure.example/verifikasi" },
   "attachment": null,
   "is_phish": true,
   "red_flags": ["DOMAIN_MIRIP", "TEKANAN_WAKTU", "ANCAMAN", "SAPAAN_GENERIK", "LINK_MENCURIGAKAN"],
-  "explanation": "Domain asli BankNusa adalah banknusa.co.id, bukan banknusa-secure.com. Batas waktu 1×24 jam dan ancaman denda adalah tekanan klasik agar korban panik. Tautan memakai http, bukan https.",
+  "explanation": "Domain asli BankNusa adalah banknusa.example, bukan banknusa-secure.example. Batas waktu 1×24 jam dan ancaman denda adalah tekanan klasik agar korban panik. Tautan memakai http, bukan https.",
   "teach": {
     "tip": "Email mengurus masalah rekening selalu bisa ditunda: tutup, lalu buka aplikasi m-banking resmi atau hubungi call center.",
     "verify_how": "Cek alamat pengirim dan domain link huruf demi huruf; putuskan transaksi lewat aplikasi resmi, bukan lewat link di email."
@@ -458,8 +458,8 @@ stateDiagram-v2
 
 ## Lampiran A — Contoh Tiga Tipe Soal
 
-**A.1 `phish_or_legit` (legit):** Newsletter promo TokoKilat dari `noreply@tokokilat.co.id`, link https ke domain resmi, ada tombol unsubscribe, sapaan menyebut nama → jawaban **Legit**, 0 red flag.
+**A.1 `phish_or_legit` (legit):** Newsletter promo TokoKilat dari `noreply@tokokilat.example`, link https ke domain resmi, ada tombol unsubscribe, sapaan menyebut nama → jawaban **Legit**, 0 red flag.
 
-**A.2 `best_action` (SMS, sulit):** SMS dari +62 811-xxx-xxx mengaku "SIBANTAR" (instansi fiktif) menyatakan data KTP bermasalah, minta cek via `http://sibantar-datalkp.net`. Opsi: (A) klik link sekarang; (B) balas SMS dengan NIK; (C) **abaikan & hapus; bila ragu, cek lewat kanal resmi instansi** ✔; (D) teruskan ke keluarga agar waspada. Red flag: `SALURAN_TIDAK_WAJAR`, `DOMAIN_PALSU`, `LINK_MENCURIGAKAN`, `ANCAMAN`.
+**A.2 `best_action` (SMS, sulit):** SMS dari +62 811-xxx-xxx mengaku "SIBANTAR" (instansi fiktif) menyatakan data KTP bermasalah, minta cek via `http://sibantar-datalkp.example`. Opsi: (A) klik link sekarang; (B) balas SMS dengan NIK; (C) **abaikan & hapus; bila ragu, cek lewat kanal resmi instansi** ✔; (D) teruskan ke keluarga agar waspada. Red flag: `SALURAN_TIDAK_WAJAR`, `DOMAIN_PALSU`, `LINK_MENCURIGAKAN`, `ANCAMAN`.
 
-**A.3 `spot_redflag` (email, sedang):** Invoice dari "KargoCepat" dengan isi wajar, alamat `billing@kargocepat.id`, kecuali lampiran `invoice-nov.pdf.exe` → opsi yang benar adalah lampiran tersebut. Red flag utama: `LAMPIRAN_BERBAHAYA`.
+**A.3 `spot_redflag` (email, sedang):** Invoice dari "KargoCepat" dengan isi wajar, alamat `billing@kargocepat.example`, kecuali lampiran `invoice-nov.pdf.exe` → opsi yang benar adalah lampiran tersebut. Red flag utama: `LAMPIRAN_BERBAHAYA`.

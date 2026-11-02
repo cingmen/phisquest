@@ -38,14 +38,14 @@ PACK_PREFIX = {
 
 # Domain resmi brand fiktif (coding-rules.md §6.2).
 WHITELIST_DOMAINS = {
-    "banknusa.co.id",
-    "dompetku.id",
-    "tokokilat.co.id",
-    "kargocepat.id",
-    "kampusnusantara.ac.id",
-    "sibantar.go.id",
-    "asurkita.co.id",
-    "lapakria.id",
+    "banknusa.example",
+    "dompetku.example",
+    "tokokilat.example",
+    "kargocepat.example",
+    "kampusnusantara.example",
+    "sibantar.example",
+    "asurkita.example",
+    "lapakria.example",
 }
 
 # Nama brand/instansi nyata yang dilarang muncul sebagai pengirim (coding-rules.md §6.2 butir 4).

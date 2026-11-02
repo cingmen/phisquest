@@ -12,14 +12,14 @@
       "channel": "email",
       "sender": {
         "name": "BankNusa Care",
-        "address": "care@banknusa-secure.com"
+        "address": "care@banknusa-secure.example"
       },
       "subject": "⚠️ Transaksi Mencurigakan Rp2.400.000 - Akun Akan Diblokir",
       "datetime": "2026-11-02T09:15:00+07:00",
-      "body": "Yth Pelanggan Yth,\n\nKami mendeteksi transaksi mencurigakan sebesar Rp2.400.000 pada rekening Anda. Segera verifikasi identitas Anda dalam 1x24 JAM atau akun Anda akan DIBLOKIR PERMANEN dan denda Rp500.000 akan dikenakan.\n\nVerifikasi sekarang: http://banknusa-secure.com/verifikasi\n\nHormat kami,\nTim Keamanan BankNusa",
+      "body": "Yth Pelanggan Yth,\n\nKami mendeteksi transaksi mencurigakan sebesar Rp2.400.000 pada rekening Anda. Segera verifikasi identitas Anda dalam 1x24 JAM atau akun Anda akan DIBLOKIR PERMANEN dan denda Rp500.000 akan dikenakan.\n\nVerifikasi sekarang: http://banknusa-secure.example/verifikasi\n\nHormat kami,\nTim Keamanan BankNusa",
       "link": {
-        "text": "banknusa-secure.com/verifikasi",
-        "href": "http://banknusa-secure.com/verifikasi"
+        "text": "banknusa-secure.example/verifikasi",
+        "href": "http://banknusa-secure.example/verifikasi"
       },
       "attachment": null,
       "options": null,
@@ -32,7 +32,7 @@
         "SAPAAN_GENERIK",
         "LINK_MENCURIGAKAN"
       ],
-      "explanation": "Domain asli BankNusa adalah banknusa.co.id, bukan banknusa-secure.com. Batas waktu 1×24 jam dan ancaman denda adalah tekanan klasik agar korban panik. Tautan memakai http, bukan https.",
+      "explanation": "Domain asli BankNusa adalah banknusa.example, bukan banknusa-secure.example. Batas waktu 1×24 jam dan ancaman denda adalah tekanan klasik agar korban panik. Tautan memakai http, bukan https.",
       "teach": {
         "tip": "Email soal masalah rekening selalu bisa ditunda: tutup pesannya, lalu buka aplikasi m-banking resmi.",
         "verify_how": "Cek alamat pengirim dan domain tautan huruf demi huruf; selesaikan transaksi lewat aplikasi resmi, bukan lewat tautan di email."
@@ -49,10 +49,10 @@
       },
       "subject": null,
       "datetime": "2026-11-01T20:42:00+07:00",
-      "body": "DompetKu: akun Anda terdeteksi login dari perangkat baru. Verifikasi dalam 1x24 jam atau saldo dibekukan sementara. Kirim kode OTP 6 digit ke nomor ini, atau buka http://dompetku-kyc.top/otp",
+      "body": "DompetKu: akun Anda terdeteksi login dari perangkat baru. Verifikasi dalam 1x24 jam atau saldo dibekukan sementara. Kirim kode OTP 6 digit ke nomor ini, atau buka http://dompetku-kyc.example/otp",
       "link": {
-        "text": "dompetku-kyc.top/otp",
-        "href": "http://dompetku-kyc.top/otp"
+        "text": "dompetku-kyc.example/otp",
+        "href": "http://dompetku-kyc.example/otp"
       },
       "attachment": null,
       "options": null,
@@ -65,7 +65,7 @@
         "TEKANAN_WAKTU",
         "LINK_MENCURIGAKAN"
       ],
-      "explanation": "DompetKu tidak pernah meminta kode OTP melalui SMS atau WhatsApp; kode itu justru kunci akun Anda. Domain dompetku-kyc.top bukan domain resmi dompetku.id, dan tautannya tidak memakai https.",
+      "explanation": "DompetKu tidak pernah meminta kode OTP melalui SMS atau WhatsApp; kode itu justru kunci akun Anda. Domain dompetku-kyc.example bukan domain resmi dompetku.example, dan tautannya tidak memakai https.",
       "teach": {
         "tip": "Kode OTP hanya untuk Anda sendiri—tidak ada petugas resmi yang boleh memintanya.",
         "verify_how": "Buka aplikasi DompetKu langsung dan cek riwayat perangkat; jika ragu, telepon call center di dalam aplikasi."
@@ -78,21 +78,21 @@
       "channel": "email",
       "sender": {
         "name": "BankNusa",
-        "address": "noreply@banknusa.co.id"
+        "address": "noreply@banknusa.example"
       },
       "subject": "Laporan Rekening Periode Oktober 2026",
       "datetime": "2026-11-01T07:05:00+07:00",
-      "body": "Halo Sari,\n\nLaporan rekening Anda untuk periode Oktober 2026 sudah tersedia. Ringkasan bisa dilihat setelah Anda masuk ke aplikasi BankNusa.\n\nBuka aplikasi atau kunjungi https://banknusa.co.id/ringkasan untuk melihat rincian transaksi dan bunga tabungan.\n\nTerima kasih,\nBankNusa",
+      "body": "Halo Sari,\n\nLaporan rekening Anda untuk periode Oktober 2026 sudah tersedia. Ringkasan bisa dilihat setelah Anda masuk ke aplikasi BankNusa.\n\nBuka aplikasi atau kunjungi https://banknusa.example/ringkasan untuk melihat rincian transaksi dan bunga tabungan.\n\nTerima kasih,\nBankNusa",
       "link": {
-        "text": "banknusa.co.id/ringkasan",
-        "href": "https://banknusa.co.id/ringkasan"
+        "text": "banknusa.example/ringkasan",
+        "href": "https://banknusa.example/ringkasan"
       },
       "attachment": null,
       "options": null,
       "is_phish": false,
       "correct_option": null,
       "red_flags": [],
-      "explanation": "Domain pengirim dan tautan sama-sama banknusa.co.id dengan https. Pesan menyebut nama pemilik rekening dan tidak meminta data sensitif apa pun.",
+      "explanation": "Domain pengirim dan tautan sama-sama banknusa.example dengan https. Pesan menyebut nama pemilik rekening dan tidak meminta data sensitif apa pun.",
       "teach": {
         "tip": "Pesan resmi boleh berisi tautan—yang menentukan adalah domainnya persis sama dengan domain resmi.",
         "verify_how": "Ketik sendiri alamat bank di browser atau buka aplikasi resmi, jangan hanya mengandalkan tautan di email."
@@ -105,14 +105,14 @@
       "channel": "email",
       "sender": {
         "name": "AsurKita Layanan Klaim",
-        "address": "klaim@asurkita-id.com"
+        "address": "klaim@asurkita-id.example"
       },
       "subject": "🎉 Pengembalian Premi Rp1.850.000 Menunggu Konfirmasi",
       "datetime": "2026-10-30T14:20:00+07:00",
-      "body": "Halo Bapak/Ibu,\n\nSelamat! Anda terpilih menerima pengembalian premi sebesar Rp1.850.000 karena kelebihan bayar tahun lalu. Dana hanya dapat dicairkan bila dikonfirmasi dalam 24 jam, setelah itu akan dialihkan ke peserta lain.\n\nKonfirmasi di http://asurkita-id.com/refund/klaim\n\nTim Layanan AsurKita",
+      "body": "Halo Bapak/Ibu,\n\nSelamat! Anda terpilih menerima pengembalian premi sebesar Rp1.850.000 karena kelebihan bayar tahun lalu. Dana hanya dapat dicairkan bila dikonfirmasi dalam 24 jam, setelah itu akan dialihkan ke peserta lain.\n\nKonfirmasi di http://asurkita-id.example/refund/klaim\n\nTim Layanan AsurKita",
       "link": {
-        "text": "asurkita-id.com/refund/klaim",
-        "href": "http://asurkita-id.com/refund/klaim"
+        "text": "asurkita-id.example/refund/klaim",
+        "href": "http://asurkita-id.example/refund/klaim"
       },
       "attachment": null,
       "options": null,
@@ -124,7 +124,7 @@
         "TEKANAN_WAKTU",
         "LINK_MENCURIGAKAN"
       ],
-      "explanation": "Domain resmi AsurKita adalah asurkita.co.id; asurkita-id.com hanya menirunya dengan tanda hubung. Pengembalian premi tidak pernah diumumkan lewat email mendadak dengan batas 24 jam, dan tautannya http.",
+      "explanation": "Domain resmi AsurKita adalah asurkita.example; asurkita-id.example hanya menirunya dengan tanda hubung. Pengembalian premi tidak pernah diumumkan lewat email mendadak dengan batas 24 jam, dan tautannya http.",
       "teach": {
         "tip": "Uang yang benar-benar menjadi hak Anda tidak akan hangus dalam 24 jam.",
         "verify_how": "Hubungi call center AsurKita dari situs resmi atau temui agen resmi, lalu tanyakan apakah ada pengembalian premi atas nama Anda."
@@ -251,7 +251,7 @@
       "channel": "email",
       "sender": {
         "name": "AsurKita",
-        "address": "cs@asurkita-polis.com"
+        "address": "cs@asurkita-polis.example"
       },
       "subject": "Polis Baru Anda Sudah Terbit",
       "datetime": "2026-10-28T10:45:00+07:00",
@@ -264,7 +264,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Alamat pengirim cs@asurkita-polis.com"
+          "text": "Alamat pengirim cs@asurkita-polis.example"
         },
         {
           "id": "B",
@@ -286,7 +286,7 @@
         "DOMAIN_MIRIP",
         "SAPAAN_GENERIK"
       ],
-      "explanation": "Lampiran .pdf.exe adalah file program yang menyamar sebagai PDF; itulah bagian paling berbahaya. Domain asurkita-polis.com juga bukan asurkita.co.id, meski isi pesannya terlihat rapi.",
+      "explanation": "Lampiran .pdf.exe adalah file program yang menyamar sebagai PDF; itulah bagian paling berbahaya. Domain asurkita-polis.example juga bukan asurkita.example, meski isi pesannya terlihat rapi.",
       "teach": {
         "tip": "Ekstensi ganda seperti .pdf.exe berarti file yang akan berjalan saat dibuka.",
         "verify_how": "Jangan buka lampirannya; cek status polis lewat aplikasi atau call center AsurKita yang Anda hubungi sendiri."

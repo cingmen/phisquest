@@ -71,7 +71,7 @@ def test_phishing_dengan_domain_whitelist_ditolak(content_copy: Path) -> None:
     _mutate(
         content_copy / "packs" / "ewallet-bank.json",
         "ew-001",
-        link={"text": "banknusa.co.id", "href": "https://banknusa.co.id/verifikasi"},
+        link={"text": "banknusa.example", "href": "https://banknusa.example/verifikasi"},
     )
     assert any("domain resmi whitelist" in message for message in _errors(content_copy))
 

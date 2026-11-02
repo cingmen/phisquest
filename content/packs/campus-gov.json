@@ -12,14 +12,14 @@
       "channel": "email",
       "sender": {
         "name": "Beasiswa KampusNusantara",
-        "address": "beasiswa@kampusnusantara-scholarship.com"
+        "address": "beasiswa@kampusnusantara-scholarship.example"
       },
       "subject": "🎓 SELAMAT! Anda Penerima Beasiswa Rp12.000.000 - Konfirmasi Hari Ini",
       "datetime": "2026-11-01T08:20:00+07:00",
-      "body": "Yth Mahasiswa Yth,\n\nBerdasarkan seleksi sistem, Anda dinyatakan sebagai penerima beasiswa prestasi sebesar Rp12.000.000. Untuk pencairan, lengkapi nomor rekening, NIK, dan foto KTP melalui formulir berikut dalam 24 jam. Jika tidak dikonfirmasi hari ini, dana dialihkan ke penerima cadangan.\n\nFormulir: http://kampusnusantara-scholarship.com/daftar\n\nPanitia Beasiswa",
+      "body": "Yth Mahasiswa Yth,\n\nBerdasarkan seleksi sistem, Anda dinyatakan sebagai penerima beasiswa prestasi sebesar Rp12.000.000. Untuk pencairan, lengkapi nomor rekening, NIK, dan foto KTP melalui formulir berikut dalam 24 jam. Jika tidak dikonfirmasi hari ini, dana dialihkan ke penerima cadangan.\n\nFormulir: http://kampusnusantara-scholarship.example/daftar\n\nPanitia Beasiswa",
       "link": {
-        "text": "kampusnusantara-scholarship.com/daftar",
-        "href": "http://kampusnusantara-scholarship.com/daftar"
+        "text": "kampusnusantara-scholarship.example/daftar",
+        "href": "http://kampusnusantara-scholarship.example/daftar"
       },
       "attachment": null,
       "options": null,
@@ -31,7 +31,7 @@
         "MEMINTA_DATA_SENSITIF",
         "TEKANAN_WAKTU"
       ],
-      "explanation": "Domain resmi kampus adalah kampusnusantara.ac.id, bukan kampusnusantara-scholarship.com. Beasiswa resmi tidak pernah meminta foto KTP lewat formulir mendadak dengan tenggat 24 jam.",
+      "explanation": "Domain resmi kampus adalah kampusnusantara.example, bukan kampusnusantara-scholarship.example. Beasiswa resmi tidak pernah meminta foto KTP lewat formulir mendadak dengan tenggat 24 jam.",
       "teach": {
         "tip": "Beasiswa kampus diumumkan lewat portal akademik, bukan email mendadak berisi formulir.",
         "verify_how": "Cek pengumuman di portal akademik kampus atau tanyakan ke bagian kemahasiswaan secara langsung."
@@ -48,10 +48,10 @@
       },
       "subject": null,
       "datetime": "2026-10-31T13:05:00+07:00",
-      "body": "SIBANTAR: data KTP Anda bermasalah dan akan dinonaktifkan dalam 24 jam. Segera periksa data Anda di http://sibantar-datalkp.net/cek atau hubungi kami. Abaikan pesan ini bila Anda tidak membutuhkan layanan kami.",
+      "body": "SIBANTAR: data KTP Anda bermasalah dan akan dinonaktifkan dalam 24 jam. Segera periksa data Anda di http://sibantar-datalkp.example/cek atau hubungi kami. Abaikan pesan ini bila Anda tidak membutuhkan layanan kami.",
       "link": {
-        "text": "sibantar-datalkp.net/cek",
-        "href": "http://sibantar-datalkp.net/cek"
+        "text": "sibantar-datalkp.example/cek",
+        "href": "http://sibantar-datalkp.example/cek"
       },
       "attachment": null,
       "options": [
@@ -80,7 +80,7 @@
         "LINK_MENCURIGAKAN",
         "ANCAMAN"
       ],
-      "explanation": "Instansi tidak menonaktifkan data KTP lewat SMS dengan tautan dan ancaman 24 jam. Domain sibantar-datalkp.net bukan sibantar.go.id, dan tautannya http sehingga tidak aman.",
+      "explanation": "Instansi tidak menonaktifkan data KTP lewat SMS dengan tautan dan ancaman 24 jam. Domain sibantar-datalkp.example bukan sibantar.example, dan tautannya http sehingga tidak aman.",
       "teach": {
         "tip": "Jangan pernah mengirim NIK lewat SMS atau membuka tautan dari pengirim tak dikenal.",
         "verify_how": "Cek layanan lewat situs resmi instansi yang Anda ketik sendiri atau datang ke kantor layanan."
@@ -93,21 +93,21 @@
       "channel": "email",
       "sender": {
         "name": "KampusNusantara",
-        "address": "pengumuman@kampusnusantara.ac.id"
+        "address": "pengumuman@kampusnusantara.example"
       },
       "subject": "Kalender Akademik Semester Genap 2026/2027",
       "datetime": "2026-10-30T08:00:00+07:00",
-      "body": "Halo Sari,\n\nKalender akademik semester genap 2026/2027 sudah terbit. Pengisian kartu rencana studi dibuka 12–16 Januari 2027 dan perkuliahan dimulai 2 Februari 2027.\n\nKalender lengkap: https://kampusnusantara.ac.id/kalender\n\nBagian Akademik",
+      "body": "Halo Sari,\n\nKalender akademik semester genap 2026/2027 sudah terbit. Pengisian kartu rencana studi dibuka 12–16 Januari 2027 dan perkuliahan dimulai 2 Februari 2027.\n\nKalender lengkap: https://kampusnusantara.example/kalender\n\nBagian Akademik",
       "link": {
-        "text": "kampusnusantara.ac.id/kalender",
-        "href": "https://kampusnusantara.ac.id/kalender"
+        "text": "kampusnusantara.example/kalender",
+        "href": "https://kampusnusantara.example/kalender"
       },
       "attachment": null,
       "options": null,
       "is_phish": false,
       "correct_option": null,
       "red_flags": [],
-      "explanation": "Domain pengirim dan tautan sama-sama kampusnusantara.ac.id dengan https. Informasi bersifat administratif, menyebut nama penerima, dan tidak meminta data pribadi.",
+      "explanation": "Domain pengirim dan tautan sama-sama kampusnusantara.example dengan https. Informasi bersifat administratif, menyebut nama penerima, dan tidak meminta data pribadi.",
       "teach": {
         "tip": "Pengumuman akademik resmi selalu berasal dari domain kampus dan tidak meminta dokumen pribadi.",
         "verify_how": "Buka portal akademik kampus sendiri untuk memastikan tanggal-tanggal penting."
@@ -153,10 +153,10 @@
       },
       "subject": null,
       "datetime": "2026-10-28T15:15:00+07:00",
-      "body": "SIBANTAR: terdeteksi tunggakan administrasi Rp1.150.000 atas nama Anda. Selesaikan pembayaran dalam 1x24 jam atau berkas Anda dilimpahkan ke bagian hukum. Bayar di http://sibantar-pajak.info/bayar",
+      "body": "SIBANTAR: terdeteksi tunggakan administrasi Rp1.150.000 atas nama Anda. Selesaikan pembayaran dalam 1x24 jam atau berkas Anda dilimpahkan ke bagian hukum. Bayar di http://sibantar-pajak.example/bayar",
       "link": {
-        "text": "sibantar-pajak.info/bayar",
-        "href": "http://sibantar-pajak.info/bayar"
+        "text": "sibantar-pajak.example/bayar",
+        "href": "http://sibantar-pajak.example/bayar"
       },
       "attachment": null,
       "options": null,
@@ -168,7 +168,7 @@
         "LINK_MENCURIGAKAN",
         "TEKANAN_WAKTU"
       ],
-      "explanation": "Domain sibantar-pajak.info meniru nama instansi, sementara kanal resminya sibantar.go.id. Ancaman pelimpahan ke bagian hukum dan tenggat 24 jam adalah pola tekanan untuk memancing pembayaran.",
+      "explanation": "Domain sibantar-pajak.example meniru nama instansi, sementara kanal resminya sibantar.example. Ancaman pelimpahan ke bagian hukum dan tenggat 24 jam adalah pola tekanan untuk memancing pembayaran.",
       "teach": {
         "tip": "Tagihan resmi selalu bisa dicek di kanal resmi instansi, bukan lewat tautan SMS.",
         "verify_how": "Cek tagihan di situs resmi instansi atau datang ke loket layanan sebelum membayar."
@@ -181,7 +181,7 @@
       "channel": "email",
       "sender": {
         "name": "Perpustakaan KampusNusantara",
-        "address": "pustaka@kampusnusantara-lib.com"
+        "address": "pustaka@kampusnusantara-lib.example"
       },
       "subject": "Tagihan Keterlambatan Buku - Mohon Diselesaikan",
       "datetime": "2026-10-27T09:40:00+07:00",
@@ -216,7 +216,7 @@
         "DOMAIN_MIRIP",
         "SAPAAN_GENERIK"
       ],
-      "explanation": "Nama berkas .pdf.js adalah skrip yang menyamar sebagai PDF dan bisa mencuri data saat dibuka. Domain kampusnusantara-lib.com bukan kampusnusantara.ac.id, dan sapaan generik menandakan pesan massal.",
+      "explanation": "Nama berkas .pdf.js adalah skrip yang menyamar sebagai PDF dan bisa mencuri data saat dibuka. Domain kampusnusantara-lib.example bukan kampusnusantara.example, dan sapaan generik menandakan pesan massal.",
       "teach": {
         "tip": "Lampiran dengan dua ekstensi seperti .pdf.js tidak pernah aman dibuka.",
         "verify_how": "Cek status pinjaman di portal perpustakaan kampus atau datangi loket perpustakaan langsung."
@@ -253,14 +253,14 @@
       "channel": "email",
       "sender": {
         "name": "KampusNusantara Akun",
-        "address": "akun@kampusnusantara.ac.id"
+        "address": "akun@kampusnusantara.example"
       },
       "subject": "Aktivasi Akun SSO Mahasiswa Baru",
       "datetime": "2026-10-25T08:45:00+07:00",
-      "body": "Halo Sari,\n\nAkun SSO mahasiswa Anda sudah dibuat. Sebelum dapat digunakan, akun perlu diaktifkan dengan mengganti kata sandi awal. Proses aktivasi hanya bisa dilakukan melalui portal resmi kampus, bukan melalui balasan email.\n\nPortal: https://kampusnusantara.ac.id/aktivasi\n\nJika Anda tidak merasa mendaftar, abaikan pesan ini.\n\nHelpdesk Akademik",
+      "body": "Halo Sari,\n\nAkun SSO mahasiswa Anda sudah dibuat. Sebelum dapat digunakan, akun perlu diaktifkan dengan mengganti kata sandi awal. Proses aktivasi hanya bisa dilakukan melalui portal resmi kampus, bukan melalui balasan email.\n\nPortal: https://kampusnusantara.example/aktivasi\n\nJika Anda tidak merasa mendaftar, abaikan pesan ini.\n\nHelpdesk Akademik",
       "link": {
-        "text": "kampusnusantara.ac.id/aktivasi",
-        "href": "https://kampusnusantara.ac.id/aktivasi"
+        "text": "kampusnusantara.example/aktivasi",
+        "href": "https://kampusnusantara.example/aktivasi"
       },
       "attachment": null,
       "options": [
@@ -297,21 +297,21 @@
       "channel": "email",
       "sender": {
         "name": "SIBANTAR",
-        "address": "noreply@sibantar.go.id"
+        "address": "noreply@sibantar.example"
       },
       "subject": "Pembaruan Informasi Layanan Publik Triwulan IV",
       "datetime": "2026-10-24T09:00:00+07:00",
-      "body": "Halo Warga,\n\nKami menginformasikan pembaruan daftar layanan publik triwulan IV 2026. Tidak ada data pribadi yang perlu Anda kirimkan melalui email. Layanan tetap dapat diakses di kantor layanan terdekat atau melalui portal https://sibantar.go.id/pengumuman.\n\nSalam,\nSIBANTAR",
+      "body": "Halo Warga,\n\nKami menginformasikan pembaruan daftar layanan publik triwulan IV 2026. Tidak ada data pribadi yang perlu Anda kirimkan melalui email. Layanan tetap dapat diakses di kantor layanan terdekat atau melalui portal https://sibantar.example/pengumuman.\n\nSalam,\nSIBANTAR",
       "link": {
-        "text": "sibantar.go.id/pengumuman",
-        "href": "https://sibantar.go.id/pengumuman"
+        "text": "sibantar.example/pengumuman",
+        "href": "https://sibantar.example/pengumuman"
       },
       "attachment": null,
       "options": null,
       "is_phish": false,
       "correct_option": null,
       "red_flags": [],
-      "explanation": "Domain pengirim dan tautan sama-sama sibantar.go.id dengan https. Pesan bersifat informasi, tanpa permintaan data dan tanpa tenggat mendesak.",
+      "explanation": "Domain pengirim dan tautan sama-sama sibantar.example dengan https. Pesan bersifat informasi, tanpa permintaan data dan tanpa tenggat mendesak.",
       "teach": {
         "tip": "Pesan resmi yang baik tidak meminta dokumen pribadi lewat email.",
         "verify_how": "Buka portal instansi yang Anda ketik sendiri untuk memeriksa informasi layanan."
