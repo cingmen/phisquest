@@ -327,3 +327,15 @@ FROM scores;
 Entri: `score`, `max_score`, `accuracy` (0..1, 4 desimal), `pack_id` (`null` = campur),
 `mode` (`classic`/`time_attack`), `at`. Maksimum 10 entri; `reset` menghapus berkas ini.
 
+## 8. Pack lokal dari editor (v1.1)
+
+| Media | Kunci | Isi |
+|---|---|---|
+| Web | `localStorage` → `pq_custom_packs_v1` | array pack `{pack_id, name, emoji, scenarios[]}` hasil editor |
+
+Pack lokal hanya hidup di perangkat, tidak pernah diunggah, dan tidak mengubah `content/`.
+`pack_id` yang sama menimpa pack lama; `reset` menghapus kunci ini. Skema tiap skenario divalidasi
+di klien dengan aturan yang sama seperti `scripts/validate_content.py` (dibuktikan
+`tests/test_editor_contract.py` + `web/test/editor.test.js`). Aturan komposisi pack (10 skenario,
+6:4 phish/legit, 3/4/3 kesulitan) tidak berlaku untuk pack lokal berisi satu skenario.
+

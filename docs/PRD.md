@@ -176,9 +176,10 @@ Recap wajib menampilkan: skor & XP dasar sesi, bonus streak, akurasi (%), best s
 | F7 | Penyimpanan progres | **Must** | Web: localStorage; CLI: file JSON `~/.phishquest/`; ekspor/impor JSON |
 | F8 | Recap & review kesalahan | **Must** | Sesuai §7.5 |
 | F9 | Umpan balik per soal | **Must** | Penjelasan red flag + tips verifikasi setiap jawaban |
-| F10 | Mode Campur | **Should** | Sesi lintas pack yang dikocok |
+| F10 | Mode Campur | **Should** | Sesi lintas pack yang dikocok, jumlah soal dapat dipilih (5–40) |
 | F11 | Validasi konten otomatis | **Should** | `scripts/validate_content.py` jalan di CI |
 | F12 | Mode Terbatas Waktu + leaderboard lokal | **Won't (v1.0)** → v1.1 | Termasuk papan skor per perangkat |
+| F13 | Mini editor skenario (v1.1) | **Should** | Tempel JSON → validasi klien → simpan lokal/ekspor → mainkan, tanpa backend |
 
 ## 9. Konten & Kebutuhan Data
 
@@ -424,7 +425,7 @@ stateDiagram-v2
 | Versi | Isi | Status |
 |-------|-----|--------|
 | **v1.0.0** | F1–F11, 40 skenario, web + CLI + Pages + README dwibahasa | Target saat ini |
-| **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Time attack + leaderboard dirilis |
+| **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Time attack, leaderboard, Campur berjumlah soal, dan editor skenario dirilis |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

@@ -186,6 +186,6 @@ Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP);
 
 - [x] Mode Terbatas Waktu (20 detik/soal + bonus kecepatan) — web & CLI, golden test dua bahasa
 - [x] Leaderboard lokal per perangkat — `pq_leaderboard_v1` (web) dan `leaderboard.json` (CLI)
-- [ ] Mode Campur dengan jumlah soal pilihan
-- [ ] Mini editor skenario (tempel JSON → validasi → main)
+- [x] Mode Campur dengan jumlah soal pilihan — dropdown 5/10/20/40 di web, `--jumlah 5–40` di CLI; jumlah tak sah ditolak (`INVALID_COUNT`/exit 2), permintaan melebihi isi pool dipotong
+- [x] Mini editor skenario (tempel JSON → validasi → main) — `web/js/scenario_editor.js`, tersimpan di `pq_custom_packs_v1`, ekspor JSON, tanpa backend
 

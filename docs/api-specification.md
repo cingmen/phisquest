@@ -170,7 +170,11 @@ async function loadManifest()            // → Promise<Manifest>
 /** Memuat satu pack berdasar pack_id; memvalidasi skema minimum (field wajib ada). */
 async function loadPack(packId)          // → Promise<Pack>
 
-/** Membuat sesi. Opsi: {count=10, difficulty=null, seed=null}. 'Campur' = pack null + gabung. */
+/**
+ * Membuat sesi. Opsi: {count=10, difficulty=null, seed=null, mode="classic", timeLimitMs=20000}.
+ * 'Campur' = pack null + gabung. count < 1 → PQError('INVALID_COUNT');
+ * count melebihi jumlah soal tersedia dipotong ke ukuran pool (tanpa error).
+ */
 function startSession(packs, opts)       // → Session (state internal)
 
 session.current()                        // → Scenario | null
@@ -183,6 +187,10 @@ session.answer(optionId)                 // → AnswerResult
 session.hasNext()                        // → boolean
 session.summary()                        // → SessionSummary (hanya valid setelah soal habis)
 ```
+
+`SessionSummary` mencatat `requested_count` (jumlah yang diminta) dan `available_count`
+(jumlah yang benar-benar dimainkan); `session` menyimpannya sebagai `requestedCount` (JS) /
+`requested_count` (Python). Nilai count wajib bilangan bulat ≥ 1, aturan sama di kedua bahasa.
 
 **`AnswerResult`** (kontrak tetap — identik dengan Python, lihat §6):
 
@@ -338,7 +346,7 @@ Exit codes: `0` valid · `1` error validasi · `2` argumen/path salah.
 | Perintah | Argumen | Fungsi |
 |----------|---------|--------|
 | `phishquest` | — | Menu interaktif (pilih pack, stats, keluar) |
-| `phishquest play` | `--pack ID` · `--difficulty X` · `--jumlah N` (5–10, default 10) · `--seed S` | Main sesi; tanpa `--pack` = mode Campur |
+| `phishquest play` | `--pack ID` · `--difficulty X` · `--jumlah N` (pack 5–10, Campur 5–40; default 10) · `--seed S` · `--mode classic\|time-attack` | Main sesi; tanpa `--pack` = mode Campur. Jumlah di luar batas → exit 2 |
 | `phishquest packs` | — | Tabel pack: nama, emoji, jumlah skenario, best score |
 | `phishquest stats` | — | XP, level + progress bar, streak, akurasi, riwayat 5 sesi terakhir |
 | `phishquest badges` | — | Grid lencana + status terperoleh/belum + syarat |

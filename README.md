@@ -134,6 +134,15 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   `localStorage` web dan `~/.phishquest/leaderboard.json` di CLI. Tanpa backend dan tanpa akun.
 - CLI: `phishquest play --mode time-attack` dan `phishquest leaderboard`.
 
+## Mode Campur berjumlah soal & editor skenario (v1.1)
+
+- **🎲 Campur Semua** — pilih 5, 10, 20, atau 40 soal. Jumlah < 1 ditolak (`INVALID_COUNT`/
+  exit 2) dan permintaan melebihi isi pool dipotong ke jumlah soal yang tersedia.
+- **🛠️ Editor skenario** — tempel satu skenario, array, atau pack JSON. Validasi memakai aturan
+  yang sama dengan `validate_content.py`, lalu simpan di perangkat (`pq_custom_packs_v1`),
+  mainkan dari menu, atau ekspor sebagai berkas JSON pack. Tanpa backend dan tanpa akun.
+- CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
+
 ## Etika & legal
 
 > PhishQuest adalah simulasi edukasi. Semua email, brand, dan domain di dalamnya fiktif.

@@ -91,6 +91,15 @@ node --test web/test/*.test.js
   web `localStorage` and `~/.phishquest/leaderboard.json` for the CLI. No backend, no account.
 - CLI: `phishquest play --mode time-attack` and `phishquest leaderboard`.
 
+## Mixed mode with question count & scenario editor (v1.1)
+
+- **🎲 Campur Semua** — pick 5, 10, 20, or 40 questions. A count below 1 is rejected
+  (`INVALID_COUNT`/exit 2); requests above the pool size are capped to what is available.
+- **🛠️ Scenario editor** — paste one scenario, an array, or a full JSON pack. Validation uses
+  the same rules as `validate_content.py`, then saves to the device (`pq_custom_packs_v1`),
+  plays from the menu, or exports a pack JSON file. No backend, no account.
+- CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
+
 ## Ethics & legal
 
 > PhishQuest is an educational simulation. Every email, brand, and domain in it is
