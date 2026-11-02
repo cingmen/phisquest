@@ -18,8 +18,21 @@ export class PQError extends Error {
 
 export const SCHEMA_VERSION = '1.0';
 
-/** Kandidat lokasi konten, dicoba berurutan. */
-const CONTENT_CANDIDATES = ['../content/', './content/', 'content/'];
+/**
+ * Kandidat lokasi konten, dicoba berurutan sesuai struktur halaman.
+ * Halaman pengembangan disajikan dari `/web/` sehingga konten ada di `../content/`,
+ * sedangkan GitHub Pages menaruh konten di subdirektori yang sama (`./content/`).
+ * Urutan dipilih agar permintaan pertama sudah benar dan konsol tetap bersih.
+ * @returns {string[]} daftar kandidat basis konten.
+ */
+function contentCandidates() {
+  const path = typeof location === 'undefined' ? '' : location.pathname;
+  return path.includes('/web/')
+    ? ['../content/', './content/', 'content/']
+    : ['./content/', '../content/', 'content/'];
+}
+
+const CONTENT_CANDIDATES = contentCandidates();
 let contentBase = null;
 
 /**
