@@ -14,6 +14,10 @@ export const STREAK_STEP = 2;
 export const STREAK_CAP = 10;
 export const HISTORY_LIMIT = 50;
 export const MIXED_PACK_ID = 'campuran';
+export const TIME_LIMIT_MS = 20000;
+export const SPEED_BONUS_MAX = 5;
+export const LEADERBOARD_LIMIT = 10;
+export const MODES = ['classic', 'time_attack'];
 
 export const LEVELS = [
   [0, 'amatir'],
@@ -226,11 +230,13 @@ export class Session {
   /**
    * @param {object} options - { scenarios, progress, packId, seed }.
    */
-  constructor({ scenarios, progress, packId = null, seed = null }) {
+  constructor({ scenarios, progress, packId = null, seed = null, mode = 'classic', timeLimitMs = TIME_LIMIT_MS }) {
     this.scenarios = scenarios;
     this.progress = progress;
     this.packId = packId;
     this.seed = seed;
+    this.mode = mode;
+    this.timeLimitMs = Number(timeLimitMs);
     this.index = 0;
     this.score = 0;
     this.maxScore = 0;
@@ -246,6 +252,8 @@ export class Session {
     this.comebackRecovered = false;
     this.answeredIds = [];
     this.summaryCache = null;
+    this.timedOutCount = 0;
+    this.speedBonusTotal = 0;
   }
 
   /**
@@ -269,7 +277,7 @@ export class Session {
    * @param {string} optionId - PHISH/LEGIT atau id opsi.
    * @returns {object} AnswerResult.
    */
-  answer(optionId) {
+  answer(optionId, elapsedMs = null) {
     if (this.summaryCache) throw new PQError('SESSION_FINISHED', 'Sesi ini sudah selesai.');
     const scenario = this.current();
     if (!scenario) {
@@ -279,11 +287,19 @@ export class Session {
       throw new PQError('ALREADY_ANSWERED', 'Soal ini sudah dijawab.');
     }
 
-    const correct = evaluateAnswer(scenario, optionId);
+    let correct = evaluateAnswer(scenario, optionId);
+    const elapsed = Math.max(0, Math.trunc(Number(elapsedMs || 0)));
+    const timedOut = this.mode === 'time_attack' && elapsed > this.timeLimitMs;
+    if (timedOut) correct = false;
+    const remaining = Math.max(0, this.timeLimitMs - elapsed);
+    const speedBonus =
+      correct && this.mode === 'time_attack'
+        ? Math.floor((remaining * SPEED_BONUS_MAX) / this.timeLimitMs)
+        : 0;
     const streakAfter = correct ? this.streak + 1 : 0;
     const xpBase = correct ? XP_BASE : 0;
     const xpBonus = correct ? streakBonus(streakAfter) : 0;
-    const xpGained = xpBase + xpBonus;
+    const xpGained = xpBase + xpBonus + speedBonus;
 
     const progress = this.progress;
     const levelBeforeAnswer = levelFor(progress.total_xp);
@@ -317,6 +333,9 @@ export class Session {
       teach: { ...scenario.teach },
       badges_earned: [],
       level_up: levelUp,
+      speed_bonus: speedBonus,
+      timed_out: timedOut,
+      elapsed_ms: elapsed,
     };
 
     const earned = evaluateAfterAnswer(progress, result);
@@ -327,10 +346,12 @@ export class Session {
     this.index += 1;
     this.answeredCount += 1;
     this.score += xpGained;
-    this.maxScore += XP_BASE;
+    this.maxScore += XP_BASE + (this.mode === 'time_attack' ? SPEED_BONUS_MAX : 0);
     this.streak = streakAfter;
     this.bestStreak = Math.max(this.bestStreak, streakAfter);
     this.answeredIds.push(scenario.id);
+    this.speedBonusTotal += speedBonus;
+    if (timedOut) this.timedOutCount += 1;
     if (correct) {
       this.correctCount += 1;
     } else {
@@ -378,6 +399,9 @@ export class Session {
       level_after: levelFor(progress.total_xp),
       mistakes: [...this.mistakes],
       recovered: Boolean(this.comebackCandidate && this.comebackRecovered),
+      mode: this.mode,
+      timed_out_count: this.timedOutCount,
+      speed_bonus_total: this.speedBonusTotal,
     };
 
     progress.counters.sessions_completed =
@@ -422,8 +446,21 @@ export class Session {
  */
 export function startSession(
   packs,
-  { count = 10, difficulty = null, seed = null, progress = null } = {},
+  {
+    count = 10,
+    difficulty = null,
+    seed = null,
+    progress = null,
+    mode = 'classic',
+    timeLimitMs = TIME_LIMIT_MS,
+  } = {},
 ) {
+  if (!MODES.includes(mode)) {
+    throw new PQError('INVALID_MODE', `Mode '${mode}' tidak dikenal.`);
+  }
+  if (!(Number(timeLimitMs) > 0)) {
+    throw new PQError('INVALID_MODE', 'Batas waktu harus lebih dari 0 milidetik.');
+  }
   const pool = [];
   for (const pack of packs) {
     for (const scenario of pack.scenarios || []) {
@@ -446,5 +483,7 @@ export function startSession(
     progress: player,
     packId: packs.length === 1 ? packs[0].pack_id : null,
     seed: seed ?? null,
+    mode,
+    timeLimitMs: Number(timeLimitMs),
   });
 }

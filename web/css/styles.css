@@ -868,3 +868,51 @@ a {
     transition: none !important;
   }
 }
+
+/* Time attack & papan skor lokal ------------------------------------- */
+.chip--timer {
+  background: var(--pq-primary);
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leaderboard__row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--pq-border);
+  border-radius: 12px;
+  background: var(--pq-surface);
+  font-size: 14px;
+}
+
+.leaderboard__row--new {
+  border-color: var(--pq-primary);
+  background: var(--pq-primary-soft);
+}
+
+.leaderboard__rank {
+  min-width: 24px;
+  font-weight: 700;
+  color: var(--pq-primary);
+}
+
+.leaderboard__score {
+  font-weight: 700;
+}
+
+.leaderboard__meta {
+  margin-left: auto;
+  color: var(--pq-muted);
+  font-size: 13px;
+}

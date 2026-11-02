@@ -7,11 +7,13 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .leaderboard import insert_entry, normalize_entries
 from .models import SCHEMA_VERSION, Progress, Settings, StorageError, now_iso
 
 DEFAULT_DIR = Path.home() / ".phishquest"
 PROGRESS_NAME = "progress.json"
 SETTINGS_NAME = "settings.json"
+LEADERBOARD_NAME = "leaderboard.json"
 
 
 def data_dir() -> Path:
@@ -140,6 +142,41 @@ def export_all(dst: Path | None = None) -> Path:
     return target
 
 
+def load_leaderboard(path: Path | None = None) -> list[dict[str, Any]]:
+    """Baca papan skor lokal (10 teratas, sudah terurut).
+
+    Args:
+        path: Lokasi berkas; default ``~/.phishquest/leaderboard.json``.
+
+    Returns:
+        Daftar entri; kosong bila berkas belum ada atau rusak.
+    """
+    target = Path(path) if path is not None else data_dir() / LEADERBOARD_NAME
+    if not target.exists():
+        return []
+    try:
+        data = _read_payload(target)
+    except StorageError:
+        return []
+    entries = data.get("entries")
+    return normalize_entries(entries if isinstance(entries, list) else [])
+
+
+def save_leaderboard(entries: list[dict[str, Any]], path: Path | None = None) -> None:
+    """Simpan papan skor lokal secara atomik."""
+    target = Path(path) if path is not None else data_dir() / LEADERBOARD_NAME
+    _atomic_write(target, {"schema_version": SCHEMA_VERSION, "entries": entries})
+
+
+def record_entry(
+    entry: dict[str, Any], path: Path | None = None
+) -> tuple[list[dict[str, Any]], int | None]:
+    """Catat satu sesi ke papan skor dan kembalikan peringkatnya."""
+    entries, rank = insert_entry(load_leaderboard(path), entry)
+    save_leaderboard(entries, path)
+    return entries, rank
+
+
 def import_all(src: Path) -> None:
     """Impor progres dan pengaturan dari berkas ekspor.
 
@@ -168,7 +205,7 @@ def reset_all() -> None:
         StorageError: Bila penghapusan gagal.
     """
     directory = data_dir()
-    for name in (PROGRESS_NAME, SETTINGS_NAME):
+    for name in (PROGRESS_NAME, SETTINGS_NAME, LEADERBOARD_NAME):
         target = directory / name
         try:
             target.unlink(missing_ok=True)

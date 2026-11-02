@@ -10,8 +10,11 @@ from . import badges
 from .models import (
     HISTORY_LIMIT,
     MIXED_PACK_ID,
+    MODES,
+    SPEED_BONUS_MAX,
     STREAK_CAP,
     STREAK_STEP,
+    TIME_LIMIT_MS,
     XP_BASE,
     AnswerResult,
     EngineError,
@@ -52,6 +55,8 @@ class Session:
     progress: Progress
     pack_id: str | None = None
     seed: int | None = None
+    mode: str = "classic"
+    time_limit_ms: int = TIME_LIMIT_MS
     index: int = 0
     score: int = 0
     max_score: int = 0
@@ -69,6 +74,8 @@ class Session:
     comeback_recovered: bool = False
     answered_ids: list[str] = field(default_factory=list)
     summary_cache: SessionSummary | None = None
+    timed_out_count: int = 0
+    speed_bonus_total: int = 0
 
 
 def streak_bonus(streak_after: int) -> int:
@@ -90,6 +97,8 @@ def start_session(
     difficulty: str | None = None,
     seed: int | None = None,
     progress: Progress | None = None,
+    mode: str = "classic",
+    time_limit_ms: int = TIME_LIMIT_MS,
 ) -> Session:
     """Susun sesi baru dari satu pack atau gabungan beberapa pack.
 
@@ -99,6 +108,8 @@ def start_session(
         difficulty: Filter kesulitan opsional (``mudah``/``sedang``/``sulit``).
         seed: Seed opsional agar urutan soal dapat direproduksi.
         progress: Progres pemain; bila None dibuat progres baru.
+        mode: ``classic`` atau ``time_attack`` (20 detik per soal).
+        time_limit_ms: Batas waktu per soal untuk mode time_attack.
 
     Returns:
         Session siap dimainkan.
@@ -106,6 +117,10 @@ def start_session(
     Raises:
         EngineError: Bila tidak ada skenario yang cocok.
     """
+    if mode not in MODES:
+        raise EngineError(f"Mode '{mode}' tidak dikenal; pilih {' atau '.join(MODES)}.")
+    if int(time_limit_ms) <= 0:
+        raise EngineError("Batas waktu harus lebih dari 0 milidetik.")
     pool: list[Scenario] = []
     for pack in packs:
         for scenario in pack.scenarios:
@@ -131,6 +146,8 @@ def start_session(
         streak=player.current_streak,
         best_streak=player.current_streak,
         level_before=level_for(player.total_xp),
+        mode=mode,
+        time_limit_ms=int(time_limit_ms),
     )
 
 
@@ -170,12 +187,13 @@ def evaluate_answer(scenario: Scenario, option_id: str) -> bool:
     return value == str(scenario.correct_option)
 
 
-def answer(session: Session, option_id: str) -> AnswerResult:
+def answer(session: Session, option_id: str, elapsed_ms: int | None = None) -> AnswerResult:
     """Nilai jawaban pemain untuk soal aktif dan perbarui progres.
 
     Args:
         session: Sesi aktif.
         option_id: ``PHISH``/``LEGIT`` atau id opsi (``A``–``D``).
+        elapsed_ms: Waktu menjawab dalam milidetik (dipakai mode time_attack).
 
     Returns:
         AnswerResult berisi XP, streak, dan lencana yang diperoleh.
@@ -192,10 +210,18 @@ def answer(session: Session, option_id: str) -> AnswerResult:
         raise EngineError("Soal ini sudah dijawab.")
 
     correct = evaluate_answer(scenario, option_id)
+    elapsed = max(0, int(elapsed_ms or 0))
+    timed = session.mode == "time_attack" and elapsed > session.time_limit_ms
+    if timed:
+        correct = False
+    remaining = max(0, session.time_limit_ms - elapsed)
+    speed_bonus = 0
+    if correct and session.mode == "time_attack":
+        speed_bonus = (remaining * SPEED_BONUS_MAX) // session.time_limit_ms
     streak_after = session.streak + 1 if correct else 0
     xp_base = XP_BASE if correct else 0
     xp_bonus = streak_bonus(streak_after) if correct else 0
-    xp_gained = xp_base + xp_bonus
+    xp_gained = xp_base + xp_bonus + speed_bonus
 
     progress = session.progress
     level_before_answer = level_for(progress.total_xp)
@@ -231,6 +257,9 @@ def answer(session: Session, option_id: str) -> AnswerResult:
         teach=dict(scenario.teach),
         badges_earned=[],
         level_up=level_up,
+        speed_bonus=speed_bonus,
+        timed_out=timed,
+        elapsed_ms=elapsed,
     )
     earned = badges.evaluate_after_answer(progress, result)
     for badge_id in earned:
@@ -241,10 +270,13 @@ def answer(session: Session, option_id: str) -> AnswerResult:
     session.index += 1
     session.answered_count += 1
     session.score += xp_gained
-    session.max_score += XP_BASE
+    session.max_score += XP_BASE + (SPEED_BONUS_MAX if session.mode == "time_attack" else 0)
     session.streak = streak_after
     session.best_streak = max(session.best_streak, streak_after)
     session.answered_ids.append(scenario.id)
+    session.speed_bonus_total += speed_bonus
+    if timed:
+        session.timed_out_count += 1
     if correct:
         session.correct_count += 1
     else:
@@ -301,6 +333,9 @@ def summary(session: Session) -> SessionSummary:
         level_after=level_for(progress.total_xp),
         mistakes=list(session.mistakes),
         recovered=bool(session.comeback_candidate and session.comeback_recovered),
+        mode=session.mode,
+        timed_out_count=session.timed_out_count,
+        speed_bonus_total=session.speed_bonus_total,
     )
 
     counters = progress.counters

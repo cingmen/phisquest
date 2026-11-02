@@ -4,9 +4,11 @@
  */
 
 import { HISTORY_LIMIT, PQError, nowIso } from './engine.js';
+import { insertEntry, normalizeEntries } from './leaderboard.js';
 
 export const PROGRESS_KEY = 'pq_progress_v1';
 export const SETTINGS_KEY = 'pq_settings_v1';
+export const LEADERBOARD_KEY = 'pq_leaderboard_v1';
 const DEBOUNCE_MS = 300;
 
 const memoryFallback = new Map();
@@ -202,6 +204,46 @@ export function exportAll() {
 }
 
 /**
+ * Muat papan skor lokal (10 teratas).
+ * @returns {object[]} entri terurut; array kosong bila belum ada.
+ */
+export function loadLeaderboard() {
+  const raw = readRaw(LEADERBOARD_KEY);
+  if (!raw) return [];
+  try {
+    const data = JSON.parse(raw);
+    const entries = Array.isArray(data) ? data : data && data.entries;
+    return normalizeEntries(entries);
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Simpan papan skor lokal.
+ * @param {object[]} entries - entri terurut.
+ * @returns {void}
+ */
+export function saveLeaderboard(entries) {
+  try {
+    writeRaw(LEADERBOARD_KEY, JSON.stringify({ schema_version: '1.0', entries }));
+  } catch (error) {
+    window.dispatchEvent(new CustomEvent('pq:storage-error', { detail: error }));
+  }
+}
+
+/**
+ * Catat satu sesi ke papan skor dan kembalikan peringkatnya.
+ * @param {object} entry - entri hasil makeEntry.
+ * @returns {{entries: object[], rank: number|null}} papan skor terbaru + peringkat.
+ */
+export function recordLeaderboardEntry(entry) {
+  const { entries, rank } = insertEntry(loadLeaderboard(), entry);
+  saveLeaderboard(entries);
+  return { entries, rank };
+}
+
+/**
  * Impor progres dari berkas ekspor.
  * @param {string|object} json - JSON mentah atau objek hasil ekspor.
  * @returns {void}
@@ -237,7 +279,7 @@ export function resetAll() {
     pendingTimer = null;
   }
   pendingProgress = null;
-  for (const key of [PROGRESS_KEY, SETTINGS_KEY]) {
+  for (const key of [PROGRESS_KEY, SETTINGS_KEY, LEADERBOARD_KEY]) {
     try {
       window.localStorage.removeItem(key);
     } catch (error) {

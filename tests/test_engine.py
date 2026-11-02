@@ -180,3 +180,38 @@ def test_golden_sesi(case: dict) -> None:
     summary = engine.summary(session).to_dict()
     for field, expected in case["expected"].items():
         assert summary[field] == expected, f"{field} ≠ harapan pada sesi '{case['name']}'"
+
+
+def test_mode_tidak_dikenal_ditolak() -> None:
+    pack = Pack("golden", "Golden", [scenario_from_golden("g-001")])
+    with pytest.raises(EngineError):
+        engine.start_session([pack], mode="kilat")
+    with pytest.raises(EngineError):
+        engine.start_session([pack], time_limit_ms=0)
+
+
+@pytest.mark.parametrize("case", GOLDEN["time_attack_cases"], ids=lambda item: item["name"])
+def test_mode_time_attack_golden(case: dict) -> None:
+    pack = Pack("golden", "Golden", [scenario_from_golden(case["scenario_id"])])
+    session = engine.start_session(
+        [pack],
+        count=1,
+        progress=Progress.from_dict(case["progress"]),
+        mode=case.get("mode", "time_attack"),
+        time_limit_ms=case.get("time_limit_ms", 20000),
+    )
+    result = engine.answer(session, case["option_id"], elapsed_ms=case["elapsed_ms"])
+    for field, expected in case["expected"].items():
+        assert getattr(result, field) == expected, f"field {field} tidak cocok"
+
+
+def test_max_score_mode_waktu_mencakup_bonus_kecepatan() -> None:
+    pack = Pack("golden", "Golden", [scenario_from_golden("g-001")])
+    classic = engine.start_session([pack], count=1, mode="classic")
+    engine.answer(classic, "PHISH", elapsed_ms=0)
+    assert classic.max_score == 10
+
+    timed = engine.start_session([pack], count=1, mode="time_attack")
+    engine.answer(timed, "PHISH", elapsed_ms=0)
+    assert timed.max_score == 15
+    assert timed.score == 15

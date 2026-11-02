@@ -3,11 +3,19 @@
 from __future__ import annotations
 
 import argparse
+import time
 from pathlib import Path
 
-from . import __version__, engine, storage, ui
+from . import __version__, engine, leaderboard, storage, ui
 from .content import default_content_dir, load_manifest, load_pack
-from .models import ContentError, PhishQuestError, Progress, Scenario
+from .models import (
+    TIME_LIMIT_MS,
+    ContentError,
+    PhishQuestError,
+    Progress,
+    Scenario,
+    now_iso,
+)
 
 MIN_QUESTIONS = 5
 MAX_QUESTIONS = 10
@@ -37,10 +45,17 @@ def build_parser() -> argparse.ArgumentParser:
     play.add_argument("--difficulty", choices=["mudah", "sedang", "sulit"], default=None)
     play.add_argument("--jumlah", type=int, default=10, help="jumlah soal (5–10, default 10)")
     play.add_argument("--seed", type=int, default=None, help="seed agar urutan soal dapat diulang")
+    play.add_argument(
+        "--mode",
+        choices=["classic", "time-attack"],
+        default="classic",
+        help="classic (default) atau time-attack (20 detik per soal + bonus kecepatan)",
+    )
 
     subparsers.add_parser("packs", help="daftar pack dan best score")
     subparsers.add_parser("stats", help="statistik pemain")
     subparsers.add_parser("badges", help="daftar lencana")
+    subparsers.add_parser("leaderboard", help="papan skor lokal perangkat ini")
 
     export = subparsers.add_parser("export", help="ekspor progres ke JSON")
     export.add_argument("path", nargs="?", default=None, help="tujuan ekspor")
@@ -100,14 +115,17 @@ def _run_session(
     difficulty: str | None,
     seed: int | None,
     progress: Progress,
+    mode: str = "classic",
 ) -> int:
     """Jalankan satu sesi penuh dari soal pertama sampai recap."""
+    engine_mode = "time_attack" if mode == "time-attack" else "classic"
     session = engine.start_session(
         packs,
         count=count,
         difficulty=difficulty,
         seed=seed,
         progress=progress,
+        mode=engine_mode,
     )
     total = len(session.scenarios)
     label = _pack_label(packs)
@@ -115,11 +133,22 @@ def _run_session(
     while engine.has_next(session):
         scenario = engine.current(session)
         assert scenario is not None
-        ui.render_header(label, session.index + 1, total, session.score, progress, session.streak)
+        remaining = int(TIME_LIMIT_MS / 1000) if engine_mode == "time_attack" else None
+        ui.render_header(
+            label,
+            session.index + 1,
+            total,
+            session.score,
+            progress,
+            session.streak,
+            remaining,
+        )
         ui.render_message(scenario)
         ui.render_question(scenario)
+        started = time.monotonic()
         option_id = _ask_answer(scenario)
-        result = engine.answer(session, option_id)
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        result = engine.answer(session, option_id, elapsed_ms=elapsed_ms)
         ui.render_feedback(result)
         storage.save_progress(progress)
         if engine.has_next(session):
@@ -127,7 +156,16 @@ def _run_session(
 
     summary = engine.summary(session)
     storage.save_progress(progress)
-    ui.render_recap(summary, progress)
+    entry = leaderboard.make_entry(
+        score=summary.score,
+        max_score=summary.max_score,
+        accuracy=summary.accuracy,
+        pack_id=summary.pack_id,
+        mode=summary.mode,
+        at=now_iso(),
+    )
+    entries, rank = storage.record_entry(entry)
+    ui.render_recap(summary, progress, entries, rank)
     ui.print_disclaimer()
     return 0
 
@@ -147,6 +185,7 @@ def cmd_play(args: argparse.Namespace) -> int:
         difficulty=args.difficulty,
         seed=args.seed,
         progress=progress,
+        mode=args.mode,
     )
 
 
@@ -169,6 +208,18 @@ def cmd_badges(args: argparse.Namespace) -> int:
     """Handler subcommand ``badges``."""
     progress = storage.load_progress() or Progress()
     ui.render_badges(progress)
+    return 0
+
+
+def cmd_leaderboard(args: argparse.Namespace) -> int:
+    """Handler subcommand ``leaderboard``."""
+    entries = storage.load_leaderboard()
+    if not entries:
+        ui.console.print(
+            "[dim]Belum ada sesi di papan skor perangkat ini. Mainkan satu sesi dulu.[/dim]"
+        )
+        return 0
+    ui.render_leaderboard(entries)
     return 0
 
 
@@ -207,7 +258,7 @@ def cmd_menu(args: argparse.Namespace) -> int:
         ui.render_packs(manifest.packs, progress)
         ui.console.print(
             "[dim]Pilih nomor pack · [c] Campur Semua · [s] statistik · "
-            "[l] lencana · [k] keluar[/dim]"
+            "[l] lencana · [t] time attack · [p] papan skor · [k] keluar[/dim]"
         )
         choice = ui.console.input("[bold yellow]> [/bold yellow]").strip().lower()
         if choice in ("k", "q", "keluar", "exit"):
@@ -218,6 +269,20 @@ def cmd_menu(args: argparse.Namespace) -> int:
             continue
         if choice in ("l", "badges", "lencana"):
             ui.render_badges(progress)
+            continue
+        if choice in ("p", "papan", "leaderboard"):
+            cmd_leaderboard(args)
+            continue
+        if choice in ("t", "time", "time-attack"):
+            packs = load_pack(_content_dir(args), None)
+            _run_session(
+                packs,
+                count=MAX_QUESTIONS,
+                difficulty=None,
+                seed=None,
+                progress=progress,
+                mode="time-attack",
+            )
             continue
         if choice in ("c", "campur"):
             packs = load_pack(_content_dir(args), None)
@@ -258,6 +323,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_stats(args)
         if args.command == "badges":
             return cmd_badges(args)
+        if args.command == "leaderboard":
+            return cmd_leaderboard(args)
         if args.command == "export":
             return cmd_export(args)
         if args.command == "reset":

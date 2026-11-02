@@ -9,13 +9,17 @@ import {
   loadAllPacks,
   loadManifest,
   loadPack,
+  nowIso,
   startSession,
 } from './engine.js';
+import { makeEntry } from './leaderboard.js';
 import {
   exportAll,
   importAll,
+  loadLeaderboard,
   loadProgress,
   loadSettings,
+  recordLeaderboardEntry,
   resetAll,
   saveProgress,
   saveSettings,
@@ -44,6 +48,12 @@ const state = {
   packLabel: '',
   lastPackId: null,
   screen: 'menu',
+  mode: 'classic',
+  remainingMs: null,
+  questionStartedAt: null,
+  timerId: null,
+  leaderboard: [],
+  rank: null,
 };
 
 const packCache = new Map();
@@ -132,7 +142,7 @@ function render() {
 
   if (state.screen === 'menu') {
     dom.screens.menu.innerHTML = state.manifest
-      ? renderMenu(state.manifest, state.progress)
+      ? renderMenu(state.manifest, state.progress, state.leaderboard)
       : '<section class="card"><p>Memuat konten…</p></section>';
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -144,12 +154,15 @@ function render() {
       position,
       total: state.session.scenarios.length,
       packLabel: state.packLabel,
+      remainingMs: state.remainingMs,
     });
   } else if (state.screen === 'recap' && state.summary) {
     dom.screens.recap.innerHTML = renderRecap(
       state.summary,
       state.progress,
       state.scenarioMap,
+      state.leaderboard,
+      state.rank,
     );
   } else if (state.screen === 'badges') {
     dom.screens.badges.innerHTML = renderBadges(state.progress);
@@ -174,7 +187,7 @@ async function getPack(packId) {
 }
 
 /** Mulai sesi baru untuk pack tertentu atau mode Campur. */
-async function playPack(packId) {
+async function playPack(packId, mode = 'classic') {
   try {
     const packs = packId ? [await getPack(packId)] : await loadAllPacks();
     state.lastPackId = packId;
@@ -182,26 +195,65 @@ async function playPack(packId) {
     state.session = startSession(packs, {
       count: QUESTIONS_PER_SESSION,
       progress: state.progress,
+      mode,
     });
+    state.mode = mode;
     state.scenarioMap = Object.fromEntries(
       state.session.scenarios.map((scenario) => [scenario.id, scenario]),
     );
     state.lastResult = null;
     state.lastScenario = null;
     state.summary = null;
+    state.rank = null;
     showScreen('game');
+    startTimer();
     announce('Sesi dimulai. Soal pertama.');
   } catch (error) {
     handleError(error);
   }
 }
 
+/** Hentikan countdown mode time attack bila sedang berjalan. */
+function stopTimer() {
+  if (state.timerId) {
+    window.clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+/** Mulai countdown; hanya aktif pada mode time attack. */
+function startTimer() {
+  stopTimer();
+  state.questionStartedAt = Date.now();
+  state.remainingMs = state.session && state.session.mode === 'time_attack' ? state.session.timeLimitMs : null;
+  if (state.remainingMs === null) return;
+  state.timerId = window.setInterval(() => {
+    const left = state.remainingMs - (Date.now() - state.questionStartedAt);
+    const chip = document.getElementById('pq-timer');
+    if (chip) chip.textContent = `⏱️ ${Math.max(0, Math.ceil(left / 1000))}s`;
+    if (left <= 0) {
+      stopTimer();
+      const scenario = state.session && state.session.current();
+      if (!scenario) return;
+      const fallback = scenario.type === 'phish_or_legit' ? 'PHISH' : String((scenario.options || [])[0].id);
+      announce('Waktu habis.');
+      submitAnswer(fallback, true);
+    }
+  }, 200);
+}
+
 /** Kirim jawaban pemain untuk soal aktif. */
-function submitAnswer(optionId) {
+function submitAnswer(optionId, timedOut = false) {
   if (state.screen !== 'game' || !state.session || state.lastResult) return;
   try {
     state.lastScenario = state.session.current();
-    state.lastResult = state.session.answer(optionId);
+    const elapsed = state.questionStartedAt ? Date.now() - state.questionStartedAt : 0;
+    const elapsedMs =
+      timedOut && state.session.mode === 'time_attack'
+        ? state.session.timeLimitMs + 1
+        : elapsed;
+    stopTimer();
+    state.lastResult = state.session.answer(optionId, elapsedMs);
     saveProgress(state.progress);
     const { correct, xp_gained: xpGained, badges_earned: badges } = state.lastResult;
     announce(`${correct ? 'Benar' : 'Belum tepat'}. ${xpGained} XP.`);
@@ -219,6 +271,7 @@ function nextStep() {
     state.lastResult = null;
     state.lastScenario = null;
     render();
+    startTimer();
     return;
   }
   finishSession();
@@ -227,8 +280,21 @@ function nextStep() {
 /** Selesaikan sesi: hitung ringkasan, simpan, tampilkan recap. */
 function finishSession() {
   try {
+    stopTimer();
     state.summary = state.session.summary();
     saveProgress(state.progress, true);
+    const entry = makeEntry({
+      score: state.summary.score,
+      maxScore: state.summary.max_score,
+      accuracy: state.summary.accuracy,
+      packId: state.summary.pack_id,
+      mode: state.summary.mode,
+      at: nowIso(),
+    });
+    const recorded = recordLeaderboardEntry(entry);
+    state.leaderboard = recorded.entries;
+    state.rank = recorded.rank;
+    state.summary.at = entry.at;
     if (state.summary.badges_earned.length) celebrate();
     showScreen('recap');
     announce('Sesi selesai. Ringkasan ditampilkan.');
@@ -292,15 +358,17 @@ function handleClick(event) {
   if (action === 'tab') {
     showScreen(target.dataset.tab);
   } else if (action === 'play') {
-    playPack(target.dataset.pack);
+    playPack(target.dataset.pack, 'classic');
   } else if (action === 'mixed') {
-    playPack(null);
+    playPack(null, 'classic');
+  } else if (action === 'time-attack') {
+    playPack(null, 'time_attack');
   } else if (action === 'answer') {
     submitAnswer(target.dataset.option);
   } else if (action === 'next') {
     nextStep();
   } else if (action === 'again') {
-    playPack(state.lastPackId);
+    playPack(state.lastPackId, state.mode);
   } else if (action === 'menu') {
     showScreen('menu');
   } else if (action === 'export') {
@@ -372,6 +440,7 @@ async function boot() {
   cacheDom();
   bindEvents();
   loadProgressSafe();
+  state.leaderboard = loadLeaderboard();
   const settings = loadSettings();
   if (settings.locale !== 'id') saveSettings({ ...settings, locale: 'id' });
   updateStats();

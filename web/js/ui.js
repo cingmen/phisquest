@@ -91,7 +91,7 @@ export function statsLabels(progress) {
  * @param {object} progress - objek Progress.
  * @returns {string} HTML layar menu.
  */
-export function renderMenu(manifest, progress) {
+export function renderMenu(manifest, progress, leaderboard = []) {
   const packs = manifest.packs
     .map((pack) => {
       const stats = (progress.packs && progress.packs[pack.pack_id]) || {};
@@ -122,7 +122,11 @@ export function renderMenu(manifest, progress) {
       <div class="btn-row" style="margin-top:12px">
         <button class="btn btn--accent btn--block" data-action="mixed">🎲 Campur Semua (10 soal)</button>
       </div>
+      <div class="btn-row">
+        <button class="btn btn--ghost btn--block" data-action="time-attack">⏱️ Time Attack · 20 detik per soal</button>
+      </div>
     </section>
+    ${leaderboard.length ? renderLeaderboardTable(leaderboard.slice(0, 3), 'Papan skor lokal · 3 terbaik') : ''}
     <section class="card">
       <h3>Ringkasan kamu</h3>
       <div class="recap-stats">
@@ -253,6 +257,7 @@ export function renderGame({
   position,
   total,
   packLabel,
+  remainingMs = null,
 }) {
   const active = result ? answeredScenario : scenario;
   if (!active) return '<section class="card"><p>Memuat soal…</p></section>';
@@ -262,6 +267,7 @@ export function renderGame({
       <span class="game-head__stats">
         <span class="chip chip--xp">${session.score} XP</span>
         <span class="chip chip--streak">🔥 ${session.streak}</span>
+        ${session.mode === 'time_attack' ? `<span class="chip chip--timer" id="pq-timer" role="timer">⏱️ ${Math.ceil((remainingMs ?? session.timeLimitMs) / 1000)}s</span>` : ''}
       </span>
     </div>
     <div class="progress">
@@ -297,7 +303,7 @@ export function renderGame({
  * @param {object} scenarioMap - peta scenario_id → skenario untuk review.
  * @returns {string} HTML layar recap.
  */
-export function renderRecap(summary, progress, scenarioMap = {}) {
+export function renderRecap(summary, progress, scenarioMap = {}, leaderboard = [], rank = null) {
   const accuracy = Math.round(summary.accuracy * 100);
   const badges = summary.badges_earned.length
     ? `<section class="card"><h3>Lencana baru</h3><div class="badge-grid">${summary.badges_earned
@@ -352,8 +358,41 @@ export function renderRecap(summary, progress, scenarioMap = {}) {
         <button class="btn btn--ghost" data-action="menu">🏠 Menu</button>
       </div>
     </section>
+    ${
+      summary.mode === 'time_attack'
+        ? `<section class="card"><p class="pack__meta">⏱️ Mode Time Attack · bonus kecepatan ${summary.speed_bonus_total} XP · ${summary.timed_out_count} soal timeout</p></section>`
+        : ''
+    }
+    ${
+      rank
+        ? `<section class="card"><p><strong>🏆 Peringkat #${rank}</strong> di papan skor perangkat ini.</p></section>`
+        : ''
+    }
+    ${leaderboard.length ? renderLeaderboardTable(leaderboard, 'Papan skor lokal', summary.at || null) : ''}
     ${badges}
     ${mistakes}`;
+}
+
+/**
+ * Tabel papan skor lokal per perangkat.
+ * @param {object[]} entries - entri terurut.
+ * @param {string} title - judul kartu.
+ * @param {string|null} highlightAt - timestamp entri sesi terbaru.
+ * @returns {string} HTML kartu papan skor.
+ */
+export function renderLeaderboardTable(entries, title = 'Papan skor lokal', highlightAt = null) {
+  const rows = entries
+    .map((entry, index) => {
+      const isNew = highlightAt !== null && entry.at === highlightAt;
+      const modeIcon = entry.mode === 'time_attack' ? '⏱️' : '🎣';
+      return `<li class="leaderboard__row${isNew ? ' leaderboard__row--new' : ''}">
+        <span class="leaderboard__rank">${index + 1}</span>
+        <span class="leaderboard__score">${Number(entry.score) || 0} XP</span>
+        <span class="leaderboard__meta">${modeIcon} ${escapeHtml(entry.pack_id || 'Campur')} · ${Math.round((Number(entry.accuracy) || 0) * 100)}%</span>
+      </li>`;
+    })
+    .join('');
+  return `<section class="card"><h3>${escapeHtml(title)}</h3><ol class="leaderboard">${rows}</ol></section>`;
 }
 
 /**

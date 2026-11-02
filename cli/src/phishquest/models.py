@@ -12,6 +12,10 @@ STREAK_STEP = 2
 STREAK_CAP = 10
 HISTORY_LIMIT = 50
 MIXED_PACK_ID = "campuran"
+TIME_LIMIT_MS = 20000
+SPEED_BONUS_MAX = 5
+LEADERBOARD_LIMIT = 10
+MODES = ("classic", "time_attack")
 
 LEVELS: list[tuple[int, str]] = [
     (0, "amatir"),
@@ -352,6 +356,9 @@ class AnswerResult:
     teach: dict[str, str]
     badges_earned: list[str]
     level_up: str | None
+    speed_bonus: int = 0
+    timed_out: bool = False
+    elapsed_ms: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Serialisasi AnswerResult sesuai kontrak api-specification §3.1."""
@@ -367,6 +374,9 @@ class AnswerResult:
             "teach": self.teach,
             "badges_earned": self.badges_earned,
             "level_up": self.level_up,
+            "speed_bonus": self.speed_bonus,
+            "timed_out": self.timed_out,
+            "elapsed_ms": self.elapsed_ms,
         }
 
 
@@ -385,6 +395,9 @@ class SessionSummary:
     level_after: str
     mistakes: list[dict[str, str]]
     recovered: bool = False
+    mode: str = "classic"
+    timed_out_count: int = 0
+    speed_bonus_total: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Serialisasi SessionSummary (termasuk field tambahan ``recovered``)."""
@@ -400,4 +413,7 @@ class SessionSummary:
             "level_after": self.level_after,
             "mistakes": self.mistakes,
             "recovered": self.recovered,
+            "mode": self.mode,
+            "timed_out_count": self.timed_out_count,
+            "speed_bonus_total": self.speed_bonus_total,
         }

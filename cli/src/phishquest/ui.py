@@ -83,6 +83,7 @@ def render_header(
     score: int,
     progress: Progress,
     streak: int,
+    remaining: int | None = None,
 ) -> Panel:
     """Panel header sesi: pack, skor, streak, dan progres soal."""
     bar_width = 20
@@ -93,6 +94,8 @@ def render_header(
         f"[green]{bar}[/green]  skor {score} · streak 🔥{streak}",
         f"[yellow]{level_line(progress)}[/yellow]",
     ]
+    if remaining is not None:
+        lines.append(f"[cyan]⏱️ Sisa waktu: {remaining} detik[/cyan]")
     return Panel(
         Group(*[Text.from_markup(line) for line in lines]),
         title="🎣 PhishQuest",
@@ -173,6 +176,15 @@ def render_feedback(result: AnswerResult) -> None:
             f"(dasar {result.xp_base}, bonus {result.xp_bonus}) · streak 🔥{result.streak_after}"
         )
     ]
+    if result.timed_out:
+        lines.append(Text.from_markup("[red]⏱️ Waktu habis — jawaban tidak dihitung.[/red]"))
+    elif result.speed_bonus:
+        lines.append(
+            Text.from_markup(
+                f"[cyan]⏱️ Bonus kecepatan +{result.speed_bonus} XP "
+                f"({result.elapsed_ms / 1000:.1f} detik)[/cyan]"
+            )
+        )
     if result.level_up:
         emoji = LEVEL_EMOJI.get(result.level_up, "⬆️")
         lines.append(
@@ -200,7 +212,12 @@ def render_feedback(result: AnswerResult) -> None:
     console.print(Panel(Group(*lines), title="Umpan balik", border_style=style, box=box.ROUNDED))
 
 
-def render_recap(summary: SessionSummary, progress: Progress) -> None:
+def render_recap(
+    summary: SessionSummary,
+    progress: Progress,
+    leaderboard: list[dict] | None = None,
+    rank: int | None = None,
+) -> None:
     """Layar recap akhir sesi."""
     accuracy = f"{summary.accuracy * 100:.0f}%"
     lines = [
@@ -241,6 +258,43 @@ def render_recap(summary: SessionSummary, progress: Progress) -> None:
             box=box.ROUNDED,
         )
     )
+    if summary.mode == "time_attack":
+        console.print(
+            Text.from_markup(
+                f"[cyan]⏱️ Time Attack · bonus kecepatan {summary.speed_bonus_total} XP "
+                f"· {summary.timed_out_count} soal timeout[/cyan]"
+            )
+        )
+    if rank:
+        console.print(
+            Text.from_markup(
+                f"[bold yellow]🏆 Peringkat #{rank} di papan skor perangkat ini.[/bold yellow]"
+            )
+        )
+    if leaderboard:
+        render_leaderboard(leaderboard)
+
+
+def render_leaderboard(entries: list[dict], title: str = "Papan skor lokal") -> None:
+    """Tabel skor terbaik yang tersimpan di perangkat ini."""
+    table = Table(title=title, box=box.SIMPLE_HEAVY)
+    table.add_column("#", width=3, style="dim")
+    table.add_column("Skor", justify="right")
+    table.add_column("Mode")
+    table.add_column("Pack")
+    table.add_column("Akurasi", justify="right")
+    table.add_column("Waktu", style="dim")
+    for index, entry in enumerate(entries, start=1):
+        mode = "⏱️ time attack" if entry.get("mode") == "time_attack" else "🎣 klasik"
+        table.add_row(
+            str(index),
+            str(entry.get("score", 0)),
+            mode,
+            str(entry.get("pack_id") or "campur"),
+            f"{float(entry.get('accuracy', 0) or 0) * 100:.0f}%",
+            str(entry.get("at", ""))[:16].replace("T", " "),
+        )
+    console.print(table)
 
 
 def render_packs(packs: list[ManifestPack], progress: Progress) -> None:

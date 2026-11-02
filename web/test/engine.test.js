@@ -18,6 +18,7 @@ import {
   startSession,
   streakBonus,
 } from '../js/engine.js';
+import { insertEntry } from '../js/leaderboard.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const golden = JSON.parse(readFileSync(resolve(here, '../../tests/fixtures/golden.json'), 'utf8'));
@@ -110,3 +111,53 @@ for (const testCase of golden.session_cases) {
     assert.deepEqual(session.summary(), summary, 'summary harus idempoten');
   });
 }
+
+for (const testCase of golden.time_attack_cases) {
+  test(`golden mode waktu: ${testCase.name}`, () => {
+    const progress = normalizeProgress(testCase.progress);
+    const session = startSession([packOf('golden', [scenarioOf(testCase.scenario_id)])], {
+      count: 1,
+      progress,
+      mode: testCase.mode,
+      timeLimitMs: testCase.time_limit_ms,
+    });
+    const result = session.answer(testCase.option_id, testCase.elapsed_ms);
+    for (const [field, expected] of Object.entries(testCase.expected)) {
+      assert.deepEqual(result[field], expected, `field ${field} tidak cocok`);
+    }
+  });
+}
+
+for (const testCase of golden.leaderboard_cases) {
+  test(`golden leaderboard: ${testCase.name}`, () => {
+    const { entries, rank } = insertEntry(testCase.entries, testCase.entry);
+    assert.equal(rank, testCase.expected_rank, 'peringkat tidak cocok');
+    assert.deepEqual(entries.map((item) => item.score), testCase.expected_scores);
+  });
+}
+
+test('mode tidak dikenal ditolak', () => {
+  assert.throws(
+    () => startSession([packOf('golden', [scenarioOf('g-001')])], { mode: 'kilat' }),
+    (error) => error instanceof PQError && error.code === 'INVALID_MODE',
+  );
+});
+
+test('batas waktu harus positif', () => {
+  assert.throws(
+    () => startSession([packOf('golden', [scenarioOf('g-001')])], { timeLimitMs: 0 }),
+    (error) => error instanceof PQError && error.code === 'INVALID_MODE',
+  );
+});
+
+test('maxScore mode waktu mencakup bonus kecepatan', () => {
+  const pack = packOf('golden', [scenarioOf('g-001')]);
+  const classic = startSession([pack], { count: 1, mode: 'classic' });
+  classic.answer('PHISH', 0);
+  assert.equal(classic.maxScore, 10);
+
+  const timed = startSession([pack], { count: 1, mode: 'time_attack' });
+  timed.answer('PHISH', 0);
+  assert.equal(timed.maxScore, 15);
+  assert.equal(timed.score, 15);
+});
