@@ -2,6 +2,12 @@
 
 > **Kenali umpan sebelum kamu terhook.**
 
+![CI](https://github.com/cingmen/phisquest/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/lisensi-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)
+![PRs welcome](https://img.shields.io/badge/PR-welcome-brightgreen.svg)
+
 PhishQuest adalah game edukasi anti-phishing berbahasa Indonesia. Pemain membaca pesan
 yang meniru email, SMS, dan WhatsApp — transaksi bank mencurigakan, paket tertahan,
 undangan beasiswa — lalu memutuskan apakah pesan itu **phishing atau legit**, memilih
@@ -24,6 +30,8 @@ plus XP, streak, level, dan lencana. Satu sumber konten JSON dipakai dua antarmu
 
 **Demo live:** <https://cingmen.github.io/phisquest/>
 
+![Tampilan menu PhishQuest di peramban](docs/assets/web-screenshot.png)
+
 Menjalankan lokal:
 
 ```bash
@@ -37,6 +45,8 @@ dependensi JavaScript eksternal (hanya Google Fonts). Untuk GitHub Pages, workfl
 saat push ke `main`.
 
 ### CLI
+
+![Demo CLI PhishQuest: daftar pack, satu soal, umpan balik, statistik, dan lencana](docs/assets/cli-demo.gif)
 
 ```bash
 pipx install ./cli        # atau: pip install ./cli

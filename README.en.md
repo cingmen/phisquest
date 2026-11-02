@@ -2,6 +2,12 @@
 
 > **Spot the bait before you get hooked.**
 
+![CI](https://github.com/cingmen/phisquest/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)
+![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
 PhishQuest is an Indonesian-language anti-phishing education game. Players read simulated
 emails, SMS, and WhatsApp messages — a suspicious Rp2,400,000 bank transaction, a held
 parcel, a fake scholarship — then decide whether the message is **phishing or legit**,
@@ -24,6 +30,8 @@ build step) and a **Python CLI** built with Rich.
 
 **Live demo:** <https://cingmen.github.io/phisquest/>
 
+![PhishQuest menu in the browser](docs/assets/web-screenshot.png)
+
 Run locally:
 
 ```bash
@@ -35,6 +43,8 @@ Pure HTML/CSS/JS. No bundler, no JS dependencies (only Google Fonts). The GitHub
 workflow assembles `web/` plus `content/` on every push to `main`.
 
 ### CLI
+
+![PhishQuest CLI demo: pack list, one question, feedback, stats, and badges](docs/assets/cli-demo.gif)
 
 ```bash
 pipx install ./cli
