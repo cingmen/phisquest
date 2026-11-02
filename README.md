@@ -22,6 +22,10 @@ plus XP, streak, level, dan lencana. Satu sumber konten JSON dipakai dua antarmu
 
 ### Web (tanpa install)
 
+**Demo live:** <https://cingmen.github.io/phisquest/>
+
+Menjalankan lokal:
+
 ```bash
 python -m http.server 8000
 # buka http://localhost:8000/web/

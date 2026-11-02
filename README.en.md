@@ -22,6 +22,10 @@ build step) and a **Python CLI** built with Rich.
 
 ### Web
 
+**Live demo:** <https://cingmen.github.io/phisquest/>
+
+Run locally:
+
 ```bash
 python -m http.server 8000
 # open http://localhost:8000/web/
