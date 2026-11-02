@@ -398,6 +398,8 @@ class SessionSummary:
     mode: str = "classic"
     timed_out_count: int = 0
     speed_bonus_total: int = 0
+    requested_count: int = 0
+    available_count: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Serialisasi SessionSummary (termasuk field tambahan ``recovered``)."""
@@ -416,4 +418,6 @@ class SessionSummary:
             "mode": self.mode,
             "timed_out_count": self.timed_out_count,
             "speed_bonus_total": self.speed_bonus_total,
+            "requested_count": self.requested_count,
+            "available_count": self.available_count,
         }

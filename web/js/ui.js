@@ -91,7 +91,7 @@ export function statsLabels(progress) {
  * @param {object} progress - objek Progress.
  * @returns {string} HTML layar menu.
  */
-export function renderMenu(manifest, progress, leaderboard = []) {
+export function renderMenu(manifest, progress, leaderboard = [], customPacks = []) {
   const packs = manifest.packs
     .map((pack) => {
       const stats = (progress.packs && progress.packs[pack.pack_id]) || {};
@@ -119,14 +119,36 @@ export function renderMenu(manifest, progress, leaderboard = []) {
     <section class="card">
       <h2>Pilih pack</h2>
       <div class="pack-grid">${packs}</div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn--accent btn--block" data-action="mixed">🎲 Campur Semua (10 soal)</button>
+      <div class="btn-row mixed-row" style="margin-top:12px">
+        <label class="mixed-row__label" for="mixed-count">Jumlah soal campur</label>
+        <select id="mixed-count" class="select" data-role="mixed-count">
+          ${[5, 10, 20, 40]
+            .map((value) => `<option value="${value}"${value === 10 ? ' selected' : ''}>${value} soal</option>`)
+            .join('')}
+        </select>
+        <button class="btn btn--accent btn--block" data-action="mixed">🎲 Campur Semua</button>
       </div>
       <div class="btn-row">
         <button class="btn btn--ghost btn--block" data-action="time-attack">⏱️ Time Attack · 20 detik per soal</button>
       </div>
     </section>
     ${leaderboard.length ? renderLeaderboardTable(leaderboard.slice(0, 3), 'Papan skor lokal · 3 terbaik') : ''}
+    <section class="card">
+      <h3>Editor skenario</h3>
+      <p class="pack__meta">Tempel JSON skenario, validasi, simpan di perangkat ini, lalu mainkan atau ekspor.</p>
+      <button class="btn btn--ghost" data-action="editor-open">Buka editor</button>
+      ${
+        customPacks.length
+          ? `<ul class="editor__packs">${customPacks
+              .map(
+                (pack) =>
+                  `<li><span>${escapeHtml(pack.name)} · ${pack.scenarios.length} skenario</span>` +
+                  `<button class="btn btn--ghost" data-action="play-custom" data-pack="${escapeHtml(pack.pack_id)}">Mainkan</button></li>`,
+              )
+              .join('')}</ul>`
+          : ''
+      }
+    </section>
     <section class="card">
       <h3>Ringkasan kamu</h3>
       <div class="recap-stats">
@@ -135,6 +157,45 @@ export function renderMenu(manifest, progress, leaderboard = []) {
         <div class="stat"><span class="stat__value">🔥 ${progress.best_streak}</span><span class="stat__label">Rekor streak</span></div>
         <div class="stat"><span class="stat__value">${answered}</span><span class="stat__label">Soal dijawab</span></div>
       </div>
+    </section>`;
+}
+
+/**
+ * Layar editor skenario (v1.1): tempel JSON, validasi, simpan lokal, ekspor.
+ * @param {object} options - isi editor, daftar masalah, pesan status, dan pack tersimpan.
+ * @returns {string} HTML layar editor.
+ */
+export function renderEditor({ text = '', errors = [], message = '', packs = [] } = {}) {
+  const list = packs.length
+    ? `<ul class="editor__packs">${packs
+        .map(
+          (pack) =>
+            `<li><span>${escapeHtml(pack.name)} · ${pack.scenarios.length} skenario</span></li>`,
+        )
+        .join('')}</ul>`
+    : '<p class="pack__meta">Belum ada pack lokal.</p>';
+
+  return `<section class="card">
+      <h2>Editor skenario</h2>
+      <p>Tempel satu skenario, array skenario, atau pack lengkap dalam format JSON. Validasi memakai aturan yang sama dengan validator konten untuk tiap skenario.</p>
+      <textarea id="editor-input" class="editor__input" rows="14" spellcheck="false" aria-label="JSON skenario">${escapeHtml(text)}</textarea>
+      <div class="btn-row">
+        <button class="btn btn--primary" data-action="editor-save">Validasi &amp; simpan</button>
+        <button class="btn btn--ghost" data-action="editor-sample">Muat contoh</button>
+        <button class="btn btn--ghost" data-action="editor-export">Ekspor pack</button>
+        <button class="btn btn--ghost" data-action="editor-delete">Hapus pack lokal</button>
+      </div>
+      ${message ? `<p class="editor__message">${escapeHtml(message)}</p>` : ''}
+      ${
+        errors.length
+          ? `<div class="editor__errors" role="alert"><h3>${errors.length} masalah ditemukan</h3><ul>${errors
+              .map((error) => `<li>${escapeHtml(error)}</li>`)
+              .join('')}</ul></div>`
+          : ''
+      }
+      <h3>Pack lokal</h3>
+      ${list}
+      <div class="btn-row"><button class="btn btn--ghost" data-action="menu">Kembali ke menu</button></div>
     </section>`;
 }
 

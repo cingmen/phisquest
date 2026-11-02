@@ -215,3 +215,23 @@ def test_max_score_mode_waktu_mencakup_bonus_kecepatan() -> None:
     engine.answer(timed, "PHISH", elapsed_ms=0)
     assert timed.max_score == 15
     assert timed.score == 15
+
+
+def test_jumlah_soal_tidak_sah_ditolak() -> None:
+    pack = Pack("golden", "Golden", [scenario_from_golden("g-001")])
+    with pytest.raises(EngineError):
+        engine.start_session([pack], count=0)
+    with pytest.raises(EngineError):
+        engine.start_session([pack], count=-3)
+
+
+def test_jumlah_melebihi_isi_pack_dipotong() -> None:
+    pack = Pack("golden", "Golden", [scenario_from_golden("g-001"), scenario_from_golden("g-002")])
+    session = engine.start_session([pack], count=99)
+    assert len(session.scenarios) == 2
+    assert session.requested_count == 99
+    engine.answer(session, "PHISH")
+    engine.answer(session, "LEGIT")
+    summary = engine.summary(session)
+    assert summary.requested_count == 99
+    assert summary.available_count == 2

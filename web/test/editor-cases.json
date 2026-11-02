@@ -1,0 +1,92 @@
+{
+  "_note": "Dipakai web/test/editor.test.js dan tests/test_editor_contract.py: skenario 'valid' harus lolos kedua validator, 'invalid' harus ditolak keduanya.",
+  "valid": [
+    {
+      "id": "ew-201",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": { "name": "DompetKu", "address": "keamanan@dompetku-verifikasi.example" },
+      "subject": "Verifikasi akun Anda",
+      "datetime": "2026-11-03T09:00:00+07:00",
+      "body": "Halo, akun Anda dibatasi. Buka tautan berikut dalam 1x24 jam untuk verifikasi dan kirim kode OTP Anda.",
+      "link": {
+        "text": "dompetku-verifikasi.example/aktifkan",
+        "href": "http://dompetku-verifikasi.example/aktifkan"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": ["DOMAIN_PALSU", "MEMINTA_DATA_SENSITIF", "TEKANAN_WAKTU"],
+      "explanation": "Domain dompetku-verifikasi.example bukan dompetku.example, dan OTP tidak pernah diminta lewat email.",
+      "teach": {
+        "tip": "Kode OTP tidak boleh dibagikan kepada siapa pun.",
+        "verify_how": "Buka aplikasi DompetKu langsung dan cek notifikasi di sana."
+      }
+    },
+    {
+      "id": "of-201",
+      "type": "best_action",
+      "difficulty": "mudah",
+      "channel": "sms",
+      "sender": { "name": "HRD Korporat", "address": "0811-2000-3000" },
+      "subject": null,
+      "datetime": "2026-11-03T10:00:00+07:00",
+      "body": "Slip gaji November sudah bisa diunduh di portal payroll kantor. Tidak ada data yang perlu dikirim.",
+      "link": null,
+      "attachment": null,
+      "options": [
+        { "id": "A", "text": "Balas dengan PIN gaji" },
+        { "id": "B", "text": "Buka portal payroll resmi kantor" },
+        { "id": "C", "text": "Kirim kode OTP lewat SMS" },
+        { "id": "D", "text": "Abaikan informasi gaji" }
+      ],
+      "is_phish": false,
+      "correct_option": "B",
+      "red_flags": [],
+      "explanation": "Pesan hanya mengabarkan slip gaji tanpa meminta data sensitif apa pun.",
+      "teach": {
+        "tip": "Akses portal lewat alamat resmi kantor.",
+        "verify_how": "Buka aplikasi payroll kantor secara langsung."
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "tipe soal tidak dikenal",
+      "expect": "type",
+      "scenario": { "id": "ew-202", "type": "kuis", "difficulty": "mudah", "channel": "sms", "sender": { "name": "DompetKu", "address": "0811" }, "subject": null, "datetime": "2026-11-03T09:00:00+07:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": null, "is_phish": true, "correct_option": null, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"], "explanation": "Penjelasan.", "teach": { "tip": "Tip.", "verify_how": "Cek." } }
+    },
+    {
+      "name": "teach hilang",
+      "expect": "teach",
+      "scenario": { "id": "ew-203", "type": "phish_or_legit", "difficulty": "mudah", "channel": "sms", "sender": { "name": "DompetKu", "address": "0811" }, "subject": null, "datetime": "2026-11-03T09:00:00+07:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": null, "is_phish": true, "correct_option": null, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"], "explanation": "Penjelasan.", "teach": null }
+    },
+    {
+      "name": "phishing dengan satu red flag",
+      "expect": "red flag",
+      "scenario": { "id": "ew-204", "type": "phish_or_legit", "difficulty": "mudah", "channel": "sms", "sender": { "name": "DompetKu", "address": "0811" }, "subject": null, "datetime": "2026-11-03T09:00:00+07:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": null, "is_phish": true, "correct_option": null, "red_flags": ["DOMAIN_PALSU"], "explanation": "Penjelasan.", "teach": { "tip": "Tip.", "verify_how": "Cek." } }
+    },
+    {
+      "name": "pesan legit dengan red flag",
+      "expect": "red flag",
+      "scenario": { "id": "ew-205", "type": "phish_or_legit", "difficulty": "mudah", "channel": "sms", "sender": { "name": "DompetKu", "address": "0811" }, "subject": null, "datetime": "2026-11-03T09:00:00+07:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": null, "is_phish": false, "correct_option": null, "red_flags": ["TEKANAN_WAKTU"], "explanation": "Penjelasan.", "teach": { "tip": "Tip.", "verify_how": "Cek." } }
+    },
+    {
+      "name": "domain memakai brand nyata",
+      "expect": "brand",
+      "scenario": { "id": "ew-206", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "sender": { "name": "BCA", "address": "cs@bca.example" }, "subject": "Promo", "datetime": "2026-11-03T09:00:00+07:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": null, "is_phish": true, "correct_option": null, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"], "explanation": "Penjelasan.", "teach": { "tip": "Tip.", "verify_how": "Cek." } }
+    },
+    {
+      "name": "datetime bukan ISO +07:00",
+      "expect": "datetime",
+      "scenario": { "id": "ew-207", "type": "phish_or_legit", "difficulty": "mudah", "channel": "sms", "sender": { "name": "DompetKu", "address": "0811" }, "subject": null, "datetime": "2026-11-03 09:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": null, "is_phish": true, "correct_option": null, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"], "explanation": "Penjelasan.", "teach": { "tip": "Tip.", "verify_how": "Cek." } }
+    },
+    {
+      "name": "correct_option tidak merujuk opsi",
+      "expect": "correct_option",
+      "scenario": { "id": "of-202", "type": "best_action", "difficulty": "mudah", "channel": "sms", "sender": { "name": "HRD", "address": "0811" }, "subject": null, "datetime": "2026-11-03T09:00:00+07:00", "body": "Isi pesan.", "link": null, "attachment": null, "options": [ { "id": "A", "text": "Satu" }, { "id": "B", "text": "Dua" }, { "id": "C", "text": "Tiga" } ], "is_phish": true, "correct_option": "Z", "red_flags": ["TEKANAN_WAKTU", "ANCAMAN"], "explanation": "Penjelasan.", "teach": { "tip": "Tip.", "verify_how": "Cek." } }
+    }
+  ]
+}

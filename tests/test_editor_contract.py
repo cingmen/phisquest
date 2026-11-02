@@ -1,0 +1,33 @@
+"""Kontrak mini editor: fixture `web/test/editor-cases.json` harus dinilai sama oleh
+validator Python dan validasi JavaScript di `web/js/scenario_editor.js`.
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+import validate_content as validator  # noqa: E402
+
+CASES = json.loads((ROOT / "web" / "test" / "editor-cases.json").read_text(encoding="utf-8"))
+
+
+def _errors_for(scenario: dict) -> list[validator.Issue]:
+    issues: list[validator.Issue] = []
+    prefix = str(scenario.get("id", "ew-000"))[:2]
+    validator.validate_scenario(issues, scenario, "editor.json", prefix)
+    return [issue for issue in issues if issue.level == "ERROR"]
+
+
+def test_skenario_contoh_editor_lolos_validator() -> None:
+    for scenario in CASES["valid"]:
+        assert _errors_for(scenario) == [], f"skenario {scenario['id']} seharusnya valid"
+
+
+def test_skenario_bermasalah_ditolak_validator() -> None:
+    for case in CASES["invalid"]:
+        assert _errors_for(case["scenario"]), f"{case['name']} seharusnya ditolak validator"

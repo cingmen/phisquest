@@ -254,6 +254,7 @@ export class Session {
     this.summaryCache = null;
     this.timedOutCount = 0;
     this.speedBonusTotal = 0;
+    this.requestedCount = 0;
   }
 
   /**
@@ -402,6 +403,8 @@ export class Session {
       mode: this.mode,
       timed_out_count: this.timedOutCount,
       speed_bonus_total: this.speedBonusTotal,
+      requested_count: this.requestedCount,
+      available_count: this.scenarios.length,
     };
 
     progress.counters.sessions_completed =
@@ -461,6 +464,9 @@ export function startSession(
   if (!(Number(timeLimitMs) > 0)) {
     throw new PQError('INVALID_MODE', 'Batas waktu harus lebih dari 0 milidetik.');
   }
+  if (!(Number(count) >= 1)) {
+    throw new PQError('INVALID_COUNT', 'Jumlah soal minimal 1.');
+  }
   const pool = [];
   for (const pack of packs) {
     for (const scenario of pack.scenarios || []) {
@@ -478,7 +484,7 @@ export function startSession(
   }
   const selected = pool.slice(0, Math.max(1, Number(count)));
   const player = progress || createProgress();
-  return new Session({
+  const session = new Session({
     scenarios: selected,
     progress: player,
     packId: packs.length === 1 ? packs[0].pack_id : null,
@@ -486,4 +492,6 @@ export function startSession(
     mode,
     timeLimitMs: Number(timeLimitMs),
   });
+  session.requestedCount = Math.max(1, Math.trunc(Number(count)));
+  return session;
 }

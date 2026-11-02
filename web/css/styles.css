@@ -916,3 +916,14 @@ a {
   color: var(--pq-muted);
   font-size: 13px;
 }
+
+/* v1.1: pilihan jumlah soal campur + mini editor skenario */
+.mixed-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mixed-row__label { font-size: 0.9rem; opacity: 0.8; }
+.select { padding: 8px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); color: inherit; border: 1px solid rgba(255, 255, 255, 0.18); }
+.editor__input { width: 100%; min-height: 220px; margin: 12px 0; padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(2, 6, 23, 0.65); color: inherit; font-family: ui-monospace, Consolas, monospace; font-size: 0.85rem; line-height: 1.5; }
+.editor__message { margin: 8px 0; color: #22C55E; }
+.editor__errors { margin: 12px 0; padding: 12px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.08); }
+.editor__errors ul { margin: 8px 0 0; padding-left: 20px; }
+.editor__packs { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+.editor__packs li { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }

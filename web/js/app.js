@@ -13,9 +13,13 @@ import {
   startSession,
 } from './engine.js';
 import { makeEntry } from './leaderboard.js';
+import { SAMPLE_PACK, parsePackText } from './scenario_editor.js';
 import {
+  addCustomPack,
+  clearCustomPacks,
   exportAll,
   importAll,
+  loadCustomPacks,
   loadLeaderboard,
   loadProgress,
   loadSettings,
@@ -30,11 +34,12 @@ import {
   renderBadges,
   renderGame,
   renderMenu,
+  renderEditor,
   renderRecap,
   statsLabels,
 } from './ui.js';
 
-const SCREENS = ['menu', 'game', 'recap', 'badges', 'about'];
+const SCREENS = ['menu', 'game', 'recap', 'badges', 'about', 'editor'];
 const QUESTIONS_PER_SESSION = 10;
 
 const state = {
@@ -54,6 +59,10 @@ const state = {
   timerId: null,
   leaderboard: [],
   rank: null,
+  customPacks: [],
+  editorText: '',
+  editorErrors: [],
+  editorMessage: '',
 };
 
 const packCache = new Map();
@@ -142,8 +151,15 @@ function render() {
 
   if (state.screen === 'menu') {
     dom.screens.menu.innerHTML = state.manifest
-      ? renderMenu(state.manifest, state.progress, state.leaderboard)
+      ? renderMenu(state.manifest, state.progress, state.leaderboard, state.customPacks)
       : '<section class="card"><p>Memuat konten…</p></section>';
+  } else if (state.screen === 'editor') {
+    dom.screens.editor.innerHTML = renderEditor({
+      text: state.editorText,
+      errors: state.editorErrors,
+      message: state.editorMessage,
+      packs: state.customPacks,
+    });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
     dom.screens.game.innerHTML = renderGame({
@@ -180,6 +196,8 @@ function showScreen(name) {
 
 /** Ambil pack dari cache atau konten. */
 async function getPack(packId) {
+  const custom = state.customPacks.find((pack) => pack.pack_id === packId);
+  if (custom) return custom;
   if (packCache.has(packId)) return packCache.get(packId);
   const pack = await loadPack(packId);
   packCache.set(packId, pack);
@@ -187,13 +205,13 @@ async function getPack(packId) {
 }
 
 /** Mulai sesi baru untuk pack tertentu atau mode Campur. */
-async function playPack(packId, mode = 'classic') {
+async function playPack(packId, mode = 'classic', count = QUESTIONS_PER_SESSION) {
   try {
     const packs = packId ? [await getPack(packId)] : await loadAllPacks();
     state.lastPackId = packId;
-    state.packLabel = packId ? packs[0].name : 'Campur Semua';
+    state.packLabel = packId ? packs[0].name : `Campur Semua · ${count} soal`;
     state.session = startSession(packs, {
-      count: QUESTIONS_PER_SESSION,
+      count,
       progress: state.progress,
       mode,
     });
@@ -304,6 +322,68 @@ function finishSession() {
 }
 
 /** Unduh progres sebagai berkas JSON. */
+function saveEditorPack() {
+  const input = document.getElementById('editor-input');
+  state.editorText = input ? input.value : state.editorText;
+  const { pack, errors } = parsePackText(state.editorText);
+  if (!pack) {
+    state.editorErrors = errors;
+    state.editorMessage = 'Perbaiki masalah berikut sebelum menyimpan.';
+    render();
+    announce('Validasi gagal.');
+    return;
+  }
+  try {
+    state.customPacks = addCustomPack(pack);
+  } catch (error) {
+    handleError(error);
+    return;
+  }
+  state.editorErrors = [];
+  state.editorMessage = `Tersimpan: ${pack.name} (${pack.scenarios.length} skenario). Buka menu untuk memainkannya.`;
+  state.editorText = '';
+  render();
+  announce('Pack lokal tersimpan.');
+}
+
+/** Ekspor pack lokal terakhir sebagai berkas content pack. */
+function exportCustomPack() {
+  const pack = state.customPacks[state.customPacks.length - 1];
+  if (!pack) {
+    showToast('Belum ada pack lokal untuk diekspor.');
+    return;
+  }
+  try {
+    const blob = new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${pack.pack_id}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast(`${pack.name} diekspor sebagai JSON.`);
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+/** Hapus seluruh pack lokal setelah konfirmasi. */
+function deleteCustomPacks() {
+  if (!state.customPacks.length) {
+    showToast('Tidak ada pack lokal.');
+    return;
+  }
+  if (!window.confirm('Hapus semua pack buatanmu di perangkat ini?')) return;
+  clearCustomPacks();
+  state.customPacks = [];
+  state.editorMessage = 'Pack lokal dihapus.';
+  render();
+  showToast('Pack lokal dihapus.');
+}
+
+/** Unduh progres sebagai berkas JSON. */
 function downloadExport() {
   try {
     const payload = JSON.stringify(exportAll(), null, 2);
@@ -360,9 +440,28 @@ function handleClick(event) {
   } else if (action === 'play') {
     playPack(target.dataset.pack, 'classic');
   } else if (action === 'mixed') {
-    playPack(null, 'classic');
+    const select = document.getElementById('mixed-count');
+    const count = Number(select && select.value) || QUESTIONS_PER_SESSION;
+    playPack(null, 'classic', count);
   } else if (action === 'time-attack') {
     playPack(null, 'time_attack');
+  } else if (action === 'play-custom') {
+    const pack = state.customPacks.find((item) => item.pack_id === target.dataset.pack);
+    if (pack) playPack(pack.pack_id, 'classic', Math.min(QUESTIONS_PER_SESSION, pack.scenarios.length));
+  } else if (action === 'editor-open') {
+    state.editorErrors = [];
+    showScreen('editor');
+  } else if (action === 'editor-sample') {
+    state.editorText = SAMPLE_PACK;
+    state.editorErrors = [];
+    state.editorMessage = 'Contoh dimuat. Tekan "Validasi & simpan" untuk mencoba.';
+    render();
+  } else if (action === 'editor-save') {
+    saveEditorPack();
+  } else if (action === 'editor-export') {
+    exportCustomPack();
+  } else if (action === 'editor-delete') {
+    deleteCustomPacks();
   } else if (action === 'answer') {
     submitAnswer(target.dataset.option);
   } else if (action === 'next') {
@@ -441,6 +540,7 @@ async function boot() {
   bindEvents();
   loadProgressSafe();
   state.leaderboard = loadLeaderboard();
+  state.customPacks = loadCustomPacks();
   const settings = loadSettings();
   if (settings.locale !== 'id') saveSettings({ ...settings, locale: 'id' });
   updateStats();

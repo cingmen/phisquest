@@ -161,3 +161,23 @@ test('maxScore mode waktu mencakup bonus kecepatan', () => {
   assert.equal(timed.maxScore, 15);
   assert.equal(timed.score, 15);
 });
+
+test('jumlah soal tidak sah ditolak', () => {
+  const pack = packOf('golden', [scenarioOf('g-001')]);
+  assert.throws(
+    () => startSession([pack], { count: 0 }),
+    (error) => error instanceof PQError && error.code === 'INVALID_COUNT',
+  );
+});
+
+test('jumlah melebihi isi pack dipotong tanpa error', () => {
+  const pack = packOf('golden', [scenarioOf('g-001'), scenarioOf('g-002')]);
+  const session = startSession([pack], { count: 99 });
+  assert.equal(session.scenarios.length, 2);
+  assert.equal(session.requestedCount, 99);
+  session.answer('PHISH');
+  session.answer('LEGIT');
+  const summary = session.summary();
+  assert.equal(summary.requested_count, 99);
+  assert.equal(summary.available_count, 2);
+});

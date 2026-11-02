@@ -822,6 +822,68 @@
         ],
         "recovered": true
       }
+    },
+    {
+      "name": "campur memotong jumlah melebihi isi pack",
+      "pack_id": "golden",
+      "scenario_ids": [
+        "g-001",
+        "g-002",
+        "g-003",
+        "g-004",
+        "g-005"
+      ],
+      "count": 99,
+      "seed": 11,
+      "progress": {},
+      "answers": {
+        "g-003": "C",
+        "g-001": "PHISH",
+        "g-005": "PHISH",
+        "g-002": "LEGIT",
+        "g-004": "B"
+      },
+      "expected_order": [
+        "g-003",
+        "g-001",
+        "g-005",
+        "g-002",
+        "g-004"
+      ],
+      "expected": {
+        "mode": "classic",
+        "requested_count": 99,
+        "available_count": 5
+      }
+    },
+    {
+      "name": "campur mengambil sebagian isi pack",
+      "pack_id": "golden",
+      "scenario_ids": [
+        "g-001",
+        "g-002",
+        "g-003",
+        "g-004",
+        "g-005"
+      ],
+      "count": 3,
+      "seed": 7,
+      "progress": {},
+      "answers": {
+        "g-005": "PHISH",
+        "g-004": "B",
+        "g-001": "PHISH"
+      },
+      "expected_order": [
+        "g-005",
+        "g-004",
+        "g-001"
+      ],
+      "expected": {
+        "mode": "classic",
+        "requested_count": 3,
+        "available_count": 3
+      }
     }
   ],
   "time_attack_cases": [

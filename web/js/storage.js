@@ -9,11 +9,61 @@ import { insertEntry, normalizeEntries } from './leaderboard.js';
 export const PROGRESS_KEY = 'pq_progress_v1';
 export const SETTINGS_KEY = 'pq_settings_v1';
 export const LEADERBOARD_KEY = 'pq_leaderboard_v1';
+export const CUSTOM_PACKS_KEY = 'pq_custom_packs_v1';
 const DEBOUNCE_MS = 300;
 
 const memoryFallback = new Map();
 let pendingTimer = null;
 let pendingProgress = null;
+
+/**
+ * Baca pack buatan pemain dari editor.
+ * @returns {Array<object>} daftar pack lokal (kosong bila belum ada atau rusak).
+ */
+export function loadCustomPacks() {
+  const raw = readRaw(CUSTOM_PACKS_KEY);
+  if (!raw) return [];
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) return [];
+    return data.filter(
+      (pack) => pack && typeof pack.pack_id === 'string' && Array.isArray(pack.scenarios),
+    );
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Simpan seluruh pack lokal.
+ * @param {Array<object>} packs - pack yang disimpan.
+ * @returns {Array<object>} pack yang tersimpan.
+ */
+export function saveCustomPacks(packs) {
+  writeRaw(CUSTOM_PACKS_KEY, JSON.stringify(packs));
+  return packs;
+}
+
+/**
+ * Tambah atau ganti pack lokal dengan pack_id yang sama.
+ * @param {object} pack - pack hasil editor.
+ * @returns {Array<object>} daftar pack terbaru.
+ */
+export function addCustomPack(pack) {
+  const packs = loadCustomPacks().filter((item) => item.pack_id !== pack.pack_id);
+  packs.push(pack);
+  saveCustomPacks(packs);
+  return packs;
+}
+
+/**
+ * Hapus semua pack lokal.
+ * @returns {Array<object>} daftar kosong.
+ */
+export function clearCustomPacks() {
+  saveCustomPacks([]);
+  return [];
+}
 
 /**
  * Baca nilai mentah dari localStorage dengan fallback memori.
@@ -279,7 +329,7 @@ export function resetAll() {
     pendingTimer = null;
   }
   pendingProgress = null;
-  for (const key of [PROGRESS_KEY, SETTINGS_KEY, LEADERBOARD_KEY]) {
+  for (const key of [PROGRESS_KEY, SETTINGS_KEY, LEADERBOARD_KEY, CUSTOM_PACKS_KEY]) {
     try {
       window.localStorage.removeItem(key);
     } catch (error) {

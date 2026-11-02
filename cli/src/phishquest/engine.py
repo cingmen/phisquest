@@ -76,6 +76,7 @@ class Session:
     summary_cache: SessionSummary | None = None
     timed_out_count: int = 0
     speed_bonus_total: int = 0
+    requested_count: int = 0
 
 
 def streak_bonus(streak_after: int) -> int:
@@ -121,6 +122,8 @@ def start_session(
         raise EngineError(f"Mode '{mode}' tidak dikenal; pilih {' atau '.join(MODES)}.")
     if int(time_limit_ms) <= 0:
         raise EngineError("Batas waktu harus lebih dari 0 milidetik.")
+    if int(count) < 1:
+        raise EngineError("Jumlah soal minimal 1; nilai yang lebih kecil tidak masuk akal.")
     pool: list[Scenario] = []
     for pack in packs:
         for scenario in pack.scenarios:
@@ -148,6 +151,7 @@ def start_session(
         level_before=level_for(player.total_xp),
         mode=mode,
         time_limit_ms=int(time_limit_ms),
+        requested_count=limit,
     )
 
 
@@ -336,6 +340,8 @@ def summary(session: Session) -> SessionSummary:
         mode=session.mode,
         timed_out_count=session.timed_out_count,
         speed_bonus_total=session.speed_bonus_total,
+        requested_count=session.requested_count,
+        available_count=len(session.scenarios),
     )
 
     counters = progress.counters

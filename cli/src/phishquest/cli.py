@@ -19,6 +19,7 @@ from .models import (
 
 MIN_QUESTIONS = 5
 MAX_QUESTIONS = 10
+MAX_MIXED_QUESTIONS = 40
 QUIT_TOKENS = ("Q", "KELUAR", "EXIT")
 
 
@@ -172,9 +173,10 @@ def _run_session(
 
 def cmd_play(args: argparse.Namespace) -> int:
     """Handler subcommand ``play``."""
-    if not MIN_QUESTIONS <= args.jumlah <= MAX_QUESTIONS:
+    batas_atas = MAX_QUESTIONS if args.pack_id else MAX_MIXED_QUESTIONS
+    if not MIN_QUESTIONS <= args.jumlah <= batas_atas:
         ui.console.print(
-            f"[red]--jumlah harus {MIN_QUESTIONS}–{MAX_QUESTIONS}, bukan {args.jumlah}.[/red]"
+            f"[red]--jumlah harus {MIN_QUESTIONS}–{batas_atas}, bukan {args.jumlah}.[/red]"
         )
         return 2
     progress = storage.load_progress() or Progress()
@@ -286,6 +288,24 @@ def cmd_menu(args: argparse.Namespace) -> int:
             continue
         if choice in ("c", "campur"):
             packs = load_pack(_content_dir(args), None)
+            raw_count = ui.console.input(
+                "[yellow]Jumlah soal campur (5–40, Enter = 10): [/yellow]"
+            ).strip()
+            try:
+                count = int(raw_count) if raw_count else MAX_QUESTIONS
+            except ValueError:
+                count = 0
+            if not MIN_QUESTIONS <= count <= MAX_MIXED_QUESTIONS:
+                ui.console.print("[red]Jumlah soal harus 5–40.[/red]")
+                continue
+            _run_session(
+                packs,
+                count=count,
+                difficulty=None,
+                seed=None,
+                progress=progress,
+            )
+            continue
         elif choice.isdigit() and 1 <= int(choice) <= len(manifest.packs):
             meta = manifest.packs[int(choice) - 1]
             packs = load_pack(_content_dir(args), meta.pack_id)
