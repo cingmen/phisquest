@@ -83,6 +83,14 @@ python -m pytest tests/
 node --test web/test/*.test.js
 ```
 
+## Time Attack & local leaderboard (v1.1)
+
+- **⏱️ Time Attack** — 10 mixed questions, 20 seconds each. Correct answers earn up to +5 XP
+  speed bonus; running out of time counts as wrong and resets the streak.
+- **🏆 Local leaderboard** — the 10 best sessions per device (score, accuracy, mode, pack) in
+  web `localStorage` and `~/.phishquest/leaderboard.json` for the CLI. No backend, no account.
+- CLI: `phishquest play --mode time-attack` and `phishquest leaderboard`.
+
 ## Ethics & legal
 
 > PhishQuest is an educational simulation. Every email, brand, and domain in it is

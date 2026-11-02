@@ -316,3 +316,14 @@ FROM scores;
 3. ❌ Menghitung `level` saat baca tanpa sinkron dengan `total_xp` (sumber kebenaran = `total_xp`; `level` disimpan hanya untuk tampilan cepat dan selalu dihitung ulang saat save).
 4. ❌ Menulis file konten dari kode (konten read-only).
 5. ❌ Menambah dependensi hanya untuk penyimpanan (mis. IndexedDB library, platformdirs) tanpa revisi dokumen ini.
+
+## 7. Papan skor lokal (v1.1)
+
+| Media | Kunci/berkas | Isi |
+|---|---|---|
+| Web | `localStorage` → `pq_leaderboard_v1` | `{"schema_version":"1.0","entries":[...]}` |
+| CLI | `~/.phishquest/leaderboard.json` | sama, ditulis atomik (tmp + rename) |
+
+Entri: `score`, `max_score`, `accuracy` (0..1, 4 desimal), `pack_id` (`null` = campur),
+`mode` (`classic`/`time_attack`), `at`. Maksimum 10 entri; `reset` menghapus berkas ini.
+

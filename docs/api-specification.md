@@ -428,3 +428,34 @@ Error: `400 VALIDATION_ERROR` · `409 DUPLICATE` (Idempotency-Key sama) · `422 
 | `summary.score` | `summary.accuracy` · `summary.level_after` |
 
 Rumus yang diuji eksplisit: XP dasar 10; bonus streak `min((streak−1)×2, 10)`; ambang level 0/100/250/450/650; lencana sesuai PRD §7.4.
+
+## 10. Tambahan v1.1 — mode terbatas waktu & papan skor lokal
+
+### 10.1 Mode sesi
+
+`start_session(packs, mode=..., time_limit_ms=...)` / `startSession(packs, {mode, timeLimitMs})`.
+`mode` menerima `classic` (default) atau `time_attack`; `time_limit_ms` default `20000`.
+Mode tidak dikenal menghasilkan `EngineError` / `PQError('INVALID_MODE')`.
+
+### 10.2 Penilaian mode time_attack
+
+`answer(session, option_id, elapsed_ms)` / `session.answer(optionId, elapsedMs)`:
+
+| Kondisi | Efek |
+|---|---|
+| `elapsed_ms > time_limit_ms` | `correct=false`, `timed_out=true`, XP 0, streak 0 |
+| benar & dalam waktu | `speed_bonus = floor((limit − elapsed) × 5 / limit)` (0–5) |
+| `xp_gained` | `xp_base + xp_bonus + speed_bonus` |
+| `max_score` per soal | `10 + 5` pada mode time attack |
+
+Field baru `AnswerResult`: `speed_bonus`, `timed_out`, `elapsed_ms`.
+Field baru `SessionSummary`: `mode`, `timed_out_count`, `speed_bonus_total`.
+
+### 10.3 Papan skor lokal
+
+Entri: `{score, max_score, accuracy, pack_id, mode, at}`.
+Urutan: skor desc → akurasi desc → `at` asc; maksimum 10 entri.
+Fungsi murni: `insert_entry(entries, entry) -> (entries, rank)` dan
+`insertEntry(entries, entry) -> {entries, rank}`; `rank` 1-basis atau `null` bila tidak
+masuk 10 teratas.
+

@@ -424,7 +424,7 @@ stateDiagram-v2
 | Versi | Isi | Status |
 |-------|-----|--------|
 | **v1.0.0** | F1–F11, 40 skenario, web + CLI + Pages + README dwibahasa | Target saat ini |
-| **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Rencana |
+| **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Time attack + leaderboard dirilis |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

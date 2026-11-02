@@ -126,6 +126,14 @@ node --test web/test/*.test.js                       # golden test JavaScript
 Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redflag`,
 3 mudah/4 sedang/3 sulit, dan keseimbangan 6 phishing : 4 legit.
 
+## Mode Time Attack & papan skor lokal (v1.1)
+
+- **⏱️ Time Attack** — 10 soal campur, 20 detik per soal. Jawaban benar dapat bonus kecepatan
+  hingga +5 XP; lewat batas waktu dihitung salah dan streak kembali 0.
+- **🏆 Papan skor lokal** — 10 sesi terbaik per perangkat (skor, akurasi, mode, pack) di
+  `localStorage` web dan `~/.phishquest/leaderboard.json` di CLI. Tanpa backend dan tanpa akun.
+- CLI: `phishquest play --mode time-attack` dan `phishquest leaderboard`.
+
 ## Etika & legal
 
 > PhishQuest adalah simulasi edukasi. Semua email, brand, dan domain di dalamnya fiktif.

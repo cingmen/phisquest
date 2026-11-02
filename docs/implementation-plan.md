@@ -181,3 +181,11 @@ fondasi  konten  engine  CLI    web    rilis
 | **Total** | **8,5 hari** |
 
 Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP); M4–M5 menambah daya tarik demo web. Jangan tukar urutan M1 ← M2: engine tanpa konten nyata = test yang menguji buatan sendiri.
+
+## 13. Status v1.1
+
+- [x] Mode Terbatas Waktu (20 detik/soal + bonus kecepatan) — web & CLI, golden test dua bahasa
+- [x] Leaderboard lokal per perangkat — `pq_leaderboard_v1` (web) dan `leaderboard.json` (CLI)
+- [ ] Mode Campur dengan jumlah soal pilihan
+- [ ] Mini editor skenario (tempel JSON → validasi → main)
+
