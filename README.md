@@ -161,7 +161,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 - **🗑️ Hapus satu pack & gandakan skenario (v1.6)** — setiap pack tersimpan punya tombol **Hapus**
   dengan konfirmasi bernama; draft editor (termasuk draft yang berasal dari pack itu) tetap aman.
   Di editor, tombol **⧉** menyalin skenario terpilih dengan id berikutnya sesuai prefix pack, jadi
-  salinannya langsung valid dan siap disunting.
+  salinannya langsung valid dan siap disunting. Sejak v1.6.1 penghapusan benar-benar permanen:
+  autosave tidak membuat pack baru, dan draft yang pack sumbernya sudah dihapus ditandai
+  **“pack sumber sudah dihapus”** — isian tetap aman, tetapi hanya tombol **Simpan skenario** yang
+  membuatnya kembali ke daftar main.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

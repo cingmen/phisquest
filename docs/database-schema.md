@@ -393,6 +393,13 @@ editor melepas pack aktif (draft tetap di perangkat) dan pesannya menyebut draft
 dari menu. `clearCustomPacks()` tetap dipakai tombol hapus semua dan baru saat itu draft ikut dibersihkan
 lewat `clearDraftPacks()`.
 
+Sejak v1.6.1 autosave (debounce input, `change`, dan `beforeunload`) tidak pernah menambah entri baru ke
+`pq_custom_packs_v1`: `savePlan()` hanya mengizinkan penulisan daftar main bila pack sudah ada di sana
+atau bila pengguna menekan **Simpan skenario**. Akibatnya pack yang dihapus tetap hilang meski draft-nya
+dilanjutkan dan halaman di-reload. Draft seperti itu disebut draft yatim (`draftIsOrphan()`), memakai
+`source_pack_id` yang tidak ada lagi di daftar main, dan ditandai di menu (“pack sumber sudah dihapus”)
+serta di editor (catatan bahwa isian aman tetapi hanya masuk daftar main lewat simpan eksplisit).
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.

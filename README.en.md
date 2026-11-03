@@ -119,7 +119,10 @@ node --test web/test/*.test.js
 - **🗑️ Delete one pack & duplicate a scenario (v1.6)** — every saved pack has a **Delete** button
   with a confirmation that names the pack; editor drafts (including drafts that came from that
   pack) stay intact. In the editor, **⧉** copies the selected scenario with the next id for the
-  pack prefix, so the copy is immediately valid and ready to edit.
+  pack prefix, so the copy is immediately valid and ready to edit. Since v1.6.1 deletion is truly
+  permanent: autosave never recreates a pack, and drafts whose source pack is gone are marked
+  **“pack sumber sudah dihapus”** — the work stays safe, but only an explicit **Save scenario**
+  brings the pack back to the playable list.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

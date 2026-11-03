@@ -146,6 +146,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v1.4.0** | Pemilih `pack_id` konten + penyelarasan prefix id; draft editor belum valid tersimpan di kunci terpisah sehingga bertahan setelah reload tanpa menimpa pack valid | 1 hari | Dirilis (v1.4.0) |
 | **v1.5.0** | Penjaga bentrok `pack_id` (pack lain tidak tertimpa, draft tetap tersimpan) dan daftar draft di menu dengan tombol “Lanjutkan draft” | 1 hari | Dirilis (v1.5.0) |
 | **v1.6.0** | Hapus satu pack tersimpan dengan konfirmasi bernama (draft tidak ikut terhapus) dan aksi gandakan skenario ber-id baru | 1 hari | Dirilis (v1.6.0) |
+| **v1.6.1** | Autosave berhenti membuat pack baru (hanya memperbarui pack yang sudah ada); draft yatim ditandai dan hanya simpan eksplisit yang memulihkan pack | 1 hari | Dirilis (v1.6.1) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Belum dikerjakan |
 
 ## 10. Strategi Pengujian
@@ -205,4 +206,6 @@ Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP);
 - [x] Menu menampilkan draft yang belum tersimpan sebagai pack valid dengan tombol “Lanjutkan draft” (aksi `editor-resume`)
 - [x] `removeCustomPack()` menghapus satu pack dari daftar main; konfirmasi menyebut nama pack dan draft editor (termasuk draft yang berasal dari pack itu) tidak ikut dihapus
 - [x] `duplicateScenario()` menyalin skenario terpilih dengan id berikutnya sesuai prefix pack, langsung lolos `validateScenario` dan tetap terkait di form editor
+- [x] `savePlan()` memisahkan autosave dari simpan eksplisit: autosave tidak pernah menambah pack baru ke `pq_custom_packs_v1` sehingga pack yang dihapus tetap hilang setelah reload + melanjutkan draft
+- [x] `draftIsOrphan()` + catatan editor/menu menandai draft yang pack sumbernya sudah dihapus; hanya tombol simpan eksplisit yang membuat pack baru
 
