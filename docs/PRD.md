@@ -10,8 +10,8 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.0.0 (jadwal di `implementation-plan.md`) |
-| Terakhir diperbarui | 2026-11-02 |
+| Target rilis | v1.1.0 (dirilis; riwayat di `implementation-plan.md`) |
+| Terakhir diperbarui | 2026-11-03 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
 ---
@@ -424,8 +424,8 @@ stateDiagram-v2
 
 | Versi | Isi | Status |
 |-------|-----|--------|
-| **v1.0.0** | F1–F11, 40 skenario, web + CLI + Pages + README dwibahasa | Target saat ini |
-| **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Time attack, leaderboard, Campur berjumlah soal, dan editor skenario dirilis |
+| **v1.0.0** | F1–F11, 40 skenario, web + CLI + Pages + README dwibahasa | Dirilis |
+| **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Dirilis (v1.1.0) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

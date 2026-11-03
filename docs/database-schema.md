@@ -339,3 +339,8 @@ di klien dengan aturan yang sama seperti `scripts/validate_content.py` (dibuktik
 `tests/test_editor_contract.py` + `web/test/editor.test.js`). Aturan komposisi pack (10 skenario,
 6:4 phish/legit, 3/4/3 kesulitan) tidak berlaku untuk pack lokal berisi satu skenario.
 
+Ekspor pack lokal menghasilkan JSON yang lolos aturan **per skenario**, tetapi belum menjadi pack
+`content/` yang sah: `validate_content.py` tetap menuntut 10 skenario, prefix id sesuai pack, serta
+`schema_version`, `description`, dan `emoji` di tingkat pack. Untuk menyumbangkan hasil editor ke
+`content/`, gabungkan skenarionya ke pack penuh lebih dulu lalu jalankan validator.
+

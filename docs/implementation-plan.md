@@ -138,10 +138,10 @@ fondasi  konten  engine  CLI    web    rilis
 
 ## 9. Roadmap Pasca v1.0
 
-| Versi | Isi | Perkiraan |
-|-------|-----|-----------|
-| **v1.1.0** | Mode Terbatas Waktu (20 dtk/soal + bonus kecepatan) & leaderboard lokal per perangkat; mode Campur dengan pilihan jumlah soal; mini editor skenario (tempel JSON → validasi → main) | 2–3 hari |
-| **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu |
+| Versi | Isi | Perkiraan | Status |
+|-------|-----|-----------|--------|
+| **v1.1.0** | Mode Terbatas Waktu (20 dtk/soal + bonus kecepatan) & leaderboard lokal per perangkat; mode Campur dengan pilihan jumlah soal; mini editor skenario (tempel JSON → validasi → main) | 2–3 hari | Dirilis (v1.1.0), diverifikasi di CLI dan situs live |
+| **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Belum dikerjakan |
 
 ## 10. Strategi Pengujian
 
