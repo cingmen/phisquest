@@ -58,6 +58,17 @@ export function addCustomPack(pack) {
 }
 
 /**
+ * Hapus satu pack lokal tanpa menyentuh draft editor.
+ * @param {string} packId - id pack yang dihapus.
+ * @returns {Array<object>} daftar pack terbaru.
+ */
+export function removeCustomPack(packId) {
+  const packs = loadCustomPacks().filter((pack) => pack.pack_id !== packId);
+  saveCustomPacks(packs);
+  return packs;
+}
+
+/**
  * Hapus semua pack lokal.
  * @returns {Array<object>} daftar kosong.
  */

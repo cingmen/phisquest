@@ -548,6 +548,35 @@ export function nextScenarioId(existingIds = [], prefix = 'ew') {
 }
 
 /**
+ * Gandakan satu skenario dengan id baru yang mengikuti prefix pack.
+ * Salinan diletakkan tepat setelah skenario asli dan memakai id berikutnya yang belum terpakai,
+ * sehingga hasilnya langsung lolos `validateScenario`.
+ * @param {object[]} scenarios - daftar skenario.
+ * @param {number} index - indeks skenario yang digandakan.
+ * @param {string} [prefix] - prefix id pack (ew/of/sc/cg).
+ * @returns {object[]} daftar baru berisi salinan; tidak berubah bila indeks di luar jangkauan.
+ */
+export function duplicateScenario(scenarios, index, prefix = 'ew') {
+  const list = [...(scenarios || [])];
+  const source = list[index];
+  if (!source || typeof source !== 'object') return list;
+  const ids = list.map((scenario) => (scenario && scenario.id != null ? scenario.id : null));
+  const copy = {
+    ...source,
+    id: nextScenarioId(ids, prefix),
+    label: `${String(source.label || source.id || 'Skenario')} (salinan)`,
+    sender: { ...(source.sender || {}) },
+    link: source.link ? { ...source.link } : null,
+    attachment: source.attachment ? { ...source.attachment } : null,
+    options: Array.isArray(source.options) ? source.options.map((option) => ({ ...option })) : null,
+    red_flags: Array.isArray(source.red_flags) ? [...source.red_flags] : [],
+    teach: { ...(source.teach || {}) },
+  };
+  list.splice(index + 1, 0, copy);
+  return list;
+}
+
+/**
  * Skenario baru yang sudah lolos aturan per-skenario.
  * @param {string[]} [existingIds] - id yang sudah dipakai pada pack.
  * @param {string} [prefix] - prefix id pack.

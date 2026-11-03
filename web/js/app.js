@@ -18,6 +18,7 @@ import {
   SAMPLE_PACK,
   alignScenarioPrefixes,
   createScenarioTemplate,
+  duplicateScenario,
   exportBlocker,
   findPackIdConflict,
   moveScenario,
@@ -38,6 +39,7 @@ import {
   loadProgress,
   loadSettings,
   recordLeaderboardEntry,
+  removeCustomPack,
   removeDraftPack,
   resetAll,
   saveCustomPacks,
@@ -690,6 +692,24 @@ function editorAddScenario() {
   render();
 }
 
+/** Gandakan skenario terpilih dengan id baru sesuai prefix pack. */
+function editorDuplicateScenario(index) {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack || !pack.scenarios[index]) return;
+  const prefix = PACK_PREFIX[pack.pack_id] || 'ew';
+  const before = pack.scenarios.length;
+  pack.scenarios = duplicateScenario(pack.scenarios, index, prefix);
+  if (pack.scenarios.length === before) return;
+  state.editorIndex = index + 1;
+  const copy = pack.scenarios[state.editorIndex];
+  const result = persistEditorDraft();
+  state.editorMessage = result.stored
+    ? `Skenario digandakan sebagai ${copy.id}.`
+    : `Skenario digandakan sebagai ${copy.id}, tetapi ${saveFailureNote(result)}.`;
+  render();
+}
+
 /** Pilih skenario yang ditampilkan di form (isian lain tetap disimpan). */
 function editorSelectScenario(index) {
   flushEditor();
@@ -868,6 +888,54 @@ function exportCustomPack() {
   }
 }
 
+/**
+ * Hapus satu pack tersimpan; draft editor tidak ikut dihapus.
+ * @param {string} packId - id pack yang dihapus.
+ */
+function deletePack(packId) {
+  const pack = state.customPacks.find((item) => item.pack_id === packId);
+  if (!pack) {
+    showToast('Pack itu tidak ada lagi di perangkat.');
+    render();
+    return;
+  }
+  const draft = loadDraftPacks().find((item) => item.pack_id === packId);
+  const active = state.editorPack && state.editorPack.pack_id === packId;
+  const notes = [];
+  if (active || (draft && state.editorDraftId === packId)) {
+    notes.push('Draft yang sedang diedit tetap tersimpan di perangkat.');
+  }
+  const sourceDrafts = loadDraftPacks().filter(
+    (item) => item.source_pack_id === packId && item.pack_id !== packId,
+  );
+  if (sourceDrafts.length) {
+    notes.push(
+      `Draft ${sourceDrafts.map((item) => `'${item.pack_id}'`).join(', ')} berasal dari pack ini dan tetap tersimpan.`,
+    );
+  }
+  const question = `Hapus pack "${pack.name}" (${pack.scenarios.length} skenario)?${notes.length ? ` ${notes.join(' ')}` : ''}`;
+  if (!window.confirm(question)) return;
+  try {
+    state.customPacks = removeCustomPack(packId);
+  } catch (error) {
+    handleError(error);
+    return;
+  }
+  if (active) {
+    state.editorPack = null;
+    state.editorSavedId = null;
+    state.editorSourceId = null;
+    state.editorDraftId = null;
+    state.editorConflict = null;
+    state.editorMessage = `Pack "${pack.name}" dihapus dari daftar main. Draft editor tetap tersimpan dan bisa dilanjutkan dari menu.`;
+  } else {
+    state.editorMessage = `Pack "${pack.name}" dihapus dari daftar main.`;
+  }
+  render();
+  showToast(`Pack "${pack.name}" dihapus.`);
+  announce(`Pack ${pack.name} dihapus dari daftar yang bisa dimainkan.`);
+}
+
 /** Hapus seluruh pack lokal setelah konfirmasi. */
 function deleteCustomPacks() {
   if (!state.customPacks.length) {
@@ -1005,6 +1073,10 @@ function handleClick(event) {
     exportCustomPack();
   } else if (action === 'editor-delete') {
     deleteCustomPacks();
+  } else if (action === 'delete-pack') {
+    deletePack(target.dataset.pack);
+  } else if (action === 'editor-duplicate-scenario') {
+    editorDuplicateScenario(Number(target.dataset.index));
   } else if (action === 'answer') {
     submitAnswer(target.dataset.option);
   } else if (action === 'next') {

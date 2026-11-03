@@ -70,6 +70,28 @@ test('pack_id baru menggantikan draft dengan id lama', () => {
   );
 });
 
+test('menghapus satu pack tidak menyentuh draft editor', () => {
+  storage.clearDraftPacks();
+  storage.saveCustomPacks([
+    { pack_id: 'office', name: 'Pack A', scenarios: [{ id: 'of-001' }] },
+    { pack_id: 'campus-gov', name: 'Pack B', scenarios: [{ id: 'cg-001' }] },
+  ]);
+  storage.saveDraftPack({ pack_id: 'campus-gov', name: 'Pack B', scenarios: [] });
+  const left = storage.removeCustomPack('office');
+  assert.deepEqual(
+    left.map((pack) => pack.pack_id),
+    ['campus-gov'],
+  );
+  assert.deepEqual(
+    storage.loadDraftPacks().map((pack) => pack.pack_id),
+    ['campus-gov'],
+  );
+  assert.deepEqual(
+    storage.removeCustomPack('tidak-ada').map((pack) => pack.pack_id),
+    ['campus-gov'],
+  );
+});
+
 test('removeDraftPack dan resetAll membersihkan draft', () => {
   storage.removeDraftPack('campus-gov');
   assert.equal(

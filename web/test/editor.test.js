@@ -12,6 +12,7 @@ import {
   SAMPLE_PACK,
   alignScenarioPrefixes,
   createScenarioTemplate,
+  duplicateScenario,
   exportBlocker,
   findPackIdConflict,
   moveScenario,
@@ -198,6 +199,22 @@ test('memilih salah satu pack_id membuat pack dari nol siap konten', () => {
     assert.equal(readiness.ready, true);
     assert.ok(selected.scenarios.every((scenario) => scenario.id.startsWith(`${prefix}-`)));
   }
+});
+
+test('menggandakan skenario memberi id baru berprefix dan tetap valid', () => {
+  const base = { ...readyPack.scenarios[0], id: 'of-001', label: 'Asli' };
+  const list = duplicateScenario([base], 0, 'of');
+  assert.equal(list.length, 2);
+  assert.equal(list[0].id, 'of-001');
+  assert.equal(list[1].id, 'of-002');
+  assert.equal(list[1].label, 'Asli (salinan)');
+  assert.deepEqual(validateScenario(list[1], 1), []);
+  assert.notEqual(list[1], base);
+  assert.notEqual(list[1].sender, base.sender);
+  const taken = duplicateScenario([{ ...base }, { ...base, id: 'of-002' }], 0, 'of');
+  assert.equal(taken[1].id, 'of-003');
+  assert.deepEqual(duplicateScenario([], 0, 'of'), []);
+  assert.deepEqual(duplicateScenario([base], 5, 'of'), [base]);
 });
 
 test('ID pack yang sudah dipakai pack lain terdeteksi bentrok', () => {

@@ -162,7 +162,8 @@ export function renderMenu(manifest, progress, leaderboard = [], customPacks = [
               .map(
                 (pack) =>
                   `<li><span>${escapeHtml(pack.name)} · ${pack.scenarios.length} skenario</span>` +
-                  `<button class="btn btn--ghost" data-action="play-custom" data-pack="${escapeHtml(pack.pack_id)}">Mainkan</button></li>`,
+                  `<span class="editor__row-actions"><button class="btn btn--ghost" data-action="play-custom" data-pack="${escapeHtml(pack.pack_id)}">Mainkan</button>` +
+                  `<button class="btn btn--ghost" data-action="delete-pack" data-pack="${escapeHtml(pack.pack_id)}" aria-label="Hapus pack ${escapeHtml(pack.name)}">Hapus</button></span></li>`,
               )
               .join('')}</ul>`
           : ''
@@ -383,7 +384,7 @@ export function renderEditor({
           const badge = status.ready
             ? '<span class="editor__ready">✅ siap konten</span>'
             : '<span class="editor__not-ready">⚠️ belum siap konten</span>';
-          return `<li><span>${escapeHtml(item.name)} · ${item.scenarios.length} skenario ${badge}</span><button class="btn btn--ghost" data-action="editor-select-pack" data-pack="${escapeHtml(item.pack_id)}">Kelola</button></li>`;
+          return `<li><span>${escapeHtml(item.name)} · ${item.scenarios.length} skenario ${badge}</span><span class="editor__row-actions"><button class="btn btn--ghost" data-action="editor-select-pack" data-pack="${escapeHtml(item.pack_id)}">Kelola</button><button class="btn btn--ghost" data-action="delete-pack" data-pack="${escapeHtml(item.pack_id)}" aria-label="Hapus pack ${escapeHtml(item.name)}">Hapus</button></span></li>`;
         })
         .join('')}</ul>`
     : '<p class="pack__meta">Belum ada pack lokal tersimpan.</p>';
@@ -397,7 +398,7 @@ export function renderEditor({
           const warning = problems.length
             ? `<span class="editor__not-ready">⚠️ ${problems.length} masalah</span>`
             : '<span class="editor__ready">✅ valid</span>';
-          return `<li class="${position === index ? 'editor__row--active' : ''}"><button class="editor__row" data-action="editor-select" data-index="${position}" aria-pressed="${position === index}"><span class="editor__row-title">${position + 1}. ${escapeHtml(title)}</span><span class="editor__row-meta">${escapeHtml(SCENARIO_TYPE_LABEL[scenario.type] || scenario.type || '-')} · ${escapeHtml(scenario.channel || '-')} · ${escapeHtml(scenario.difficulty || '-')} ${warning}</span></button><span class="editor__row-actions"><button class="btn btn--ghost" data-action="editor-move-up" data-index="${position}" aria-label="Naikkan skenario ${position + 1}">↑</button><button class="btn btn--ghost" data-action="editor-move-down" data-index="${position}" aria-label="Turunkan skenario ${position + 1}">↓</button><button class="btn btn--ghost" data-action="editor-delete-scenario" data-index="${position}" aria-label="Hapus skenario ${position + 1}">🗑️</button></span></li>`;
+          return `<li class="${position === index ? 'editor__row--active' : ''}"><button class="editor__row" data-action="editor-select" data-index="${position}" aria-pressed="${position === index}"><span class="editor__row-title">${position + 1}. ${escapeHtml(title)}</span><span class="editor__row-meta">${escapeHtml(SCENARIO_TYPE_LABEL[scenario.type] || scenario.type || '-')} · ${escapeHtml(scenario.channel || '-')} · ${escapeHtml(scenario.difficulty || '-')} ${warning}</span></button><span class="editor__row-actions"><button class="btn btn--ghost" data-action="editor-duplicate-scenario" data-index="${position}" aria-label="Gandakan skenario ${position + 1}">⧉</button><button class="btn btn--ghost" data-action="editor-move-up" data-index="${position}" aria-label="Naikkan skenario ${position + 1}">↑</button><button class="btn btn--ghost" data-action="editor-move-down" data-index="${position}" aria-label="Turunkan skenario ${position + 1}">↓</button><button class="btn btn--ghost" data-action="editor-delete-scenario" data-index="${position}" aria-label="Hapus skenario ${position + 1}">🗑️</button></span></li>`;
         })
         .join('')
     : '';
