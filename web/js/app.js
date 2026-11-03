@@ -656,7 +656,10 @@ function openEditorPack(packId) {
   const twin = state.customPacks.find((item) => samePackContent(source, item));
   state.editorPack = clonePack(source);
   state.editorSourceId =
-    (draft && draft.source_pack_id) || (stored ? stored.pack_id : null) || (twin ? twin.pack_id : null);
+    (draft && draft.source_pack_id) ||
+    (stored ? stored.pack_id : null) ||
+    (twin ? twin.pack_id : null) ||
+    (draft ? draft.pack_id : null);
   state.editorSavedId = state.editorSourceId;
   state.editorDraftId = draft ? draft.pack_id : null;
   state.editorIndex = 0;
@@ -681,7 +684,7 @@ function resumeDraft(packId) {
   }
   const twin = state.customPacks.find((item) => samePackContent(draft, item));
   state.editorPack = clonePack(draft);
-  state.editorSourceId = draft.source_pack_id || (twin ? twin.pack_id : null);
+  state.editorSourceId = draft.source_pack_id || (twin ? twin.pack_id : null) || draft.pack_id;
   state.editorSavedId = state.editorSourceId;
   state.editorDraftId = draft.pack_id;
   state.editorIndex = 0;
