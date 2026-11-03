@@ -571,14 +571,17 @@ export function savePlan({
 }
 
 /**
- * Draft yang pack sumbernya sudah tidak ada di daftar main.
- * @param {object} draft - draft editor (memakai `source_pack_id`).
+ * Draft yang pack-nya sudah tidak ada di daftar main.
+ * Deteksi memakai keberadaan pack di daftar main (bukan hanya `source_pack_id`), sehingga draft
+ * lama pra-v1.6.1 yang belum punya `source_pack_id` tetap dikenali sebagai draft yatim.
+ * @param {object} draft - draft editor (memakai `pack_id`, `source_pack_id` opsional).
  * @param {object[]} packs - pack yang saat ini ada di daftar main.
  * @returns {boolean} true bila draft berasal dari pack yang sudah dihapus.
  */
 export function draftIsOrphan(draft, packs = []) {
-  if (!draft || !draft.source_pack_id) return false;
-  return !packs.some((pack) => pack && pack.pack_id === draft.source_pack_id);
+  if (!draft || typeof draft.pack_id !== 'string' || !draft.pack_id.trim()) return false;
+  const packId = draft.pack_id.trim();
+  return !packs.some((pack) => pack && String(pack.pack_id).trim() === packId);
 }
 
 /**

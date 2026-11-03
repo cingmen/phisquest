@@ -209,9 +209,7 @@ function render() {
       storedCount: storedActive ? storedActive.scenarios.length : 0,
       draftProblem: active ? packProblems(active)[0] || '' : '',
       conflict: active ? state.editorConflict : null,
-      orphan: active
-        ? draftIsOrphan({ source_pack_id: state.editorSourceId }, state.customPacks)
-        : false,
+      orphan: active ? draftIsOrphan(active, state.customPacks) : false,
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -512,7 +510,7 @@ function persistEditorDraft({ explicit = false } = {}) {
   const conflict = currentConflict(pack);
   state.editorConflict = conflict;
   const inStore = state.customPacks.some((item) => item.pack_id === pack.pack_id);
-  state.editorOrphan = Boolean(state.editorSourceId) && !inStore;
+  state.editorOrphan = !inStore && Boolean(state.editorDraftId || state.editorSourceId);
   const plan = savePlan({ problems, conflict: Boolean(conflict), inStore, explicit });
   if (!plan.stored) return plan;
   try {
@@ -561,6 +559,21 @@ function saveFailureNote(result) {
     return 'belum masuk daftar main; tekan "Simpan skenario" untuk menyimpannya sebagai pack';
   }
   return 'belum tersimpan karena ada masalah validasi';
+}
+
+/**
+ * Lengkapi `source_pack_id` draft lama tanpa menyentuh daftar pack.
+ * Draft pra-v1.6.1 belum punya penanda asal; backfill ini hanya menulis kunci draft.
+ * @param {string} packId - id draft.
+ */
+function backfillDraftSource(packId) {
+  const draft = loadDraftPacks().find((item) => item.pack_id === packId);
+  if (!draft || draft.source_pack_id) return;
+  try {
+    saveDraftPack({ ...draft, source_pack_id: draft.pack_id }, packId);
+  } catch (error) {
+    handleError(error);
+  }
 }
 
 /**
@@ -616,7 +629,7 @@ function refreshReadiness() {
       stored ? stored.scenarios.length : 0,
       packProblems(pack)[0] || '',
       state.editorConflict,
-      draftIsOrphan({ source_pack_id: state.editorSourceId }, state.customPacks),
+      draftIsOrphan(pack, state.customPacks),
     );
   }
   const slot = document.getElementById('editor-readiness');
@@ -649,7 +662,8 @@ function openEditorPack(packId) {
   state.editorIndex = 0;
   state.editorErrors = [];
   state.editorConflict = currentConflict(state.editorPack);
-  state.editorOrphan = draftIsOrphan({ source_pack_id: state.editorSourceId }, state.customPacks);
+  state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
+  if (draft && !draft.source_pack_id) backfillDraftSource(draft.pack_id);
   state.editorMessage =
     draft && stored && packProblems(draft).length
       ? `Draft belum valid dimuat. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
@@ -674,6 +688,7 @@ function resumeDraft(packId) {
   state.editorErrors = packProblems(draft);
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(draft, state.customPacks);
+  if (!draft.source_pack_id) backfillDraftSource(draft.pack_id);
   state.editorMessage = state.editorOrphan
     ? `Melanjutkan draft "${state.editorPack.name || packId}". Pack sumbernya sudah dihapus; tekan "Simpan skenario" untuk membuat pack baru di daftar main.`
     : twin

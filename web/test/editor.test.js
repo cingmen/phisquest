@@ -221,12 +221,19 @@ test('savePlan tidak pernah membuat pack baru dari autosave', () => {
   });
 });
 
-test('draft yatim dikenali saat pack sumbernya sudah dihapus', () => {
+test('draft yatim dikenali dari daftar main, termasuk draft tanpa source_pack_id', () => {
   const draft = { pack_id: 'kustom', source_pack_id: 'kustom' };
   assert.equal(draftIsOrphan(draft, []), true);
   assert.equal(draftIsOrphan(draft, [{ pack_id: 'kustom' }]), false);
-  assert.equal(draftIsOrphan({ pack_id: 'kustom', source_pack_id: null }, []), false);
+  assert.equal(draftIsOrphan({ pack_id: 'kustom' }, []), true);
+  assert.equal(draftIsOrphan({ pack_id: 'kustom' }, [{ pack_id: 'kustom' }]), false);
+  assert.equal(draftIsOrphan({ pack_id: 'kustom', source_pack_id: null }, []), true);
+  assert.equal(
+    draftIsOrphan({ pack_id: 'kustom', source_pack_id: 'lain' }, [{ pack_id: 'kustom' }]),
+    false,
+  );
   assert.equal(draftIsOrphan(null, []), false);
+  assert.equal(draftIsOrphan({}, []), false);
 });
 
 test('menggandakan skenario memberi id baru berprefix dan tetap valid', () => {
