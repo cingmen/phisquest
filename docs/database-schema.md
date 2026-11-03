@@ -407,6 +407,13 @@ editor, termasuk draft yang isinya identik dengan pack tersimpan (label “isiny
 tersimpan”). Menampilkan draft tidak menulis daftar pack; hanya **Simpan skenario** yang menulis
 `pq_custom_packs_v1`.
 
+Sejak v1.6.4 setiap draft menyimpan `updated_at` (ISO-8601). Sebelum menulis, editor membaca ulang
+`pq_editor_draft_v1` dan membandingkan `updated_at` versi tab ini dengan versi tersimpan lewat
+`draftWriteDecision()`: bila versi tersimpan lebih baru (tab lain menyimpan belakangan), penulisan
+dibatalkan dan editor menampilkan pilihan **Muat versi terbaru** (mengganti isi tab) atau **Timpa
+dengan versi tab ini** (konfirmasi lalu menulis dengan `updated_at` baru). Dengan begitu dua tab pada
+draft yang sama tidak saling menimpa diam-diam.
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.

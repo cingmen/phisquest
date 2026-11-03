@@ -128,6 +128,10 @@ node --test web/test/*.test.js
   status (including “pack sumber sudah dihapus” and “isinya sama dengan pack tersimpan”) plus
   **Resume**/**Discard** buttons, and **Alt+D** duplicates the open scenario without disturbing text
   fields.
+- **🔀 Cross-tab safe drafts (v1.6.4)** — drafts carry an `updated_at` stamp; a tab holding older
+  content never overwrites a newer draft, and the editor offers **Load latest version** or
+  **Overwrite with this tab's version**. The draft list is sorted newest-first, and Alt+D is ignored
+  while a dropdown has focus.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

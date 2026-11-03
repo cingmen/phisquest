@@ -170,6 +170,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   statusnya (termasuk “pack sumber sudah dihapus” dan “isinya sama dengan pack tersimpan”) plus tombol
   **Lanjutkan**/**Buang**, dan **Alt+D** menggandakan skenario yang sedang dibuka tanpa mengganggu
   pengetikan di kolom isian.
+- **🔀 Draft aman antar-tab (v1.6.4)** — draft menyimpan waktu edit (`updated_at`); tab yang isinya
+  lebih lama tidak menimpa draft yang lebih baru, dan editor menawarkan **Muat versi terbaru** atau
+  **Timpa dengan versi tab ini**. Daftar draft diurutkan dari edit terbaru, dan pintasan Alt+D juga
+  diabaikan saat fokus di dropdown.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

@@ -3,6 +3,15 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.4 — 2026-11-03
+
+- Penyimpanan draft antar-tab memakai `updated_at` dan penggabungan deterministik: tab dengan versi
+  lama tidak menimpa draft yang lebih baru, dan editor menampilkan pilihan **Muat versi terbaru** atau
+  **Timpa dengan versi tab ini**.
+- Daftar draft di layar editor diurutkan dari waktu edit terakhir, dan label status tetap benar setelah
+  pengurutan.
+- Pintasan Alt+D kini juga diabaikan saat fokus berada di elemen `select`.
+
 ## v1.6.3 — 2026-11-03
 
 - Daftar draft tersimpan kini tampil di layar editor, bukan hanya di menu, lengkap dengan status tiap
