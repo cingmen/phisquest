@@ -54,3 +54,16 @@ def test_pack_multi_skenario_siap_ekspor_diterima_validator() -> None:
         scenario_issues: list[validator.Issue] = []
         validator.validate_scenario(scenario_issues, scenario, "editor-pack-ready.json", "of")
         assert [issue for issue in scenario_issues if issue.level == "ERROR"] == [], scenario["id"]
+
+
+def test_pemilihan_pack_id_bawaan_selalu_diterima() -> None:
+    """Setiap pack_id bawaan + id berprefix sesuai tetap lolos validator (paritas JS)."""
+    for pack_id, prefix in validator.PACK_PREFIX.items():
+        candidate = json.loads(json.dumps(READY))
+        candidate["pack_id"] = pack_id
+        for index, scenario in enumerate(candidate["scenarios"], start=1):
+            scenario["id"] = f"{prefix}-{index:03d}"
+        issues: list[validator.Issue] = []
+        validator.validate_pack(issues, Path("editor-pack-ready.json"), candidate, prefix)
+        errors = [issue for issue in issues if issue.level == "ERROR"]
+        assert errors == [], f"{pack_id}: " + " | ".join(issue.message for issue in errors)

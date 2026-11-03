@@ -10,6 +10,7 @@ export const PROGRESS_KEY = 'pq_progress_v1';
 export const SETTINGS_KEY = 'pq_settings_v1';
 export const LEADERBOARD_KEY = 'pq_leaderboard_v1';
 export const CUSTOM_PACKS_KEY = 'pq_custom_packs_v1';
+export const DRAFT_PACKS_KEY = 'pq_editor_draft_v1';
 const DEBOUNCE_MS = 300;
 
 const memoryFallback = new Map();
@@ -62,6 +63,59 @@ export function addCustomPack(pack) {
  */
 export function clearCustomPacks() {
   saveCustomPacks([]);
+  return [];
+}
+
+/**
+ * Baca draft editor: pack yang sedang diedit, boleh belum lolos validasi.
+ * @returns {Array<object>} daftar draft; kosong bila belum ada atau rusak.
+ */
+export function loadDraftPacks() {
+  const raw = readRaw(DRAFT_PACKS_KEY);
+  if (!raw) return [];
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) return [];
+    return data.filter(
+      (pack) => pack && typeof pack.pack_id === 'string' && Array.isArray(pack.scenarios),
+    );
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Simpan draft satu pack tanpa menyentuh pack valid yang bisa dimainkan.
+ * @param {object} pack - draft pack (boleh belum valid).
+ * @param {string|null} [previousId] - id lama bila pack_id baru saja diganti.
+ * @returns {Array<object>} daftar draft terbaru.
+ */
+export function saveDraftPack(pack, previousId = null) {
+  const drafts = loadDraftPacks().filter(
+    (item) => item.pack_id !== pack.pack_id && item.pack_id !== previousId,
+  );
+  drafts.push(pack);
+  writeRaw(DRAFT_PACKS_KEY, JSON.stringify(drafts));
+  return drafts;
+}
+
+/**
+ * Hapus draft satu pack (mis. saat pemain memilih kembali versi tersimpan).
+ * @param {string} packId - id pack.
+ * @returns {Array<object>} daftar draft terbaru.
+ */
+export function removeDraftPack(packId) {
+  const drafts = loadDraftPacks().filter((item) => item.pack_id !== packId);
+  writeRaw(DRAFT_PACKS_KEY, JSON.stringify(drafts));
+  return drafts;
+}
+
+/**
+ * Hapus semua draft editor.
+ * @returns {Array<object>} daftar kosong.
+ */
+export function clearDraftPacks() {
+  writeRaw(DRAFT_PACKS_KEY, JSON.stringify([]));
   return [];
 }
 
@@ -329,7 +383,7 @@ export function resetAll() {
     pendingTimer = null;
   }
   pendingProgress = null;
-  for (const key of [PROGRESS_KEY, SETTINGS_KEY, LEADERBOARD_KEY, CUSTOM_PACKS_KEY]) {
+  for (const key of [PROGRESS_KEY, SETTINGS_KEY, LEADERBOARD_KEY, CUSTOM_PACKS_KEY, DRAFT_PACKS_KEY]) {
     try {
       window.localStorage.removeItem(key);
     } catch (error) {

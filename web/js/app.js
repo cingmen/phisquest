@@ -16,7 +16,9 @@ import { makeEntry } from './leaderboard.js';
 import {
   PACK_PREFIX,
   SAMPLE_PACK,
+  alignScenarioPrefixes,
   createScenarioTemplate,
+  exportBlocker,
   moveScenario,
   parsePackText,
   toContentPack,
@@ -26,15 +28,19 @@ import {
 import {
   addCustomPack,
   clearCustomPacks,
+  clearDraftPacks,
   exportAll,
   importAll,
   loadCustomPacks,
+  loadDraftPacks,
   loadLeaderboard,
   loadProgress,
   loadSettings,
   recordLeaderboardEntry,
+  removeDraftPack,
   resetAll,
   saveCustomPacks,
+  saveDraftPack,
   saveProgress,
   saveSettings,
 } from './storage.js';
@@ -47,6 +53,7 @@ import {
   renderEditor,
   renderRecap,
   statsLabels,
+  draftNotice,
 } from './ui.js';
 
 const SCREENS = ['menu', 'game', 'recap', 'badges', 'about', 'editor'];
@@ -75,11 +82,13 @@ const state = {
   editorMessage: '',
   editorPack: null,
   editorSavedId: null,
+  editorDraftId: null,
   editorIndex: 0,
 };
 
 const packCache = new Map();
 const dom = {};
+let draftSaveTimer = null;
 
 /** Cache referensi DOM sekali di awal. */
 function cacheDom() {
@@ -168,6 +177,9 @@ function render() {
       : '<section class="card"><p>Memuat konten…</p></section>';
   } else if (state.screen === 'editor') {
     const active = state.editorPack;
+    const storedActive = active
+      ? state.customPacks.find((pack) => pack.pack_id === active.pack_id)
+      : null;
     dom.screens.editor.innerHTML = renderEditor({
       text: state.editorText,
       errors: state.editorErrors,
@@ -179,6 +191,9 @@ function render() {
       scenarioProblems: active
         ? active.scenarios.map((scenario, index) => validateScenario(scenario, index))
         : [],
+      draftActive: active ? packProblems(active).length > 0 : false,
+      storedCount: storedActive ? storedActive.scenarios.length : 0,
+      draftProblem: active ? packProblems(active)[0] || '' : '',
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -428,35 +443,94 @@ function flushEditor() {
 }
 
 /**
- * Simpan draft editor ke localStorage bila seluruh skenario valid.
- * @returns {boolean} true bila pack tersimpan.
+ * Daftar masalah yang membuat pack belum bisa dimainkan.
+ * @param {object} pack - pack lokal.
+ * @returns {string[]} masalah validasi; kosong berarti siap dimainkan.
  */
-function persistEditorDraft() {
-  const pack = state.editorPack;
-  if (!pack) return false;
+function packProblems(pack) {
   const problems = [];
   pack.scenarios.forEach((scenario, index) => problems.push(...validateScenario(scenario, index)));
   const ids = pack.scenarios.map((scenario) => String(scenario.id));
   if (new Set(ids).size !== ids.length) problems.push('id skenario duplikat di pack ini');
+  return problems;
+}
+
+/**
+ * Simpan draft editor ke perangkat; pack valid ikut masuk daftar yang bisa dimainkan.
+ * Draft selalu ditulis (meski belum valid) agar isian bertahan setelah reload, dan
+ * tidak pernah menimpa pack valid yang sudah tersimpan.
+ * @returns {boolean} true bila pack juga tersimpan sebagai versi valid.
+ */
+function persistEditorDraft() {
+  const pack = state.editorPack;
+  if (!pack) return false;
+  const problems = packProblems(pack);
   state.editorErrors = problems;
+
+  try {
+    saveDraftPack(clonePack(pack), state.editorDraftId);
+    state.editorDraftId = pack.pack_id;
+  } catch (error) {
+    handleError(error);
+  }
+
   if (problems.length) return false;
-  const others = state.customPacks.filter(
-    (packItem) => packItem.pack_id !== pack.pack_id && packItem.pack_id !== state.editorSavedId,
-  );
-  state.customPacks = saveCustomPacks([...others, clonePack(pack)]);
-  state.editorSavedId = pack.pack_id;
+  try {
+    const others = state.customPacks.filter(
+      (packItem) => packItem.pack_id !== pack.pack_id && packItem.pack_id !== state.editorSavedId,
+    );
+    state.customPacks = saveCustomPacks([...others, clonePack(pack)]);
+    state.editorSavedId = pack.pack_id;
+  } catch (error) {
+    handleError(error);
+    return false;
+  }
   return true;
 }
 
-/** Buka pack tersimpan ke editor. */
+/** Perbarui badge kesiapan + catatan draft tanpa membangun ulang form (fokus tidak hilang). */
+function refreshReadiness() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  const stored = state.customPacks.find((item) => item.pack_id === pack.pack_id);
+  const note = document.getElementById('editor-draft-note');
+  if (note) {
+    note.innerHTML = draftNotice(
+      packProblems(pack).length > 0,
+      stored ? stored.scenarios.length : 0,
+      packProblems(pack)[0] || '',
+    );
+  }
+  const slot = document.getElementById('editor-readiness');
+  if (!slot) return;
+  const readiness = validatePackShape(pack);
+  const badge = readiness.ready
+    ? '<span class="editor__ready">✅ siap konten</span>'
+    : '<span class="editor__not-ready">⚠️ belum siap konten</span>';
+  const detail =
+    readiness.ready || !readiness.issues.length
+      ? ''
+      : `<details class="editor__issues" open><summary>${readiness.issues.length} alasan</summary><ul>${readiness.issues
+          .map((issue) => `<li>${escapeHtml(issue)}</li>`)
+          .join('')}</ul></details>`;
+  slot.innerHTML = `${badge}${detail}`;
+}
+
+/** Buka pack tersimpan (atau draft-nya) ke editor. */
 function openEditorPack(packId) {
-  const found = state.customPacks.find((pack) => pack.pack_id === packId);
-  if (!found) return;
-  state.editorPack = clonePack(found);
-  state.editorSavedId = found.pack_id;
+  const stored = state.customPacks.find((pack) => pack.pack_id === packId);
+  const draft = loadDraftPacks().find((pack) => pack.pack_id === packId);
+  const source = draft || stored;
+  if (!source) return;
+  state.editorPack = clonePack(source);
+  state.editorSavedId = stored ? stored.pack_id : null;
+  state.editorDraftId = draft ? draft.pack_id : null;
   state.editorIndex = 0;
   state.editorErrors = [];
-  state.editorMessage = `Mengelola ${found.name} (${found.scenarios.length} skenario).`;
+  state.editorMessage =
+    draft && stored && packProblems(draft).length
+      ? `Draft belum valid dimuat. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
+      : `Mengelola ${source.name} (${source.scenarios.length} skenario).`;
   render();
 }
 
@@ -470,6 +544,7 @@ function createEditorPack() {
     scenarios: [createScenarioTemplate([], 'ew')],
   };
   state.editorSavedId = null;
+  state.editorDraftId = null;
   state.editorIndex = 0;
   state.editorErrors = [];
   const saved = persistEditorDraft();
@@ -589,12 +664,64 @@ function editorImportJson() {
   render();
 }
 
+/** Selaraskan prefix id skenario dengan ID pack konten yang dipilih. */
+function editorAlignPrefix() {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack) return;
+  const prefix = PACK_PREFIX[pack.pack_id];
+  if (!prefix) {
+    state.editorMessage = `Prefix id belum bisa diselaraskan: pilih salah satu ID pack konten (${Object.keys(PACK_PREFIX).join(', ')}) lebih dulu.`;
+    render();
+    return;
+  }
+  const misaligned = pack.scenarios.some(
+    (scenario) => !String(scenario.id).startsWith(`${prefix}-`),
+  );
+  if (!misaligned) {
+    state.editorMessage = `Semua id skenario sudah berprefix '${prefix}-'.`;
+    render();
+    return;
+  }
+  const lastId = `${prefix}-${String(pack.scenarios.length).padStart(3, '0')}`;
+  if (!window.confirm(`Ubah id skenario menjadi ${prefix}-001 … ${lastId}?`)) return;
+  pack.scenarios = alignScenarioPrefixes(pack.scenarios, prefix);
+  const saved = persistEditorDraft();
+  state.editorMessage = saved
+    ? `Id skenario diselaraskan ke prefix '${prefix}-'.`
+    : `Id diselaraskan ke '${prefix}-', tetapi pack belum lolos validasi karena masalah lain.`;
+  render();
+}
+
+/** Buang draft yang belum valid dan kembali ke versi tersimpan. */
+function discardEditorDraft() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  if (!window.confirm('Buang draft yang belum valid dan kembali ke versi tersimpan?')) return;
+  removeDraftPack(pack.pack_id);
+  const stored =
+    state.customPacks.find((item) => item.pack_id === pack.pack_id) || state.customPacks[0] || null;
+  state.editorPack = stored ? clonePack(stored) : null;
+  state.editorSavedId = stored ? stored.pack_id : null;
+  state.editorDraftId = stored ? stored.pack_id : null;
+  state.editorIndex = 0;
+  state.editorErrors = [];
+  state.editorMessage = stored
+    ? 'Draft dibuang. Editor kembali ke versi tersimpan.'
+    : 'Draft dibuang. Belum ada pack tersimpan.';
+  render();
+}
+
 /** Ekspor seluruh skenario pack aktif sebagai berkas pack content/. */
 function exportCustomPack() {
   flushEditor();
   const pack = state.editorPack;
-  if (!pack) {
-    showToast('Belum ada pack lokal untuk diekspor.');
+  const blocker = exportBlocker(pack);
+  if (blocker) {
+    state.editorMessage = blocker;
+    render();
+    showToast(blocker);
+    announce('Ekspor ditolak.');
     return;
   }
   const readiness = validatePackShape(pack);
@@ -627,9 +754,11 @@ function deleteCustomPacks() {
   }
   if (!window.confirm('Hapus semua pack buatanmu di perangkat ini?')) return;
   clearCustomPacks();
+  clearDraftPacks();
   state.customPacks = [];
   state.editorPack = null;
   state.editorSavedId = null;
+  state.editorDraftId = null;
   state.editorIndex = 0;
   state.editorMessage = 'Pack lokal dihapus.';
   render();
@@ -704,9 +833,19 @@ function handleClick(event) {
   } else if (action === 'editor-open') {
     state.editorErrors = [];
     if (!state.editorPack && state.customPacks.length) {
-      state.editorPack = clonePack(state.customPacks[0]);
-      state.editorSavedId = state.editorPack.pack_id;
+      const stored = state.customPacks[0];
+      const draft = loadDraftPacks().find((item) => item.pack_id === stored.pack_id);
+      state.editorPack = clonePack(draft || stored);
+      state.editorSavedId = stored.pack_id;
+      state.editorDraftId = draft ? draft.pack_id : null;
       state.editorIndex = 0;
+    } else if (!state.editorPack) {
+      const drafts = loadDraftPacks();
+      if (drafts.length) {
+        state.editorPack = clonePack(drafts[0]);
+        state.editorDraftId = drafts[0].pack_id;
+        state.editorIndex = 0;
+      }
     }
     showScreen('editor');
   } else if (action === 'editor-new-pack') {
@@ -723,6 +862,10 @@ function handleClick(event) {
     editorDeleteScenario(Number(target.dataset.index));
   } else if (action === 'editor-add-scenario') {
     editorAddScenario();
+  } else if (action === 'editor-align-prefix') {
+    editorAlignPrefix();
+  } else if (action === 'editor-discard-draft') {
+    discardEditorDraft();
   } else if (action === 'editor-save-scenario') {
     editorSaveScenario();
   } else if (action === 'editor-import') {
@@ -792,6 +935,15 @@ function bindEvents() {
       if (event.target.value) openEditorPack(event.target.value);
       return;
     }
+    if (event.target && event.target.id === 'pack-id-choice') {
+      const choice = event.target.value;
+      const input = document.getElementById('pack-id');
+      if (input && choice && choice !== '__custom__') input.value = choice;
+      flushEditor();
+      persistEditorDraft();
+      render();
+      return;
+    }
     if (!state.editorPack || !event.target || !event.target.id) return;
     const id = event.target.id;
     if (id.startsWith('pack-') || id.startsWith('scn-')) {
@@ -799,11 +951,27 @@ function bindEvents() {
       persistEditorDraft();
     }
   });
+  document.addEventListener('input', (event) => {
+    if (state.screen !== 'editor' || !state.editorPack) return;
+    const id = event.target && event.target.id;
+    if (!id || (!id.startsWith('pack-') && !id.startsWith('scn-'))) return;
+    if (id === 'pack-id' || id === 'pack-name') refreshReadiness();
+    window.clearTimeout(draftSaveTimer);
+    draftSaveTimer = window.setTimeout(() => {
+      flushEditor();
+      persistEditorDraft();
+      refreshReadiness();
+    }, 350);
+  });
   window.addEventListener('pq:storage-error', (event) => {
     const detail = event.detail || {};
     showToast(detail.message || 'Penyimpanan penuh; progres hanya tersimpan selama tab terbuka.');
   });
   window.addEventListener('beforeunload', () => {
+    if (state.screen === 'editor' && state.editorPack) {
+      flushEditor();
+      persistEditorDraft();
+    }
     if (state.session) saveProgress(state.progress, true);
   });
 }

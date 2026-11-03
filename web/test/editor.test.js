@@ -10,7 +10,9 @@ import { fileURLToPath } from 'node:url';
 
 import {
   SAMPLE_PACK,
+  alignScenarioPrefixes,
   createScenarioTemplate,
+  exportBlocker,
   moveScenario,
   parsePackText,
   toContentPack,
@@ -178,4 +180,29 @@ test('menambah skenario mengubah status kesiapan pack', () => {
   const readiness = validatePackShape(extended);
   assert.equal(readiness.ready, false);
   assert.ok(readiness.issues.some((issue) => issue.includes('10 skenario')));
+});
+
+test('memilih salah satu pack_id membuat pack dari nol siap konten', () => {
+  for (const packId of ['ewallet-bank', 'office', 'shopping-courier', 'campus-gov']) {
+    const prefix = { 'ewallet-bank': 'ew', office: 'of', 'shopping-courier': 'sc', 'campus-gov': 'cg' }[
+      packId
+    ];
+    const selected = {
+      ...readyPack,
+      pack_id: packId,
+      scenarios: alignScenarioPrefixes(readyPack.scenarios, prefix),
+    };
+    const readiness = validatePackShape(selected);
+    assert.deepEqual(readiness.issues, [], `pack_id ${packId}`);
+    assert.equal(readiness.ready, true);
+    assert.ok(selected.scenarios.every((scenario) => scenario.id.startsWith(`${prefix}-`)));
+  }
+});
+
+test('pack_id tak dikenal ditolak saat ekspor dengan alasan jelas', () => {
+  const blocker = exportBlocker({ ...readyPack, pack_id: 'kustom' });
+  assert.ok(blocker && blocker.includes('kustom'));
+  assert.ok(blocker.includes('ewallet-bank'));
+  assert.equal(exportBlocker(readyPack), null);
+  assert.ok((exportBlocker(null) || '').includes('Belum ada pack'));
 });

@@ -598,6 +598,40 @@ export function moveScenario(scenarios, from, to) {
   return list;
 }
 
+/**
+ * Selaraskan prefix id seluruh skenario dengan pack konten yang dipilih.
+ * Id dinomori ulang `{prefix}-001`, `{prefix}-002`, ... agar unik dan sesuai pack.
+ * @param {object[]} scenarios - daftar skenario.
+ * @param {string} prefix - prefix tujuan (ew/of/sc/cg).
+ * @returns {object[]} daftar baru dengan id baru; tidak berubah bila prefix tak dikenal.
+ */
+export function alignScenarioPrefixes(scenarios, prefix) {
+  const list = [...(scenarios || [])];
+  if (!prefix || !Object.values(PACK_PREFIX).includes(prefix)) return list;
+  return list.map((scenario, index) => ({
+    ...scenario,
+    id: `${prefix}-${String(index + 1).padStart(3, '0')}`,
+  }));
+}
+
+/**
+ * Alasan pack lokal tidak boleh diekspor sebagai pack `content/`.
+ * @param {object} pack - pack lokal.
+ * @returns {string|null} pesan penolakan, atau null bila ekspor boleh.
+ */
+export function exportBlocker(pack) {
+  if (!pack || typeof pack !== 'object') return 'Belum ada pack lokal untuk diekspor.';
+  const packId = String(pack.pack_id ?? '').trim();
+  if (!packId) return 'Ekspor ditolak: ID pack belum diisi.';
+  if (!PACK_PREFIX[packId]) {
+    return `Ekspor ditolak: pack_id '${packId}' tidak dikenal validator, jadi berkasnya tidak bisa dipakai di content/. Pilih salah satu dari ${Object.keys(PACK_PREFIX).join(', ')}.`;
+  }
+  if (!Array.isArray(pack.scenarios) || !pack.scenarios.length) {
+    return 'Ekspor ditolak: pack belum punya skenario.';
+  }
+  return null;
+}
+
 /** Contoh pack yang lolos validator, dipakai tombol "Muat contoh". */
 export const SAMPLE_PACK = JSON.stringify(
   {

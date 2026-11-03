@@ -11,7 +11,7 @@ import {
   correctAnswerOf,
   levelProgress,
 } from './engine.js';
-import { CHANNELS, DIFFICULTIES, RED_FLAGS } from './scenario_editor.js';
+import { CHANNELS, DIFFICULTIES, PACK_PREFIX, RED_FLAGS } from './scenario_editor.js';
 
 const CHANNEL_LABEL = {
   email: '✉️ Email',
@@ -317,7 +317,27 @@ function renderScenarioForm(scenario, index, problems = []) {
 }
 
 /**
- * Layar editor skenario (v1.3): kelola banyak skenario dalam satu pack tanpa JSON mentah.
+ * Keterangan beda antara draft editor dan pack tersimpan.
+ * @param {boolean} draftActive - true bila draft belum lolos validasi.
+ * @param {number} storedCount - jumlah skenario pada pack tersimpan yang bisa dimainkan.
+ * @returns {string} HTML catatan draft.
+ */
+export function draftNotice(draftActive, storedCount, draftProblem = '') {
+  if (!draftActive) {
+    return '<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>';
+  }
+  const stored =
+    storedCount > 0
+      ? `Menu tetap memainkan versi tersimpan (${storedCount} skenario) sampai draft ini lolos validasi.`
+      : 'Belum ada versi tersimpan yang bisa dimainkan.';
+  const problem = draftProblem
+    ? `<p>Masalah pertama: ${escapeHtml(draftProblem)}</p>`
+    : '';
+  return `<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
+}
+
+/**
+ * Layar editor skenario (v1.4): kelola banyak skenario dalam satu pack tanpa JSON mentah.
  * @param {object} options - isi editor, pesan, pack tersimpan, pack aktif, dan statusnya.
  * @returns {string} HTML layar editor.
  */
@@ -330,6 +350,9 @@ export function renderEditor({
   index = 0,
   readiness = null,
   scenarioProblems = [],
+  draftActive = false,
+  storedCount = 0,
+  draftProblem = '',
 } = {}) {
   const savedList = packs.length
     ? `<ul class="editor__packs">${packs
@@ -373,19 +396,30 @@ export function renderEditor({
     ? `<section class="editor__active">
         <div class="editor__pack-head">
           <h3>${escapeHtml(pack.name)}</h3>
-          ${readinessBadge}
+          <div id="editor-readiness">${readinessBadge}${readinessDetail}</div>
         </div>
         <div class="editor__grid">
           ${formField('pack-name', 'Nama pack', pack.name || '')}
-          ${formField('pack-id', 'ID pack', pack.pack_id || '')}
+          ${formSelect(
+            'pack-id-choice',
+            'Pilih ID pack konten',
+            [
+              { value: '', text: '— pilih ID pack —' },
+              ...Object.keys(PACK_PREFIX).map((id) => ({ value: id, text: id })),
+              { value: '__custom__', text: 'Lainnya (isi sendiri)' },
+            ],
+            PACK_PREFIX[pack.pack_id] ? pack.pack_id : '__custom__',
+          )}
+          ${formField('pack-id', 'ID pack (bebas diisi)', pack.pack_id || '')}
           ${formField('pack-description', 'Deskripsi pack', pack.description || '')}
           ${formField('pack-emoji', 'Emoji pack', pack.emoji || '')}
         </div>
-        ${readinessDetail}
+        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem)}</div>
         <h3>Skenario (${pack.scenarios.length})</h3>
         <ol class="editor__scenario-list">${activeRows}</ol>
         <div class="btn-row">
           <button class="btn btn--primary" data-action="editor-add-scenario">+ Tambah skenario</button>
+          <button class="btn btn--ghost" data-action="editor-align-prefix">Selaraskan prefix id</button>
           <button class="btn btn--ghost" data-action="editor-export">Ekspor pack content/</button>
           <button class="btn btn--ghost" data-action="editor-delete">Hapus semua pack lokal</button>
         </div>
@@ -399,7 +433,7 @@ export function renderEditor({
 
   return `<section class="card">
       <h2>Editor skenario</h2>
-      <p>Kelola pack lokal berisi banyak skenario tanpa mengedit JSON mentah: tambah, ganti judul, hapus, dan susun urutannya. Perubahan tersimpan di perangkat begitu semua skenario lolos validasi, dan ekspor memuat seluruh skenario dalam bentuk pack <code>content/</code>.</p>
+      <p>Kelola pack lokal berisi banyak skenario tanpa mengedit JSON mentah: tambah, ganti judul, hapus, dan susun urutannya. Isian editor selalu disimpan sebagai draft di perangkat; pack baru masuk daftar yang bisa dimainkan setelah semua skenario lolos validasi. Ekspor memuat seluruh skenario dalam bentuk pack <code>content/</code>.</p>
       <div class="btn-row">
         <button class="btn btn--primary" data-action="editor-new-pack">+ Pack baru</button>
         <select id="editor-pack-select" aria-label="Pilih pack lokal">
