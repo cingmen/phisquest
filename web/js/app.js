@@ -13,7 +13,16 @@ import {
   startSession,
 } from './engine.js';
 import { makeEntry } from './leaderboard.js';
-import { SAMPLE_PACK, parsePackText, toContentPack, validatePackShape } from './scenario_editor.js';
+import {
+  PACK_PREFIX,
+  SAMPLE_PACK,
+  createScenarioTemplate,
+  moveScenario,
+  parsePackText,
+  toContentPack,
+  validatePackShape,
+  validateScenario,
+} from './scenario_editor.js';
 import {
   addCustomPack,
   clearCustomPacks,
@@ -25,6 +34,7 @@ import {
   loadSettings,
   recordLeaderboardEntry,
   resetAll,
+  saveCustomPacks,
   saveProgress,
   saveSettings,
 } from './storage.js';
@@ -63,6 +73,9 @@ const state = {
   editorText: '',
   editorErrors: [],
   editorMessage: '',
+  editorPack: null,
+  editorSavedId: null,
+  editorIndex: 0,
 };
 
 const packCache = new Map();
@@ -154,11 +167,18 @@ function render() {
       ? renderMenu(state.manifest, state.progress, state.leaderboard, state.customPacks)
       : '<section class="card"><p>Memuat konten…</p></section>';
   } else if (state.screen === 'editor') {
+    const active = state.editorPack;
     dom.screens.editor.innerHTML = renderEditor({
       text: state.editorText,
       errors: state.editorErrors,
       message: state.editorMessage,
       packs: state.customPacks.map((pack) => ({ ...pack, readiness: validatePackShape(pack) })),
+      pack: active,
+      index: state.editorIndex,
+      readiness: active ? validatePackShape(active) : null,
+      scenarioProblems: active
+        ? active.scenarios.map((scenario, index) => validateScenario(scenario, index))
+        : [],
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -322,47 +342,265 @@ function finishSession() {
   }
 }
 
-/** Unduh progres sebagai berkas JSON. */
-function saveEditorPack() {
-  const input = document.getElementById('editor-input');
-  state.editorText = input ? input.value : state.editorText;
-  const { pack, errors } = parsePackText(state.editorText);
-  if (!pack) {
-    state.editorErrors = errors;
-    state.editorMessage = 'Perbaiki masalah berikut sebelum menyimpan.';
-    render();
-    announce('Validasi gagal.');
-    return;
-  }
-  try {
-    state.customPacks = addCustomPack(pack);
-  } catch (error) {
-    handleError(error);
-    return;
-  }
-  state.editorErrors = [];
-  const readiness = validatePackShape(pack);
-  const readinessNote = readiness.ready
-    ? ' Pack ini sudah memenuhi aturan pack konten.'
-    : ` Belum siap jadi pack konten: ${readiness.issues[0]}.`;
-  state.editorMessage = `Tersimpan: ${pack.name} (${pack.scenarios.length} skenario).${readinessNote}`;
-  state.editorText = '';
-  render();
-  announce('Pack lokal tersimpan.');
+/** Salin pack agar draft editor tidak mengubah objek yang tersimpan. */
+function clonePack(pack) {
+  return JSON.parse(JSON.stringify(pack));
 }
 
-/** Ekspor pack lokal terakhir sebagai berkas pack content/ (field pack lengkap). */
+/** Id pack lokal yang belum dipakai. */
+function uniquePackId(base = 'kustom') {
+  const taken = new Set(state.customPacks.map((pack) => pack.pack_id));
+  if (!taken.has(base)) return base;
+  let number = 2;
+  while (taken.has(`${base}-${number}`)) number += 1;
+  return `${base}-${number}`;
+}
+
+/** Ambil nilai elemen berdasarkan id (string kosong bila tidak ada). */
+function fieldValue(id) {
+  const element = document.getElementById(id);
+  return element ? element.value : '';
+}
+
+/** Susun satu skenario dari isian form yang sedang terbuka. */
+function readScenarioForm() {
+  const scenario = {
+    label: fieldValue('scn-label').trim(),
+    id: fieldValue('scn-id').trim(),
+    type: fieldValue('scn-type'),
+    difficulty: fieldValue('scn-difficulty'),
+    channel: fieldValue('scn-channel'),
+    sender: {
+      name: fieldValue('scn-sender-name').trim(),
+      address: fieldValue('scn-sender-address').trim(),
+    },
+    subject: fieldValue('scn-subject').trim() || null,
+    datetime: fieldValue('scn-datetime').trim(),
+    body: fieldValue('scn-body').trim(),
+    link: null,
+    attachment: null,
+    options: null,
+    is_phish: fieldValue('scn-is-phish') === 'true',
+    correct_option: null,
+    red_flags: Array.from(document.querySelectorAll('input[name="scn-flag"]:checked')).map(
+      (element) => element.value,
+    ),
+    explanation: fieldValue('scn-explanation').trim(),
+    teach: {
+      tip: fieldValue('scn-tip').trim(),
+      verify_how: fieldValue('scn-verify').trim(),
+    },
+  };
+
+  const href = fieldValue('scn-link-href').trim();
+  if (href) scenario.link = { text: fieldValue('scn-link-text').trim() || href, href };
+  const attachmentName = fieldValue('scn-attachment-name').trim();
+  if (attachmentName) {
+    scenario.attachment = {
+      name: attachmentName,
+      size_kb: Number(fieldValue('scn-attachment-size')) || 0,
+    };
+  }
+  if (scenario.type !== 'phish_or_legit') {
+    scenario.options = ['A', 'B', 'C', 'D']
+      .map((id) => ({ id, text: fieldValue(`scn-option-${id}`).trim() }))
+      .filter((option) => option.text);
+    scenario.correct_option = fieldValue('scn-correct') || null;
+  }
+  return scenario;
+}
+
+/** Tulis isian form (detail pack + skenario aktif) ke draft di memori. */
+function flushEditor() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  if (document.getElementById('pack-name')) {
+    pack.name = fieldValue('pack-name').trim() || pack.name;
+    const packId = fieldValue('pack-id').trim();
+    if (packId) pack.pack_id = packId;
+    pack.description = fieldValue('pack-description').trim();
+    pack.emoji = fieldValue('pack-emoji').trim() || pack.emoji;
+  }
+  const current = pack.scenarios[state.editorIndex];
+  if (current && document.getElementById('scn-id')) {
+    pack.scenarios[state.editorIndex] = readScenarioForm();
+  }
+}
+
+/**
+ * Simpan draft editor ke localStorage bila seluruh skenario valid.
+ * @returns {boolean} true bila pack tersimpan.
+ */
+function persistEditorDraft() {
+  const pack = state.editorPack;
+  if (!pack) return false;
+  const problems = [];
+  pack.scenarios.forEach((scenario, index) => problems.push(...validateScenario(scenario, index)));
+  const ids = pack.scenarios.map((scenario) => String(scenario.id));
+  if (new Set(ids).size !== ids.length) problems.push('id skenario duplikat di pack ini');
+  state.editorErrors = problems;
+  if (problems.length) return false;
+  const others = state.customPacks.filter(
+    (packItem) => packItem.pack_id !== pack.pack_id && packItem.pack_id !== state.editorSavedId,
+  );
+  state.customPacks = saveCustomPacks([...others, clonePack(pack)]);
+  state.editorSavedId = pack.pack_id;
+  return true;
+}
+
+/** Buka pack tersimpan ke editor. */
+function openEditorPack(packId) {
+  const found = state.customPacks.find((pack) => pack.pack_id === packId);
+  if (!found) return;
+  state.editorPack = clonePack(found);
+  state.editorSavedId = found.pack_id;
+  state.editorIndex = 0;
+  state.editorErrors = [];
+  state.editorMessage = `Mengelola ${found.name} (${found.scenarios.length} skenario).`;
+  render();
+}
+
+/** Buat pack lokal baru berisi satu skenario yang sudah valid. */
+function createEditorPack() {
+  state.editorPack = {
+    pack_id: uniquePackId('kustom'),
+    name: `Pack lokal ${state.customPacks.length + 1}`,
+    description: '',
+    emoji: '🛠️',
+    scenarios: [createScenarioTemplate([], 'ew')],
+  };
+  state.editorSavedId = null;
+  state.editorIndex = 0;
+  state.editorErrors = [];
+  const saved = persistEditorDraft();
+  state.editorMessage = saved
+    ? 'Pack baru dibuat. Ubah isinya, lalu tambah skenario lain.'
+    : 'Pack baru dibuat, tetapi belum tersimpan karena ada masalah validasi.';
+  render();
+}
+
+/** Tambah satu skenario baru ke pack aktif. */
+function editorAddScenario() {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack) return;
+  const prefix = PACK_PREFIX[pack.pack_id] || 'ew';
+  const ids = pack.scenarios.map((scenario) => scenario.id);
+  pack.scenarios.push(createScenarioTemplate(ids, prefix));
+  state.editorIndex = pack.scenarios.length - 1;
+  const saved = persistEditorDraft();
+  state.editorMessage = saved
+    ? `Skenario ${pack.scenarios.length} ditambahkan dan tersimpan.`
+    : 'Skenario ditambahkan, tetapi belum tersimpan karena ada masalah validasi.';
+  render();
+}
+
+/** Pilih skenario yang ditampilkan di form (isian lain tetap disimpan). */
+function editorSelectScenario(index) {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack) return;
+  state.editorIndex = Math.min(Math.max(index, 0), Math.max(pack.scenarios.length - 1, 0));
+  persistEditorDraft();
+  render();
+}
+
+/** Geser skenario satu langkah ke atas/bawah. */
+function editorMoveScenario(index, delta) {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack) return;
+  const target = index + delta;
+  pack.scenarios = moveScenario(pack.scenarios, index, target);
+  state.editorIndex = Math.min(Math.max(target, 0), Math.max(pack.scenarios.length - 1, 0));
+  const saved = persistEditorDraft();
+  state.editorMessage = saved
+    ? `Urutan diperbarui: skenario ${index + 1} → ${state.editorIndex + 1}.`
+    : 'Urutan diubah, tetapi belum tersimpan karena ada masalah validasi.';
+  render();
+}
+
+/** Hapus satu skenario dari pack aktif setelah konfirmasi. */
+function editorDeleteScenario(index) {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack || !pack.scenarios[index]) return;
+  const label = pack.scenarios[index].label || pack.scenarios[index].id;
+  if (!window.confirm(`Hapus skenario "${label}" dari pack ini?`)) return;
+  pack.scenarios.splice(index, 1);
+  state.editorIndex = Math.min(state.editorIndex, Math.max(pack.scenarios.length - 1, 0));
+  const saved = persistEditorDraft();
+  state.editorMessage = saved
+    ? `Skenario dihapus. Sisa ${pack.scenarios.length} skenario di pack ini.`
+    : 'Skenario dihapus, tetapi pack belum tersimpan karena ada masalah validasi.';
+  render();
+}
+
+/** Simpan skenario aktif setelah divalidasi. */
+function editorSaveScenario() {
+  flushEditor();
+  const pack = state.editorPack;
+  if (!pack) return;
+  const scenario = pack.scenarios[state.editorIndex];
+  const problems = validateScenario(scenario, state.editorIndex);
+  const saved = persistEditorDraft();
+  if (problems.length) {
+    state.editorMessage = `Skenario ${state.editorIndex + 1} belum valid: ${problems[0]}`;
+  } else if (saved) {
+    state.editorMessage = `Skenario ${state.editorIndex + 1} tersimpan. Pack berisi ${pack.scenarios.length} skenario.`;
+  } else {
+    state.editorMessage = `Skenario ${state.editorIndex + 1} valid, tetapi pack belum tersimpan karena skenario lain bermasalah.`;
+  }
+  render();
+}
+
+/** Impor skenario dari kotak JSON ke pack aktif. */
+function editorImportJson() {
+  const input = document.getElementById('editor-input');
+  state.editorText = input ? input.value : state.editorText;
+  const { pack: parsed, errors } = parsePackText(state.editorText);
+  if (!parsed) {
+    state.editorErrors = errors;
+    state.editorMessage = 'Perbaiki masalah berikut sebelum mengimpor.';
+    render();
+    announce('Impor JSON gagal.');
+    return;
+  }
+  flushEditor();
+  if (!state.editorPack) {
+    state.editorPack = {
+      pack_id: uniquePackId(parsed.pack_id || 'kustom'),
+      name: parsed.name,
+      description: parsed.description || '',
+      emoji: parsed.emoji || '🛠️',
+      scenarios: [],
+    };
+    state.editorSavedId = null;
+    state.editorIndex = 0;
+  }
+  const pack = state.editorPack;
+  pack.scenarios.push(...parsed.scenarios.map((scenario) => ({ ...scenario })));
+  state.editorIndex = pack.scenarios.length - 1;
+  const saved = persistEditorDraft();
+  state.editorText = '';
+  state.editorMessage = saved
+    ? `${parsed.scenarios.length} skenario diimpor. Pack kini berisi ${pack.scenarios.length} skenario.`
+    : 'Skenario diimpor, tetapi pack belum tersimpan karena ada masalah validasi.';
+  render();
+}
+
+/** Ekspor seluruh skenario pack aktif sebagai berkas pack content/. */
 function exportCustomPack() {
-  const pack = state.customPacks[state.customPacks.length - 1];
+  flushEditor();
+  const pack = state.editorPack;
   if (!pack) {
     showToast('Belum ada pack lokal untuk diekspor.');
     return;
   }
+  const readiness = validatePackShape(pack);
+  const payload = toContentPack(pack);
   try {
-    const readiness = validatePackShape(pack);
-    const blob = new Blob([JSON.stringify(toContentPack(pack), null, 2)], {
-      type: 'application/json',
-    });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -372,10 +610,10 @@ function exportCustomPack() {
     link.remove();
     URL.revokeObjectURL(url);
     state.editorMessage = readiness.ready
-      ? `${pack.name} diekspor dan sudah siap menjadi pack content/.`
-      : `${pack.name} diekspor. Belum siap jadi pack content/: ${readiness.issues[0]}`;
+      ? `${payload.scenarios.length} skenario diekspor dan siap menjadi pack content/.`
+      : `${payload.scenarios.length} skenario diekspor. Belum siap jadi pack content/: ${readiness.issues[0]}`;
     render();
-    showToast(`${pack.name} diekspor sebagai JSON.`);
+    showToast(`${pack.name} diekspor (${payload.scenarios.length} skenario).`);
   } catch (error) {
     handleError(error);
   }
@@ -390,6 +628,9 @@ function deleteCustomPacks() {
   if (!window.confirm('Hapus semua pack buatanmu di perangkat ini?')) return;
   clearCustomPacks();
   state.customPacks = [];
+  state.editorPack = null;
+  state.editorSavedId = null;
+  state.editorIndex = 0;
   state.editorMessage = 'Pack lokal dihapus.';
   render();
   showToast('Pack lokal dihapus.');
@@ -462,14 +703,35 @@ function handleClick(event) {
     if (pack) playPack(pack.pack_id, 'classic', Math.min(QUESTIONS_PER_SESSION, pack.scenarios.length));
   } else if (action === 'editor-open') {
     state.editorErrors = [];
+    if (!state.editorPack && state.customPacks.length) {
+      state.editorPack = clonePack(state.customPacks[0]);
+      state.editorSavedId = state.editorPack.pack_id;
+      state.editorIndex = 0;
+    }
     showScreen('editor');
+  } else if (action === 'editor-new-pack') {
+    createEditorPack();
+  } else if (action === 'editor-select-pack') {
+    openEditorPack(target.dataset.pack);
+  } else if (action === 'editor-select') {
+    editorSelectScenario(Number(target.dataset.index));
+  } else if (action === 'editor-move-up') {
+    editorMoveScenario(Number(target.dataset.index), -1);
+  } else if (action === 'editor-move-down') {
+    editorMoveScenario(Number(target.dataset.index), 1);
+  } else if (action === 'editor-delete-scenario') {
+    editorDeleteScenario(Number(target.dataset.index));
+  } else if (action === 'editor-add-scenario') {
+    editorAddScenario();
+  } else if (action === 'editor-save-scenario') {
+    editorSaveScenario();
+  } else if (action === 'editor-import') {
+    editorImportJson();
   } else if (action === 'editor-sample') {
     state.editorText = SAMPLE_PACK;
     state.editorErrors = [];
-    state.editorMessage = 'Contoh dimuat. Tekan "Validasi & simpan" untuk mencoba.';
+    state.editorMessage = 'Contoh dimuat. Tekan "Impor ke pack aktif" untuk menambahkannya.';
     render();
-  } else if (action === 'editor-save') {
-    saveEditorPack();
   } else if (action === 'editor-export') {
     exportCustomPack();
   } else if (action === 'editor-delete') {
@@ -524,6 +786,17 @@ function bindEvents() {
   document.addEventListener('change', (event) => {
     if (event.target && event.target.id === 'import-file') {
       handleImportFile(event.target.files && event.target.files[0]);
+      return;
+    }
+    if (event.target && event.target.id === 'editor-pack-select') {
+      if (event.target.value) openEditorPack(event.target.value);
+      return;
+    }
+    if (!state.editorPack || !event.target || !event.target.id) return;
+    const id = event.target.id;
+    if (id.startsWith('pack-') || id.startsWith('scn-')) {
+      flushEditor();
+      persistEditorDraft();
     }
   });
   window.addEventListener('pq:storage-error', (event) => {

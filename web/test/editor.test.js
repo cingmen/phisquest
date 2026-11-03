@@ -10,6 +10,8 @@ import { fileURLToPath } from 'node:url';
 
 import {
   SAMPLE_PACK,
+  createScenarioTemplate,
+  moveScenario,
   parsePackText,
   toContentPack,
   validatePackShape,
@@ -19,6 +21,7 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const cases = JSON.parse(readFileSync(resolve(here, 'editor-cases.json'), 'utf8'));
 const packCases = JSON.parse(readFileSync(resolve(here, 'editor-packs.json'), 'utf8'));
+const readyPack = JSON.parse(readFileSync(resolve(here, 'editor-pack-ready.json'), 'utf8'));
 
 test('skenario contoh lolos validasi editor', () => {
   for (const scenario of cases.valid) {
@@ -125,4 +128,54 @@ test('ekspor pack melengkapi field tingkat pack', () => {
   assert.equal(exported.emoji, '🛠️');
   assert.equal(exported.scenarios.length, cases.valid.length);
   assert.notEqual(exported.scenarios[0], cases.valid[0]);
+});
+
+test('skenario baru langsung lolos validasi per-skenario', () => {
+  const created = createScenarioTemplate(['ew-001', 'ew-002'], 'ew');
+  assert.deepEqual(validateScenario(created), []);
+  assert.equal(created.id, 'ew-003');
+  assert.equal(createScenarioTemplate([], 'of').id, 'of-001');
+});
+
+test('susun ulang skenario tanpa mengubah daftar asli', () => {
+  const original = [
+    { id: 'ew-001' },
+    { id: 'ew-002' },
+    { id: 'ew-003' },
+  ];
+  const moved = moveScenario(original, 2, 0);
+  assert.deepEqual(
+    moved.map((item) => item.id),
+    ['ew-003', 'ew-001', 'ew-002'],
+  );
+  assert.deepEqual(
+    original.map((item) => item.id),
+    ['ew-001', 'ew-002', 'ew-003'],
+  );
+  assert.deepEqual(moveScenario(original, 0, 5), original);
+});
+
+test('pack siap konten tetap siap dan mengekspor semua skenario', () => {
+  assert.equal(readyPack.scenarios.length, 10);
+  assert.equal(validatePackShape(readyPack).ready, true);
+  const exported = toContentPack(readyPack);
+  assert.equal(exported.scenarios.length, 10);
+  assert.equal(
+    exported.scenarios.some((scenario) => 'label' in scenario),
+    false,
+  );
+  for (const scenario of exported.scenarios) {
+    assert.deepEqual(validateScenario(scenario), [], `skenario ${scenario.id}`);
+  }
+  assert.deepEqual(validatePackShape(exported).issues, []);
+});
+
+test('menambah skenario mengubah status kesiapan pack', () => {
+  const extended = {
+    ...readyPack,
+    scenarios: [...readyPack.scenarios, createScenarioTemplate([], 'of')],
+  };
+  const readiness = validatePackShape(extended);
+  assert.equal(readiness.ready, false);
+  assert.ok(readiness.issues.some((issue) => issue.includes('10 skenario')));
 });

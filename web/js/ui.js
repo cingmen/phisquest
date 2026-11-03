@@ -11,6 +11,7 @@ import {
   correctAnswerOf,
   levelProgress,
 } from './engine.js';
+import { CHANNELS, DIFFICULTIES, RED_FLAGS } from './scenario_editor.js';
 
 const CHANNEL_LABEL = {
   email: '✉️ Email',
@@ -160,40 +161,266 @@ export function renderMenu(manifest, progress, leaderboard = [], customPacks = [
     </section>`;
 }
 
+const SCENARIO_TYPE_LABEL = {
+  phish_or_legit: 'Phishing atau legit?',
+  best_action: 'Tindakan terbaik',
+  spot_redflag: 'Temukan red flag',
+};
+
 /**
- * Layar editor skenario (v1.1): tempel JSON, validasi, simpan lokal, ekspor.
- * @param {object} options - isi editor, daftar masalah, pesan status, dan pack tersimpan.
+ * Satu baris isian teks pada form skenario.
+ * @param {string} id - id elemen.
+ * @param {string} label - label tampil.
+ * @param {unknown} value - nilai awal.
+ * @param {object} [options] - jenis input dan atribut tambahan.
+ * @returns {string} HTML satu field.
+ */
+function formField(id, label, value, options = {}) {
+  const { type = 'text', extra = '' } = options;
+  return `<label class="field"><span>${escapeHtml(label)}</span><input id="${id}" type="${type}"${extra} value="${escapeHtml(value ?? '')}"></label>`;
+}
+
+/**
+ * Satu baris textarea pada form skenario.
+ * @param {string} id - id elemen.
+ * @param {string} label - label tampil.
+ * @param {unknown} value - nilai awal.
+ * @param {number} [rows] - tinggi textarea.
+ * @returns {string} HTML satu textarea.
+ */
+function formArea(id, label, value, rows = 4) {
+  return `<label class="field"><span>${escapeHtml(label)}</span><textarea id="${id}" rows="${rows}">${escapeHtml(value ?? '')}</textarea></label>`;
+}
+
+/**
+ * Satu baris pilihan (select) pada form skenario.
+ * @param {string} id - id elemen.
+ * @param {string} label - label tampil.
+ * @param {Array<{value: string, text: string}>} choices - opsi.
+ * @param {unknown} value - nilai terpilih.
+ * @returns {string} HTML satu select.
+ */
+function formSelect(id, label, choices, value) {
+  const options = choices
+    .map(
+      (choice) =>
+        `<option value="${escapeHtml(choice.value)}"${String(choice.value) === String(value) ? ' selected' : ''}>${escapeHtml(choice.text)}</option>`,
+    )
+    .join('');
+  return `<label class="field"><span>${escapeHtml(label)}</span><select id="${id}">${options}</select></label>`;
+}
+
+/**
+ * Form lengkap untuk satu skenario terpilih.
+ * @param {object} scenario - skenario yang diedit.
+ * @param {number} index - posisi skenario pada pack.
+ * @param {string[]} problems - masalah validasi skenario ini.
+ * @returns {string} HTML form.
+ */
+function renderScenarioForm(scenario, index, problems = []) {
+  const sender = scenario.sender || {};
+  const link = scenario.link || {};
+  const attachment = scenario.attachment || {};
+  const teach = scenario.teach || {};
+  const optionBased = scenario.type !== 'phish_or_legit';
+  const optionFields = optionBased
+    ? ['A', 'B', 'C', 'D'].map((id) => {
+        const found = (scenario.options || []).find((option) => String(option.id) === id);
+        return formField(`scn-option-${id}`, `Pilihan ${id}`, found ? found.text : '');
+      })
+    : [];
+  const flags = RED_FLAGS.map(
+    (flag) =>
+      `<label class="field field--check"><input type="checkbox" name="scn-flag" value="${escapeHtml(flag)}"${(scenario.red_flags || []).includes(flag) ? ' checked' : ''}><span>${escapeHtml(RED_FLAG_LABELS[flag] || flag)}</span></label>`,
+  ).join('');
+
+  return `<div class="editor__form" data-index="${index}">
+      <h3>Skenario ${index + 1} · ${escapeHtml(SCENARIO_TYPE_LABEL[scenario.type] || scenario.type || 'baru')}</h3>
+      ${
+        problems.length
+          ? `<div class="editor__errors" role="alert"><h4>${problems.length} masalah pada skenario ini</h4><ul>${problems
+              .map((problem) => `<li>${escapeHtml(problem)}</li>`)
+              .join('')}</ul></div>`
+          : ''
+      }
+      <div class="editor__grid">
+        ${formField('scn-label', 'Judul skenario (hanya di perangkat)', scenario.label || '')}
+        ${formField('scn-id', 'ID skenario', scenario.id || '')}
+        ${formSelect(
+          'scn-type',
+          'Tipe soal',
+          Object.keys(SCENARIO_TYPE_LABEL).map((type) => ({
+            value: type,
+            text: SCENARIO_TYPE_LABEL[type],
+          })),
+          scenario.type,
+        )}
+        ${formSelect(
+          'scn-difficulty',
+          'Kesulitan',
+          DIFFICULTIES.map((item) => ({ value: item, text: item })),
+          scenario.difficulty,
+        )}
+        ${formSelect(
+          'scn-channel',
+          'Kanal',
+          CHANNELS.map((item) => ({ value: item, text: CHANNEL_LABEL[item] || item })),
+          scenario.channel,
+        )}
+        ${formSelect(
+          'scn-is-phish',
+          'Penilaian pesan',
+          [
+            { value: 'true', text: 'Phishing' },
+            { value: 'false', text: 'Legit' },
+          ],
+          String(scenario.is_phish !== false),
+        )}
+        ${formField('scn-sender-name', 'Nama pengirim', sender.name || '')}
+        ${formField('scn-sender-address', 'Alamat/nomor pengirim', sender.address || '')}
+        ${formField('scn-subject', 'Subjek (kosongkan untuk SMS/WhatsApp)', scenario.subject || '')}
+        ${formField('scn-datetime', 'Waktu ISO-8601 +07:00', scenario.datetime || '')}
+      </div>
+      ${formArea('scn-body', 'Isi pesan', scenario.body || '')}
+      <div class="editor__grid">
+        ${formField('scn-link-text', 'Teks tautan (kosong = tanpa tautan)', link.text || '')}
+        ${formField('scn-link-href', 'URL tautan', link.href || '')}
+        ${formField('scn-attachment-name', 'Nama lampiran (kosong = tanpa lampiran)', attachment.name || '')}
+        ${formField('scn-attachment-size', 'Ukuran lampiran (KB)', attachment.size_kb ?? '', {
+          type: 'number',
+          extra: ' min="0"',
+        })}
+      </div>
+      ${
+        optionBased
+          ? `<fieldset class="editor__options"><legend>Pilihan jawaban</legend><div class="editor__grid">${optionFields.join(
+              '',
+            )}${formSelect(
+              'scn-correct',
+              'Jawaban benar',
+              ['A', 'B', 'C', 'D'].map((id) => ({ value: id, text: id })),
+              scenario.correct_option,
+            )}</div></fieldset>`
+          : '<p class="pack__meta">Tipe ini dinilai sebagai phishing/legit, jadi tidak butuh pilihan ganda.</p>'
+      }
+      <fieldset class="editor__flags"><legend>Red flag</legend><div class="editor__flag-grid">${flags}</div></fieldset>
+      ${formArea('scn-explanation', 'Penjelasan (maksimal 3 kalimat)', scenario.explanation || '', 3)}
+      <div class="editor__grid">
+        ${formField('scn-tip', 'Tip (1 kalimat)', teach.tip || '')}
+        ${formField('scn-verify', 'Cara verifikasi (maksimal 2 kalimat)', teach.verify_how || '')}
+      </div>
+      <div class="btn-row">
+        <button class="btn btn--primary" data-action="editor-save-scenario">Simpan skenario</button>
+        <button class="btn btn--ghost" data-action="editor-export">Ekspor pack content/</button>
+      </div>
+    </div>`;
+}
+
+/**
+ * Layar editor skenario (v1.3): kelola banyak skenario dalam satu pack tanpa JSON mentah.
+ * @param {object} options - isi editor, pesan, pack tersimpan, pack aktif, dan statusnya.
  * @returns {string} HTML layar editor.
  */
-export function renderEditor({ text = '', errors = [], message = '', packs = [] } = {}) {
-  const list = packs.length
+export function renderEditor({
+  text = '',
+  errors = [],
+  message = '',
+  packs = [],
+  pack = null,
+  index = 0,
+  readiness = null,
+  scenarioProblems = [],
+} = {}) {
+  const savedList = packs.length
     ? `<ul class="editor__packs">${packs
-        .map((pack) => {
-          const readiness = pack.readiness || { ready: false, issues: [] };
-          const badge = readiness.ready
+        .map((item) => {
+          const status = item.readiness || { ready: false, issues: [] };
+          const badge = status.ready
             ? '<span class="editor__ready">✅ siap konten</span>'
             : '<span class="editor__not-ready">⚠️ belum siap konten</span>';
-          const detail =
-            readiness.ready || !readiness.issues.length
-              ? ''
-              : `<details class="editor__issues"><summary>${readiness.issues.length} alasan</summary><ul>${readiness.issues
-                  .map((issue) => `<li>${escapeHtml(issue)}</li>`)
-                  .join('')}</ul></details>`;
-          return `<li><span>${escapeHtml(pack.name)} · ${pack.scenarios.length} skenario ${badge}</span>${detail}</li>`;
+          return `<li><span>${escapeHtml(item.name)} · ${item.scenarios.length} skenario ${badge}</span><button class="btn btn--ghost" data-action="editor-select-pack" data-pack="${escapeHtml(item.pack_id)}">Kelola</button></li>`;
         })
         .join('')}</ul>`
-    : '<p class="pack__meta">Belum ada pack lokal.</p>';
+    : '<p class="pack__meta">Belum ada pack lokal tersimpan.</p>';
+
+  const activeRows = pack
+    ? pack.scenarios
+        .map((scenario, position) => {
+          const problems = scenarioProblems[position] || [];
+          const title =
+            scenario.label || scenario.subject || scenario.id || `Skenario ${position + 1}`;
+          const warning = problems.length
+            ? `<span class="editor__not-ready">⚠️ ${problems.length} masalah</span>`
+            : '<span class="editor__ready">✅ valid</span>';
+          return `<li class="${position === index ? 'editor__row--active' : ''}"><button class="editor__row" data-action="editor-select" data-index="${position}" aria-pressed="${position === index}"><span class="editor__row-title">${position + 1}. ${escapeHtml(title)}</span><span class="editor__row-meta">${escapeHtml(SCENARIO_TYPE_LABEL[scenario.type] || scenario.type || '-')} · ${escapeHtml(scenario.channel || '-')} · ${escapeHtml(scenario.difficulty || '-')} ${warning}</span></button><span class="editor__row-actions"><button class="btn btn--ghost" data-action="editor-move-up" data-index="${position}" aria-label="Naikkan skenario ${position + 1}">↑</button><button class="btn btn--ghost" data-action="editor-move-down" data-index="${position}" aria-label="Turunkan skenario ${position + 1}">↓</button><button class="btn btn--ghost" data-action="editor-delete-scenario" data-index="${position}" aria-label="Hapus skenario ${position + 1}">🗑️</button></span></li>`;
+        })
+        .join('')
+    : '';
+
+  const readinessBadge = readiness
+    ? readiness.ready
+      ? '<span class="editor__ready">✅ siap konten</span>'
+      : '<span class="editor__not-ready">⚠️ belum siap konten</span>'
+    : '';
+  const readinessDetail =
+    readiness && !readiness.ready && readiness.issues.length
+      ? `<details class="editor__issues" open><summary>${readiness.issues.length} alasan</summary><ul>${readiness.issues
+          .map((issue) => `<li>${escapeHtml(issue)}</li>`)
+          .join('')}</ul></details>`
+      : '';
+
+  const activePack = pack
+    ? `<section class="editor__active">
+        <div class="editor__pack-head">
+          <h3>${escapeHtml(pack.name)}</h3>
+          ${readinessBadge}
+        </div>
+        <div class="editor__grid">
+          ${formField('pack-name', 'Nama pack', pack.name || '')}
+          ${formField('pack-id', 'ID pack', pack.pack_id || '')}
+          ${formField('pack-description', 'Deskripsi pack', pack.description || '')}
+          ${formField('pack-emoji', 'Emoji pack', pack.emoji || '')}
+        </div>
+        ${readinessDetail}
+        <h3>Skenario (${pack.scenarios.length})</h3>
+        <ol class="editor__scenario-list">${activeRows}</ol>
+        <div class="btn-row">
+          <button class="btn btn--primary" data-action="editor-add-scenario">+ Tambah skenario</button>
+          <button class="btn btn--ghost" data-action="editor-export">Ekspor pack content/</button>
+          <button class="btn btn--ghost" data-action="editor-delete">Hapus semua pack lokal</button>
+        </div>
+        ${
+          pack.scenarios.length
+            ? renderScenarioForm(pack.scenarios[index], index, scenarioProblems[index] || [])
+            : '<p class="pack__meta">Pack ini belum punya skenario.</p>'
+        }
+      </section>`
+    : '<p class="pack__meta">Pilih pack di bawah atau buat pack baru untuk mulai mengelola skenario.</p>';
 
   return `<section class="card">
       <h2>Editor skenario</h2>
-      <p>Tempel satu skenario, array skenario, atau pack lengkap dalam format JSON. Validasi memakai aturan yang sama dengan validator konten untuk tiap skenario, dan daftar pack di bawah menunjukkan kesiapan pack bila ingin dijadikan pack <code>content/</code> (10 skenario + komposisi PRD §9.4).</p>
-      <textarea id="editor-input" class="editor__input" rows="14" spellcheck="false" aria-label="JSON skenario">${escapeHtml(text)}</textarea>
+      <p>Kelola pack lokal berisi banyak skenario tanpa mengedit JSON mentah: tambah, ganti judul, hapus, dan susun urutannya. Perubahan tersimpan di perangkat begitu semua skenario lolos validasi, dan ekspor memuat seluruh skenario dalam bentuk pack <code>content/</code>.</p>
       <div class="btn-row">
-        <button class="btn btn--primary" data-action="editor-save">Validasi &amp; simpan</button>
-        <button class="btn btn--ghost" data-action="editor-sample">Muat contoh</button>
-        <button class="btn btn--ghost" data-action="editor-export">Ekspor pack</button>
-        <button class="btn btn--ghost" data-action="editor-delete">Hapus pack lokal</button>
+        <button class="btn btn--primary" data-action="editor-new-pack">+ Pack baru</button>
+        <select id="editor-pack-select" aria-label="Pilih pack lokal">
+          <option value="">— pilih pack —</option>
+          ${packs
+            .map(
+              (item) =>
+                `<option value="${escapeHtml(item.pack_id)}"${pack && pack.pack_id === item.pack_id ? ' selected' : ''}>${escapeHtml(item.name)} (${item.scenarios.length})</option>`,
+            )
+            .join('')}
+        </select>
       </div>
+      ${activePack}
+      <details class="editor__import">
+        <summary>Impor skenario dari JSON</summary>
+        <textarea id="editor-input" class="editor__input" rows="8" spellcheck="false" aria-label="JSON skenario">${escapeHtml(text)}</textarea>
+        <div class="btn-row">
+          <button class="btn btn--ghost" data-action="editor-import">Impor ke pack aktif</button>
+          <button class="btn btn--ghost" data-action="editor-sample">Muat contoh ke kotak</button>
+        </div>
+      </details>
       ${message ? `<p class="editor__message">${escapeHtml(message)}</p>` : ''}
       ${
         errors.length
@@ -202,8 +429,8 @@ export function renderEditor({ text = '', errors = [], message = '', packs = [] 
               .join('')}</ul></div>`
           : ''
       }
-      <h3>Pack lokal</h3>
-      ${list}
+      <h3>Pack tersimpan</h3>
+      ${savedList}
       <div class="btn-row"><button class="btn btn--ghost" data-action="menu">Kembali ke menu</button></div>
     </section>`;
 }

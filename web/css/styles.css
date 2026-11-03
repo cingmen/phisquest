@@ -932,3 +932,26 @@ a {
 .editor__issues { flex-basis: 100%; font-size: 0.85rem; color: rgba(226, 232, 240, 0.85); }
 .editor__issues summary { cursor: pointer; }
 .editor__issues ul { margin: 6px 0 0; padding-left: 20px; }
+
+/* v1.3: pengelola pack multi-skenario */
+.editor__active { margin: 16px 0; padding: 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.03); }
+.editor__pack-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }
+.editor__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 12px 0; }
+.field { display: grid; gap: 6px; font-size: 0.85rem; }
+.field span { opacity: 0.8; }
+.field input, .field select, .field textarea { width: 100%; padding: 9px 11px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(2, 6, 23, 0.65); color: inherit; font: inherit; }
+.field textarea { min-height: 84px; resize: vertical; }
+.field--check { display: flex; gap: 8px; align-items: center; font-size: 0.85rem; }
+.field--check input { width: auto; }
+.editor__flag-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 14px; }
+.editor__options, .editor__flags { margin: 12px 0; padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); }
+.editor__scenario-list { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; counter-reset: none; }
+.editor__scenario-list li { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 6px; border-radius: 12px; }
+.editor__scenario-list li.editor__row--active { background: rgba(124, 58, 237, 0.16); border: 1px solid rgba(124, 58, 237, 0.45); }
+.editor__row { flex: 1 1 240px; display: grid; gap: 4px; text-align: left; background: transparent; border: 0; color: inherit; cursor: pointer; padding: 6px; }
+.editor__row-title { font-weight: 600; }
+.editor__row-meta { font-size: 0.8rem; opacity: 0.8; display: flex; gap: 8px; flex-wrap: wrap; }
+.editor__row-actions { display: flex; gap: 6px; }
+.editor__form { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.editor__import { margin: 16px 0; }
+.editor__import summary { cursor: pointer; opacity: 0.85; }

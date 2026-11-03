@@ -516,8 +516,86 @@ export function toContentPack(pack) {
     name: pack.name,
     description,
     emoji: typeof pack.emoji === 'string' && pack.emoji.trim() ? pack.emoji : DEFAULT_PACK_EMOJI,
-    scenarios: (pack.scenarios || []).map((scenario) => ({ ...scenario })),
+    scenarios: (pack.scenarios || []).map((scenario) => {
+      // `label` hanya metadata tampilan di perangkat, bukan bagian skema konten.
+      const copy = { ...scenario };
+      delete copy.label;
+      return copy;
+    }),
   };
+}
+
+/**
+ * Waktu sekarang dalam ISO-8601 zona +07:00 (format `datetime` konten).
+ * @returns {string} contoh "2026-11-03T09:00:00+07:00".
+ */
+export function nowJakartaIso() {
+  const shifted = new Date(Date.now() + 7 * 60 * 60 * 1000);
+  return `${shifted.toISOString().slice(0, 19)}+07:00`;
+}
+
+/**
+ * Id skenario berikutnya yang belum terpakai pada satu pack.
+ * @param {string[]} [existingIds] - id yang sudah dipakai.
+ * @param {string} [prefix] - prefix pack (ew/of/sc/cg).
+ * @returns {string} id berpola `{prefix}-{3 digit}`.
+ */
+export function nextScenarioId(existingIds = [], prefix = 'ew') {
+  const taken = new Set(existingIds.map((id) => String(id)));
+  let number = 1;
+  while (taken.has(`${prefix}-${String(number).padStart(3, '0')}`)) number += 1;
+  return `${prefix}-${String(number).padStart(3, '0')}`;
+}
+
+/**
+ * Skenario baru yang sudah lolos aturan per-skenario.
+ * @param {string[]} [existingIds] - id yang sudah dipakai pada pack.
+ * @param {string} [prefix] - prefix id pack.
+ * @returns {object} skenario siap edit.
+ */
+export function createScenarioTemplate(existingIds = [], prefix = 'ew') {
+  return {
+    label: 'Skenario baru',
+    id: nextScenarioId(existingIds, prefix),
+    type: 'phish_or_legit',
+    difficulty: 'mudah',
+    channel: 'email',
+    sender: { name: 'DompetKu', address: 'keamanan@dompetku-verifikasi.example' },
+    subject: 'Verifikasi akun Anda',
+    datetime: nowJakartaIso(),
+    body: 'Halo, akun Anda dibatasi. Buka tautan berikut dalam 1x24 jam untuk verifikasi dan kirim kode OTP Anda.',
+    link: {
+      text: 'dompetku-verifikasi.example/aktifkan',
+      href: 'http://dompetku-verifikasi.example/aktifkan',
+    },
+    attachment: null,
+    options: null,
+    is_phish: true,
+    correct_option: null,
+    red_flags: ['DOMAIN_PALSU', 'MEMINTA_DATA_SENSITIF', 'TEKANAN_WAKTU'],
+    explanation:
+      'Domain dompetku-verifikasi.example bukan dompetku.example, dan OTP tidak pernah diminta lewat email.',
+    teach: {
+      tip: 'Kode OTP tidak boleh dibagikan kepada siapa pun.',
+      verify_how: 'Buka aplikasi DompetKu langsung dan cek notifikasi di sana.',
+    },
+  };
+}
+
+/**
+ * Susun ulang skenario tanpa mengubah objek aslinya.
+ * @param {object[]} scenarios - daftar skenario.
+ * @param {number} from - indeks asal.
+ * @param {number} to - indeks tujuan.
+ * @returns {object[]} daftar baru; tidak berubah bila indeks di luar jangkauan.
+ */
+export function moveScenario(scenarios, from, to) {
+  const list = [...(scenarios || [])];
+  if (from === to) return list;
+  if (from < 0 || from >= list.length || to < 0 || to >= list.length) return list;
+  const [item] = list.splice(from, 1);
+  list.splice(to, 0, item);
+  return list;
 }
 
 /** Contoh pack yang lolos validator, dipakai tombol "Muat contoh". */

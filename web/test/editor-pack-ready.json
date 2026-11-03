@@ -1,0 +1,356 @@
+{
+  "schema_version": "1.0",
+  "pack_id": "office",
+  "name": "Kehidupan Kantor",
+  "description": "Email kerja, invoice vendor, sms absensi, dan permintaan aneh dari atasan yang tiba-tiba.",
+  "emoji": "🏢",
+  "scenarios": [
+    {
+      "id": "of-001",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": {
+        "name": "Tim IT Support",
+        "address": "it-support@portal-absensi-kantor.top"
+      },
+      "subject": "KATA SANDI ANDA KEDALUWARSA HARI INI - WAJIB RESET SEKARANG",
+      "datetime": "2026-10-31T08:05:00+07:00",
+      "body": "PEMBERITAHUAN PENTING\n\nKepada seluruh karyawan, kata sandi email kantor anda akan KEDALUWARSA hari ini jam 17.00. Untuk menghindari kehilangan akses, segera reset kata sandi melalui portal berikut sebelum jam tersebut. Akun yang tidak reset akan dinonaktifkan otomatis oleh sistem.\n\nReset kata sandi: http://portal-absensi-kantor.top/reset\n\nAdmin IT",
+      "link": {
+        "text": "portal-absensi-kantor.top/reset",
+        "href": "http://portal-absensi-kantor.top/reset"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "PENGIRIM_TIDAK_WAJAR",
+        "LINK_MENCURIGAKAN",
+        "TEKANAN_WAKTU",
+        "GRAMATIKA_AJANG"
+      ],
+      "explanation": "IT kantor tidak memakai domain portal-absensi-kantor.top dan tidak mematikan akun hanya karena kata sandi tidak direset. Tautannya http dan nadanya mendesak dengan kapital berlebihan serta ejaan tidak konsisten.",
+      "teach": {
+        "tip": "Reset kata sandi selalu dimulai dari portal internal yang Anda ketik sendiri, bukan dari tautan email.",
+        "verify_how": "Konfirmasi ke tim IT lewat kanal internal kantor sebelum mengubah kata sandi apa pun."
+      },
+      "label": "Skenario contoh 1"
+    },
+    {
+      "id": "of-002",
+      "type": "best_action",
+      "difficulty": "mudah",
+      "channel": "email",
+      "sender": {
+        "name": "KargoCepat Billing",
+        "address": "billing@kargocepat-tagihan.example"
+      },
+      "subject": "Revisi Nomor Rekening Invoice KC-2026-8841 - Pembayaran Ditunda",
+      "datetime": "2026-10-30T09:48:00+07:00",
+      "body": "Halo Tim Keuangan,\n\nMohon perhatiannya, terdapat perubahan nomor rekening perusahaan kami. Invoice KC-2026-8841 sebesar Rp42.500.000 mohon ditransfer ke rekening baru: 5566-7788-9900 (BankNusa) a.n. PT Karya Logistik Prima. Pembayaran yang masuk ke rekening lama akan ditolak sistem.\n\nMohon diselesaikan sebelum akhir pekan ini.\n\nBagian Penagihan",
+      "link": null,
+      "attachment": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "Segera transfer ke rekening baru karena invoice mendesak"
+        },
+        {
+          "id": "B",
+          "text": "Verifikasi dulu nomor rekening ke vendor lewat kontak resmi yang sudah tercatat"
+        },
+        {
+          "id": "C",
+          "text": "Balas email menanyakan apakah rekening benar-benar berubah"
+        },
+        {
+          "id": "D",
+          "text": "Teruskan email ke seluruh tim keuangan sebagai informasi"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "B",
+      "red_flags": [
+        "DOMAIN_MIRIP",
+        "PENGIRIM_TIDAK_WAJAR",
+        "TEKANAN_WAKTU"
+      ],
+      "explanation": "Domain kargocepat-tagihan.example bukan domain resmi kargocepat.example, dan perubahan rekening lewat email adalah pola penipuan invoice klasik. Jangan pernah memverifikasi lewat email balasan—penipu mengendalikan alamat itu.",
+      "teach": {
+        "tip": "Perubahan nomor rekening wajib dikonfirmasi melalui telepon ke nomor vendor yang sudah Anda catat sebelumnya.",
+        "verify_how": "Hubungi bagian keuangan KargoCepat dari kontrak atau situs resmi, lalu minta konfirmasi tertulis sebelum transfer."
+      },
+      "label": "Skenario contoh 2"
+    },
+    {
+      "id": "of-003",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "sms",
+      "sender": {
+        "name": "TokoKilat Bisnis",
+        "address": "0811-2000-4455"
+      },
+      "subject": null,
+      "datetime": "2026-10-30T13:15:00+07:00",
+      "body": "Pesanan bisnis TK-88213 untuk kantor Anda sudah dikirim. Kurir KargoCepat akan menghubungi penerima di alamat kantor besok pagi. Rincian pesanan dapat dilihat di akun TokoKilat Bisnis Anda.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Pesan hanya memberi kabar pengiriman tanpa tautan dan tanpa meminta data. Rujukan tindak lanjut ada di akun resmi TokoKilat Bisnis.",
+      "teach": {
+        "tip": "Notifikasi pengiriman yang tenang dan tanpa tautan adalah bentuk pesan yang wajar.",
+        "verify_how": "Cocokkan nomor pesanan di akun TokoKilat Bisnis sebelum menyiapkan penerimaan barang."
+      },
+      "label": "Skenario contoh 3"
+    },
+    {
+      "id": "of-004",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "whatsapp",
+      "sender": {
+        "name": "Pak Hendra - Direktur",
+        "address": "+62 813-5566-7781"
+      },
+      "subject": null,
+      "datetime": "2026-11-01T18:47:00+07:00",
+      "body": "Halo Budi, saya sedang di luar kota dan tidak bisa angkat telepon. Tolong belikan voucher hadiah 10 x Rp500.000 untuk klien penting hari ini, nanti saya ganti. Kirim kode vouchernya ke nomor ini ya, jangan bilang ke tim lain dulu. Ini rahasia.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "SALURAN_TIDAK_WAJAR",
+        "PENGIRIM_TIDAK_WAJAR",
+        "TEKANAN_WAKTU",
+        "MEMINTA_DATA_SENSITIF"
+      ],
+      "explanation": "Permintaan voucher hadiah lewat nomor WhatsApp pribadi adalah penipuan CEO klasik; kode voucher sama berharganya dengan uang. Nada mendesak, permintaan rahasia, dan nomor tak dikenal adalah tiga tanda yang saling menguatkan.",
+      "teach": {
+        "tip": "Perintah berbau uang dari atasan selalu diverifikasi lewat jalur kantor, bukan lewat chat pribadi.",
+        "verify_how": "Telepon langsung nomor kantor direktur atau tanyakan ke sekretariat sebelum membeli apa pun."
+      },
+      "label": "Skenario contoh 4"
+    },
+    {
+      "id": "of-005",
+      "type": "phish_or_legit",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": {
+        "name": "BankNusa Payroll",
+        "address": "noreply@banknusa.example"
+      },
+      "subject": "Slip Gaji Karyawan Oktober 2026 Telah Tersedia",
+      "datetime": "2026-10-31T16:00:00+07:00",
+      "body": "Halo Budi,\n\nPayroll kantor Anda sudah diproses untuk periode Oktober 2026. Slip gaji bisa diunduh setelah Anda masuk ke portal payroll lewat aplikasi BankNusa.\n\nDetail: https://banknusa.example/payroll\n\nPesan ini tidak meminta kata sandi, PIN, atau kode OTP Anda.\n\nBankNusa",
+      "link": {
+        "text": "banknusa.example/payroll",
+        "href": "https://banknusa.example/payroll"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Domain pengirim dan tautan sama-sama banknusa.example dengan https. Pesan menyebut nama penerima, tidak meminta data sensitif, dan justru menegaskan hal itu.",
+      "teach": {
+        "tip": "Pesan gaji yang resmi tidak pernah meminta kata sandi atau OTP.",
+        "verify_how": "Unduh slip gaji dari aplikasi atau portal payroll resmi, bukan dari tautan pesan yang tidak Anda kenali."
+      },
+      "label": "Skenario contoh 5"
+    },
+    {
+      "id": "of-006",
+      "type": "spot_redflag",
+      "difficulty": "sedang",
+      "channel": "email",
+      "sender": {
+        "name": "LapakRia Dokumen",
+        "address": "dokumen@lapakria-share.example"
+      },
+      "subject": "Daftar Hadir Rapat Koordinasi November",
+      "datetime": "2026-10-29T11:20:00+07:00",
+      "body": "Halo Bapak/Ibu,\n\nBerikut daftar hadir rapat koordinasi bulan November yang perlu Bapak/Ibu periksa. Mohon dibuka melalui peramban agar tabelnya tampil rapi, lalu balas konfirmasi bila sudah sesuai.\n\nTerima kasih,\nSekretariat",
+      "link": null,
+      "attachment": {
+        "name": "Daftar-Hadir-November.html",
+        "size_kb": 96
+      },
+      "options": [
+        {
+          "id": "A",
+          "text": "Sapaan \"Halo Bapak/Ibu\" tanpa nama penerima"
+        },
+        {
+          "id": "B",
+          "text": "Lampiran Daftar-Hadir-November.html yang diminta dibuka di peramban"
+        },
+        {
+          "id": "C",
+          "text": "Subjek menyebut rapat koordinasi November"
+        },
+        {
+          "id": "D",
+          "text": "Permintaan balas konfirmasi setelah diperiksa"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "B",
+      "red_flags": [
+        "LAMPIRAN_BERBAHAYA",
+        "DOMAIN_MIRIP",
+        "SAPAAN_GENERIK"
+      ],
+      "explanation": "Lampiran .html yang harus dibuka di peramban bisa menjalankan skrip pencuri sesi; dokumen rapat normalnya PDF. Domain lapakria-share.example bukan lapakria.example, dan pesannya tidak menyebut nama penerima.",
+      "teach": {
+        "tip": "Dokumen kantor tidak pernah berbentuk .html, .js, atau .exe.",
+        "verify_how": "Minta ulang berkasnya lewat kanal internal kantor dan buka hanya dari penyimpanan resmi perusahaan."
+      },
+      "label": "Skenario contoh 6"
+    },
+    {
+      "id": "of-007",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "email",
+      "sender": {
+        "name": "AsurKita Korporat",
+        "address": "korporat@asurkita.example"
+      },
+      "subject": "Ringkasan Manfaat Asuransi Kesehatan Karyawan 2027",
+      "datetime": "2026-10-28T09:30:00+07:00",
+      "body": "Halo Budi,\n\nTerlampir ringkasan manfaat asuransi kesehatan karyawan untuk periode 2027, termasuk batas rawat inap dan layanan gigi. Tidak ada tindakan yang perlu Anda lakukan sekarang; rincian lengkap tersedia di https://asurkita.example/klaim setelah Anda masuk dengan akun kantor.\n\nSalam,\nAsurKita Korporat",
+      "link": {
+        "text": "asurkita.example/klaim",
+        "href": "https://asurkita.example/klaim"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Domain pengirim dan tautan cocok dengan asurkita.example, dan tidak ada permintaan data maupun tenggat mendesak. Pesan yang menyebut nama penerima dan menyatakan tidak perlu tindakan adalah pola informasi resmi.",
+      "teach": {
+        "tip": "Informasi manfaat asuransi tidak memerlukan data pribadi Anda lewat email.",
+        "verify_how": "Masuk ke portal asuransi korporat kantor untuk melihat rincian manfaat, bukan lewat tautan yang tidak dikenal."
+      },
+      "label": "Skenario contoh 7"
+    },
+    {
+      "id": "of-008",
+      "type": "phish_or_legit",
+      "difficulty": "mudah",
+      "channel": "whatsapp",
+      "sender": {
+        "name": "KargoCepat Kurir",
+        "address": "+62 812-9000-1234"
+      },
+      "subject": null,
+      "datetime": "2026-10-31T10:02:00+07:00",
+      "body": "Selamat pagi, saya kurir KargoCepat. Paket untuk kantor Bapak/Ibu ada 2 koli dan akan saya antar sekitar pukul 11.00. Mohon siapkan penerima di lobi. Jika jam tersebut tidak cocok, balas pesan ini.",
+      "link": null,
+      "attachment": null,
+      "options": null,
+      "is_phish": false,
+      "correct_option": null,
+      "red_flags": [],
+      "explanation": "Kurir hanya mengatur waktu pengantaran, tanpa tautan dan tanpa permintaan data atau pembayaran. Ini pola komunikasi logistik yang wajar.",
+      "teach": {
+        "tip": "Kurir yang asli tidak meminta biaya tambahan lewat chat pribadi.",
+        "verify_how": "Cocokkan nomor resi di aplikasi KargoCepat bila ada permintaan pembayaran tak terduga."
+      },
+      "label": "Skenario contoh 8"
+    },
+    {
+      "id": "of-009",
+      "type": "best_action",
+      "difficulty": "sedang",
+      "channel": "sms",
+      "sender": {
+        "name": "Admin HRD",
+        "address": "0899-7712-3344"
+      },
+      "subject": null,
+      "datetime": "2026-11-01T07:25:00+07:00",
+      "body": "Karyawan yang belum mengisi absensi November diminta segera melengkapi data kehadiran melalui tautan berikut sebelum pukul 12.00 hari ini, jika tidak gaji bulan ini akan ditunda. Isi data di http://bit.ly/absensi-nov",
+      "link": {
+        "text": "bit.ly/absensi-nov",
+        "href": "http://bit.ly/absensi-nov"
+      },
+      "attachment": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "Buka tautan dan isi data kehadiran sebelum pukul 12.00"
+        },
+        {
+          "id": "B",
+          "text": "Balas SMS dengan nomor induk karyawan agar data diperbarui admin"
+        },
+        {
+          "id": "C",
+          "text": "Abaikan tautannya; buka sistem absensi kantor yang biasa dipakai dan konfirmasi ke HRD"
+        },
+        {
+          "id": "D",
+          "text": "Teruskan SMS ke rekan kerja supaya mereka juga cepat mengisi"
+        }
+      ],
+      "is_phish": true,
+      "correct_option": "C",
+      "red_flags": [
+        "SALURAN_TIDAK_WAJAR",
+        "LINK_MENCURIGAKAN",
+        "TEKANAN_WAKTU",
+        "ANCAMAN"
+      ],
+      "explanation": "HRD tidak mengelola absensi lewat tautan shortener dari nomor pribadi, apalagi dengan ancaman gaji ditunda. Tautan bit.ly menyembunyikan tujuan sebenarnya dan dirancang memancing kepanikan.",
+      "teach": {
+        "tip": "Tautan pendek dari nomor tak dikenal tidak pernah layak diklik untuk urusan kepegawaian.",
+        "verify_how": "Buka sistem absensi resmi kantor lalu tanyakan ke HRD lewat nomor internal yang sudah tercatat."
+      },
+      "label": "Skenario contoh 9"
+    },
+    {
+      "id": "of-010",
+      "type": "phish_or_legit",
+      "difficulty": "sulit",
+      "channel": "sms",
+      "sender": {
+        "name": "BankNusa",
+        "address": "0812-7001-9988"
+      },
+      "subject": null,
+      "datetime": "2026-10-30T19:40:00+07:00",
+      "body": "Nasabah Yth, rekening payroll kantor Anda akan dipindahkan ke kantor cabang baru. Konfirmasi data rekening dalam 1x24 jam atau gaji karyawan tidak dapat diproses bulan ini. Konfirmasi: http://banknusa-payroll.example/ubah",
+      "link": {
+        "text": "banknusa-payroll.example/ubah",
+        "href": "http://banknusa-payroll.example/ubah"
+      },
+      "attachment": null,
+      "options": null,
+      "is_phish": true,
+      "correct_option": null,
+      "red_flags": [
+        "PENGIRIM_TIDAK_WAJAR",
+        "LINK_MENCURIGAKAN",
+        "ANCAMAN",
+        "SALURAN_TIDAK_WAJAR"
+      ],
+      "explanation": "Bank tidak memindahkan rekening payroll lewat SMS dengan tautan dan tenggat 24 jam. Domain banknusa-payroll.example bukan banknusa.example, dan pesan mengancam gaji tidak diproses agar korban bertindak cepat.",
+      "teach": {
+        "tip": "Perubahan rekening payroll hanya sah bila disampaikan lewat kanal resmi bank dan bagian keuangan kantor.",
+        "verify_how": "Tanyakan ke bagian keuangan kantor dan cek mutasi di aplikasi BankNusa resmi, bukan lewat tautan SMS."
+      },
+      "label": "Skenario contoh 10"
+    }
+  ]
+}
