@@ -500,10 +500,20 @@ function persistEditorDraft() {
   if (problems.length) return { stored: false, reason: 'invalid' };
   if (conflict) return { stored: false, reason: 'conflict' };
   try {
+    // Buang salinan lama dengan isi sama (mis. setelah ID pack diganti) agar tidak jadi pack ganda.
+    const staleIds = state.customPacks
+      .filter(
+        (packItem) =>
+          packItem.pack_id !== pack.pack_id &&
+          packItem.pack_id !== state.editorSavedId &&
+          samePackContent(pack, packItem),
+      )
+      .map((packItem) => packItem.pack_id);
     const others = state.customPacks.filter(
-      (packItem) => packItem.pack_id !== pack.pack_id && packItem.pack_id !== state.editorSavedId,
+      (packItem) => packItem.pack_id !== pack.pack_id && !staleIds.includes(packItem.pack_id),
     );
     state.customPacks = saveCustomPacks([...others, clonePack(pack)]);
+    for (const staleId of staleIds) removeDraftPack(staleId);
     state.editorSavedId = pack.pack_id;
   } catch (error) {
     handleError(error);
