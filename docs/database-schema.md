@@ -402,6 +402,11 @@ eksplisit). Sejak v1.6.2 deteksi memakai keberadaan `pack_id` di `pq_custom_pack
 `source_pack_id`, sehingga draft pra-v1.6.1 yang belum punya penanda ikut dikenali. Saat draft lama
 dibuka, `source_pack_id` di-backfill ke kunci draft saja — `pq_custom_packs_v1` tidak disentuh.
 
+Sejak v1.6.3 seluruh isi `pq_editor_draft_v1` ditampilkan lewat `listDrafts()` di menu dan di layar
+editor, termasuk draft yang isinya identik dengan pack tersimpan (label “isinya sama dengan pack
+tersimpan”). Menampilkan draft tidak menulis daftar pack; hanya **Simpan skenario** yang menulis
+`pq_custom_packs_v1`.
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.

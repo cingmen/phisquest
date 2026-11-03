@@ -124,6 +124,10 @@ node --test web/test/*.test.js
   **“pack sumber sudah dihapus”** — the work stays safe, but only an explicit **Save scenario**
   brings the pack back to the playable list. Since v1.6.2 the marker also applies to older drafts
   created before v1.6.1.
+- **📝 Drafts managed from the editor & a shortcut (v1.6.3)** — the editor lists every draft with its
+  status (including “pack sumber sudah dihapus” and “isinya sama dengan pack tersimpan”) plus
+  **Resume**/**Discard** buttons, and **Alt+D** duplicates the open scenario without disturbing text
+  fields.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

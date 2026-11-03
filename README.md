@@ -166,6 +166,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   **“pack sumber sudah dihapus”** — isian tetap aman, tetapi hanya tombol **Simpan skenario** yang
   membuatnya kembali ke daftar main. Sejak v1.6.2 penanda ini juga berlaku untuk draft lama yang
   dibuat sebelum v1.6.1.
+- **📝 Draft dikelola dari editor & pintasan (v1.6.3)** — layar editor menampilkan semua draft dengan
+  statusnya (termasuk “pack sumber sudah dihapus” dan “isinya sama dengan pack tersimpan”) plus tombol
+  **Lanjutkan**/**Buang**, dan **Alt+D** menggandakan skenario yang sedang dibuka tanpa mengganggu
+  pengetikan di kolom isian.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
