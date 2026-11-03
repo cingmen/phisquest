@@ -19,6 +19,7 @@ import {
   alignScenarioPrefixes,
   createScenarioTemplate,
   exportBlocker,
+  findPackIdConflict,
   moveScenario,
   parsePackText,
   toContentPack,
@@ -83,6 +84,7 @@ const state = {
   editorPack: null,
   editorSavedId: null,
   editorDraftId: null,
+  editorConflict: null,
   editorIndex: 0,
 };
 
@@ -173,7 +175,13 @@ function render() {
 
   if (state.screen === 'menu') {
     dom.screens.menu.innerHTML = state.manifest
-      ? renderMenu(state.manifest, state.progress, state.leaderboard, state.customPacks)
+      ? renderMenu(
+          state.manifest,
+          state.progress,
+          state.leaderboard,
+          state.customPacks,
+          menuDrafts(),
+        )
       : '<section class="card"><p>Memuat konten…</p></section>';
   } else if (state.screen === 'editor') {
     const active = state.editorPack;
@@ -194,6 +202,7 @@ function render() {
       draftActive: active ? packProblems(active).length > 0 : false,
       storedCount: storedActive ? storedActive.scenarios.length : 0,
       draftProblem: active ? packProblems(active)[0] || '' : '',
+      conflict: active ? state.editorConflict : null,
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -456,14 +465,26 @@ function packProblems(pack) {
 }
 
 /**
+ * Pack lain (tersimpan atau draft) yang sudah memakai ID pack aktif.
+ * @param {object} pack - pack yang sedang diedit.
+ * @returns {{pack_id: string, name: string, scenarios: number}|null} pack bentrok.
+ */
+function currentConflict(pack) {
+  if (!pack) return null;
+  const stored = findPackIdConflict(pack, state.customPacks, state.editorSavedId);
+  if (stored) return stored;
+  return findPackIdConflict(pack, loadDraftPacks(), state.editorDraftId);
+}
+
+/**
  * Simpan draft editor ke perangkat; pack valid ikut masuk daftar yang bisa dimainkan.
  * Draft selalu ditulis (meski belum valid) agar isian bertahan setelah reload, dan
- * tidak pernah menimpa pack valid yang sudah tersimpan.
- * @returns {boolean} true bila pack juga tersimpan sebagai versi valid.
+ * tidak pernah menimpa pack valid lain yang kebetulan memakai ID pack sama.
+ * @returns {{stored: boolean, reason: 'invalid'|'conflict'|null}} hasil penyimpanan.
  */
 function persistEditorDraft() {
   const pack = state.editorPack;
-  if (!pack) return false;
+  if (!pack) return { stored: false, reason: 'invalid' };
   const problems = packProblems(pack);
   state.editorErrors = problems;
 
@@ -474,7 +495,10 @@ function persistEditorDraft() {
     handleError(error);
   }
 
-  if (problems.length) return false;
+  const conflict = currentConflict(pack);
+  state.editorConflict = conflict;
+  if (problems.length) return { stored: false, reason: 'invalid' };
+  if (conflict) return { stored: false, reason: 'conflict' };
   try {
     const others = state.customPacks.filter(
       (packItem) => packItem.pack_id !== pack.pack_id && packItem.pack_id !== state.editorSavedId,
@@ -483,9 +507,29 @@ function persistEditorDraft() {
     state.editorSavedId = pack.pack_id;
   } catch (error) {
     handleError(error);
-    return false;
+    return { stored: false, reason: 'invalid' };
   }
-  return true;
+  return { stored: true, reason: null };
+}
+
+/**
+ * Keterangan singkat kenapa pack belum tersimpan.
+ * @param {{stored: boolean, reason: string|null}} result - hasil persistEditorDraft.
+ * @returns {string} lanjutan kalimat untuk pesan editor.
+ */
+function saveFailureNote(result) {
+  if (result.reason === 'conflict' && state.editorConflict) {
+    return `belum tersimpan karena ID pack '${state.editorConflict.pack_id}' sudah dipakai pack lain (${state.editorConflict.scenarios} skenario); ganti ID pack untuk menyimpan`;
+  }
+  return 'belum tersimpan karena ada masalah validasi';
+}
+
+/** Draft editor yang belum tersimpan sebagai pack valid, untuk ditampilkan di menu. */
+function menuDrafts() {
+  return loadDraftPacks().filter((draft) => {
+    const stored = state.customPacks.find((pack) => pack.pack_id === draft.pack_id);
+    return !stored || packProblems(draft).length > 0;
+  });
 }
 
 /** Perbarui badge kesiapan + catatan draft tanpa membangun ulang form (fokus tidak hilang). */
@@ -495,10 +539,12 @@ function refreshReadiness() {
   const stored = state.customPacks.find((item) => item.pack_id === pack.pack_id);
   const note = document.getElementById('editor-draft-note');
   if (note) {
+    state.editorConflict = currentConflict(pack);
     note.innerHTML = draftNotice(
       packProblems(pack).length > 0,
       stored ? stored.scenarios.length : 0,
       packProblems(pack)[0] || '',
+      state.editorConflict,
     );
   }
   const slot = document.getElementById('editor-readiness');
@@ -527,11 +573,33 @@ function openEditorPack(packId) {
   state.editorDraftId = draft ? draft.pack_id : null;
   state.editorIndex = 0;
   state.editorErrors = [];
+  state.editorConflict = currentConflict(state.editorPack);
   state.editorMessage =
     draft && stored && packProblems(draft).length
       ? `Draft belum valid dimuat. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
       : `Mengelola ${source.name} (${source.scenarios.length} skenario).`;
   render();
+}
+
+/** Lanjutkan draft belum valid yang dipilih dari menu. */
+function resumeDraft(packId) {
+  const draft = loadDraftPacks().find((item) => item.pack_id === packId);
+  if (!draft) {
+    showToast('Draft itu tidak ditemukan lagi di perangkat.');
+    render();
+    return;
+  }
+  const stored = state.customPacks.find((item) => item.pack_id === packId);
+  state.editorPack = clonePack(draft);
+  state.editorSavedId = stored ? stored.pack_id : null;
+  state.editorDraftId = draft.pack_id;
+  state.editorIndex = 0;
+  state.editorErrors = packProblems(draft);
+  state.editorConflict = currentConflict(state.editorPack);
+  state.editorMessage = stored
+    ? `Melanjutkan draft. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
+    : `Melanjutkan draft ${state.editorPack.name || packId}.`;
+  showScreen('editor');
 }
 
 /** Buat pack lokal baru berisi satu skenario yang sudah valid. */
@@ -545,12 +613,13 @@ function createEditorPack() {
   };
   state.editorSavedId = null;
   state.editorDraftId = null;
+  state.editorConflict = null;
   state.editorIndex = 0;
   state.editorErrors = [];
-  const saved = persistEditorDraft();
-  state.editorMessage = saved
+  const result = persistEditorDraft();
+  state.editorMessage = result.stored
     ? 'Pack baru dibuat. Ubah isinya, lalu tambah skenario lain.'
-    : 'Pack baru dibuat, tetapi belum tersimpan karena ada masalah validasi.';
+    : `Pack baru dibuat, tetapi ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -563,10 +632,10 @@ function editorAddScenario() {
   const ids = pack.scenarios.map((scenario) => scenario.id);
   pack.scenarios.push(createScenarioTemplate(ids, prefix));
   state.editorIndex = pack.scenarios.length - 1;
-  const saved = persistEditorDraft();
-  state.editorMessage = saved
+  const result = persistEditorDraft();
+  state.editorMessage = result.stored
     ? `Skenario ${pack.scenarios.length} ditambahkan dan tersimpan.`
-    : 'Skenario ditambahkan, tetapi belum tersimpan karena ada masalah validasi.';
+    : `Skenario ditambahkan, tetapi ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -588,10 +657,10 @@ function editorMoveScenario(index, delta) {
   const target = index + delta;
   pack.scenarios = moveScenario(pack.scenarios, index, target);
   state.editorIndex = Math.min(Math.max(target, 0), Math.max(pack.scenarios.length - 1, 0));
-  const saved = persistEditorDraft();
-  state.editorMessage = saved
+  const result = persistEditorDraft();
+  state.editorMessage = result.stored
     ? `Urutan diperbarui: skenario ${index + 1} → ${state.editorIndex + 1}.`
-    : 'Urutan diubah, tetapi belum tersimpan karena ada masalah validasi.';
+    : `Urutan diubah, tetapi ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -604,10 +673,10 @@ function editorDeleteScenario(index) {
   if (!window.confirm(`Hapus skenario "${label}" dari pack ini?`)) return;
   pack.scenarios.splice(index, 1);
   state.editorIndex = Math.min(state.editorIndex, Math.max(pack.scenarios.length - 1, 0));
-  const saved = persistEditorDraft();
-  state.editorMessage = saved
+  const result = persistEditorDraft();
+  state.editorMessage = result.stored
     ? `Skenario dihapus. Sisa ${pack.scenarios.length} skenario di pack ini.`
-    : 'Skenario dihapus, tetapi pack belum tersimpan karena ada masalah validasi.';
+    : `Skenario dihapus, tetapi pack ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -618,13 +687,13 @@ function editorSaveScenario() {
   if (!pack) return;
   const scenario = pack.scenarios[state.editorIndex];
   const problems = validateScenario(scenario, state.editorIndex);
-  const saved = persistEditorDraft();
+  const result = persistEditorDraft();
   if (problems.length) {
     state.editorMessage = `Skenario ${state.editorIndex + 1} belum valid: ${problems[0]}`;
-  } else if (saved) {
+  } else if (result.stored) {
     state.editorMessage = `Skenario ${state.editorIndex + 1} tersimpan. Pack berisi ${pack.scenarios.length} skenario.`;
   } else {
-    state.editorMessage = `Skenario ${state.editorIndex + 1} valid, tetapi pack belum tersimpan karena skenario lain bermasalah.`;
+    state.editorMessage = `Skenario ${state.editorIndex + 1} valid, tetapi pack ${saveFailureNote(result)}.`;
   }
   render();
 }
@@ -656,11 +725,11 @@ function editorImportJson() {
   const pack = state.editorPack;
   pack.scenarios.push(...parsed.scenarios.map((scenario) => ({ ...scenario })));
   state.editorIndex = pack.scenarios.length - 1;
-  const saved = persistEditorDraft();
+  const result = persistEditorDraft();
   state.editorText = '';
-  state.editorMessage = saved
+  state.editorMessage = result.stored
     ? `${parsed.scenarios.length} skenario diimpor. Pack kini berisi ${pack.scenarios.length} skenario.`
-    : 'Skenario diimpor, tetapi pack belum tersimpan karena ada masalah validasi.';
+    : `Skenario diimpor, tetapi pack ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -686,10 +755,10 @@ function editorAlignPrefix() {
   const lastId = `${prefix}-${String(pack.scenarios.length).padStart(3, '0')}`;
   if (!window.confirm(`Ubah id skenario menjadi ${prefix}-001 … ${lastId}?`)) return;
   pack.scenarios = alignScenarioPrefixes(pack.scenarios, prefix);
-  const saved = persistEditorDraft();
-  state.editorMessage = saved
+  const result = persistEditorDraft();
+  state.editorMessage = result.stored
     ? `Id skenario diselaraskan ke prefix '${prefix}-'.`
-    : `Id diselaraskan ke '${prefix}-', tetapi pack belum lolos validasi karena masalah lain.`;
+    : `Id diselaraskan ke '${prefix}-', tetapi pack ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -704,6 +773,7 @@ function discardEditorDraft() {
   state.editorPack = stored ? clonePack(stored) : null;
   state.editorSavedId = stored ? stored.pack_id : null;
   state.editorDraftId = stored ? stored.pack_id : null;
+  state.editorConflict = null;
   state.editorIndex = 0;
   state.editorErrors = [];
   state.editorMessage = stored
@@ -759,6 +829,7 @@ function deleteCustomPacks() {
   state.editorPack = null;
   state.editorSavedId = null;
   state.editorDraftId = null;
+  state.editorConflict = null;
   state.editorIndex = 0;
   state.editorMessage = 'Pack lokal dihapus.';
   render();
@@ -852,6 +923,8 @@ function handleClick(event) {
     createEditorPack();
   } else if (action === 'editor-select-pack') {
     openEditorPack(target.dataset.pack);
+  } else if (action === 'editor-resume') {
+    resumeDraft(target.dataset.pack);
   } else if (action === 'editor-select') {
     editorSelectScenario(Number(target.dataset.index));
   } else if (action === 'editor-move-up') {

@@ -92,7 +92,24 @@ export function statsLabels(progress) {
  * @param {object} progress - objek Progress.
  * @returns {string} HTML layar menu.
  */
-export function renderMenu(manifest, progress, leaderboard = [], customPacks = []) {
+/**
+ * Daftar draft editor yang belum tersimpan sebagai pack valid.
+ * @param {object[]} draftPacks - draft dari perangkat.
+ * @returns {string} HTML daftar draft (kosong bila tidak ada).
+ */
+function renderDraftList(draftPacks) {
+  if (!draftPacks.length) return '';
+  const rows = draftPacks
+    .map(
+      (draft) =>
+        `<li><span>${escapeHtml(draft.name || draft.pack_id)} · ${draft.scenarios.length} skenario · belum tersimpan</span>` +
+        `<button class="btn btn--ghost" data-action="editor-resume" data-pack="${escapeHtml(draft.pack_id)}">Lanjutkan draft</button></li>`,
+    )
+    .join('');
+  return `<div class="menu__drafts"><p class="pack__meta">📝 Draft editor tersimpan di perangkat (${draftPacks.length}). Lanjutkan agar isian tidak hilang.</p><ul class="editor__packs">${rows}</ul></div>`;
+}
+
+export function renderMenu(manifest, progress, leaderboard = [], customPacks = [], draftPacks = []) {
   const packs = manifest.packs
     .map((pack) => {
       const stats = (progress.packs && progress.packs[pack.pack_id]) || {};
@@ -138,6 +155,7 @@ export function renderMenu(manifest, progress, leaderboard = [], customPacks = [
       <h3>Editor skenario</h3>
       <p class="pack__meta">Tempel JSON skenario, validasi, simpan di perangkat ini, lalu mainkan atau ekspor.</p>
       <button class="btn btn--ghost" data-action="editor-open">Buka editor</button>
+      ${renderDraftList(draftPacks)}
       ${
         customPacks.length
           ? `<ul class="editor__packs">${customPacks
@@ -322,7 +340,10 @@ function renderScenarioForm(scenario, index, problems = []) {
  * @param {number} storedCount - jumlah skenario pada pack tersimpan yang bisa dimainkan.
  * @returns {string} HTML catatan draft.
  */
-export function draftNotice(draftActive, storedCount, draftProblem = '') {
+export function draftNotice(draftActive, storedCount, draftProblem = '', conflict = null) {
+  if (conflict) {
+    return `<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
+  }
   if (!draftActive) {
     return '<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>';
   }
@@ -353,6 +374,7 @@ export function renderEditor({
   draftActive = false,
   storedCount = 0,
   draftProblem = '',
+  conflict = null,
 } = {}) {
   const savedList = packs.length
     ? `<ul class="editor__packs">${packs
@@ -414,7 +436,7 @@ export function renderEditor({
           ${formField('pack-description', 'Deskripsi pack', pack.description || '')}
           ${formField('pack-emoji', 'Emoji pack', pack.emoji || '')}
         </div>
-        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem)}</div>
+        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict)}</div>
         <h3>Skenario (${pack.scenarios.length})</h3>
         <ol class="editor__scenario-list">${activeRows}</ol>
         <div class="btn-row">

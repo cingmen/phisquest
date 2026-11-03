@@ -632,6 +632,30 @@ export function exportBlocker(pack) {
   return null;
 }
 
+/**
+ * Cari pack lain yang sudah memakai `pack_id` yang sama.
+ * Dipakai editor agar mengganti ID pack tidak menimpa pack lain secara diam-diam.
+ * @param {object} pack - pack yang sedang diedit.
+ * @param {object[]} packs - pack tersimpan atau draft yang sudah ada.
+ * @param {string|null} [editingId] - id pack yang sedang diedit (dilewati).
+ * @returns {{pack_id: string, name: string, scenarios: number}|null} pack bentrok.
+ */
+export function findPackIdConflict(pack, packs, editingId = null) {
+  if (!pack || !Array.isArray(packs)) return null;
+  const packId = String(pack.pack_id ?? '').trim();
+  if (!packId) return null;
+  const editing = editingId == null ? null : String(editingId);
+  const other = packs.find(
+    (item) => item && String(item.pack_id ?? '').trim() === packId && String(item.pack_id) !== editing,
+  );
+  if (!other) return null;
+  return {
+    pack_id: packId,
+    name: String(other.name || packId),
+    scenarios: Array.isArray(other.scenarios) ? other.scenarios.length : 0,
+  };
+}
+
 /** Contoh pack yang lolos validator, dipakai tombol "Muat contoh". */
 export const SAMPLE_PACK = JSON.stringify(
   {

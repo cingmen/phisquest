@@ -13,6 +13,7 @@ import {
   alignScenarioPrefixes,
   createScenarioTemplate,
   exportBlocker,
+  findPackIdConflict,
   moveScenario,
   parsePackText,
   toContentPack,
@@ -197,6 +198,16 @@ test('memilih salah satu pack_id membuat pack dari nol siap konten', () => {
     assert.equal(readiness.ready, true);
     assert.ok(selected.scenarios.every((scenario) => scenario.id.startsWith(`${prefix}-`)));
   }
+});
+
+test('ID pack yang sudah dipakai pack lain terdeteksi bentrok', () => {
+  const packs = [{ pack_id: 'office', name: 'Office lama', scenarios: [{}, {}] }];
+  const conflict = findPackIdConflict({ ...readyPack, pack_id: 'office' }, packs, null);
+  assert.deepEqual(conflict, { pack_id: 'office', name: 'Office lama', scenarios: 2 });
+  assert.equal(findPackIdConflict({ ...readyPack, pack_id: 'office' }, packs, 'office'), null);
+  assert.equal(findPackIdConflict({ ...readyPack, pack_id: 'campus-gov' }, packs), null);
+  assert.equal(findPackIdConflict(null, packs), null);
+  assert.equal(findPackIdConflict({ ...readyPack, pack_id: '  ' }, packs), null);
 });
 
 test('pack_id tak dikenal ditolak saat ekspor dengan alasan jelas', () => {
