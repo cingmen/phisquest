@@ -37,6 +37,7 @@ import {
   addCustomPack,
   clearCustomPacks,
   clearDraftPacks,
+  CUSTOM_PACKS_KEY,
   DRAFT_PACKS_KEY,
   exportAll,
   importAll,
@@ -503,6 +504,8 @@ function currentConflict(pack) {
 function persistEditorDraft({ explicit = false, force = false } = {}) {
   const pack = state.editorPack;
   if (!pack) return { stored: false, reason: 'invalid' };
+  // Selalu baca ulang daftar dari penyimpanan agar perubahan tab lain ikut terlihat.
+  state.customPacks = loadCustomPacks();
   const problems = packProblems(pack);
   state.editorErrors = problems;
 
@@ -1321,8 +1324,12 @@ function bindEvents() {
     }, 350);
   });
   window.addEventListener('storage', (event) => {
-    if (event.key !== DRAFT_PACKS_KEY) return;
-    if (state.screen === 'editor') render();
+    if (event.key !== DRAFT_PACKS_KEY && event.key !== CUSTOM_PACKS_KEY) return;
+    state.customPacks = loadCustomPacks();
+    if (state.screen === 'editor') {
+      state.editorConflict = state.editorPack ? currentConflict(state.editorPack) : null;
+      render();
+    }
   });
   window.addEventListener('pq:storage-error', (event) => {
     const detail = event.detail || {};
