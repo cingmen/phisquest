@@ -533,7 +533,6 @@ function saveFailureNote(result) {
 function samePackContent(draft, stored) {
   if (!draft || !stored) return false;
   return (
-    draft.pack_id === stored.pack_id &&
     String(draft.name || '') === String(stored.name || '') &&
     JSON.stringify(draft.scenarios || []) === JSON.stringify(stored.scenarios || [])
   );
