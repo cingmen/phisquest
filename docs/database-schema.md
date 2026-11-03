@@ -327,7 +327,7 @@ FROM scores;
 Entri: `score`, `max_score`, `accuracy` (0..1, 4 desimal), `pack_id` (`null` = campur),
 `mode` (`classic`/`time_attack`), `at`. Maksimum 10 entri; `reset` menghapus berkas ini.
 
-## 8. Pack lokal dari editor (v1.1, diperluas v1.2)
+## 8. Pack lokal dari editor (v1.1, diperluas v1.2–v1.3)
 
 | Media | Kunci | Isi |
 |---|---|---|
@@ -351,6 +351,19 @@ PhishQuest.", emoji 🛠️).
 daftar pack di layar editor; paritas dua bahasa dibuktikan `web/test/editor-packs.json` +
 `tests/test_editor_pack_contract.py`, dan `web/test/editor.test.js` memastikan seluruh
 `content/packs/*.json` dinyatakan siap oleh pemeriksa JS.
+
+Editor multi-skenario (v1.3) mengelola satu pack sekaligus: tambah, ganti judul, hapus, dan susun
+ulang skenario lewat form. Setiap skenario punya field lokal `label` (judul tampil) yang **tidak**
+ikut saat ekspor — `toContentPack()` membuang `label` sehingga berkas hasil ekspor tetap sesuai
+skema konten. Skenario baru dibuat oleh `createScenarioTemplate()` dan sudah lolos
+`validateScenario()` saat dibuat. Fixture `web/test/editor-pack-ready.json` (10 skenario + label
+lokal) dipakai kedua bahasa untuk membuktikan bentuk ekspor multi-skenario tetap diterima.
+
+Draft editor hidup di memori dan baru ditulis ke `pq_custom_packs_v1` setelah **seluruh** skenario
+pack lolos validasi; bila ada skenario bermasalah, perubahan ditahan di memori dan layar editor
+menyebut alasan pertamanya. Dengan begitu isi tersimpan selalu bisa dimainkan, sementara isian
+antar-skenario tidak hilang ketika pemain berpindah skenario (isian di-*flush* ke draft sebelum
+pindah). Kesiapan pack dihitung ulang dari seluruh skenario draft, bukan hanya yang sedang terbuka.
 
 Batas yang tetap berlaku: pack lokal **tidak** otomatis menjadi pack `content/` baru, karena
 `validate_content.py` hanya mengenal empat `pack_id` di `content/manifest.json`. Pemeriksa kesiapan

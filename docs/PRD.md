@@ -10,7 +10,7 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.2.0 (dirilis; riwayat di `implementation-plan.md`) |
+| Target rilis | v1.3.0 (dirilis; riwayat di `implementation-plan.md`) |
 | Terakhir diperbarui | 2026-11-03 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
@@ -427,6 +427,7 @@ stateDiagram-v2
 | **v1.0.0** | F1–F11, 40 skenario, web + CLI + Pages + README dwibahasa | Dirilis |
 | **v1.1.0** | Mode Terbatas Waktu + leaderboard lokal (per perangkat), mode acak lintas pack dengan jumlah soal pilihan, mini editor skenario (impor JSON dari teks) | Dirilis (v1.1.0) |
 | **v1.2.0** | Ekspor hasil editor berbentuk pack `content/` lengkap + pemeriksa kesiapan pack (10 skenario, komposisi 7/2/1 tipe, 3/4/3 kesulitan, kanal, 6:4 phishing/legit, cakupan red flag, prefix id) dengan paritas dua bahasa | Dirilis (v1.2.0) |
+| **v1.3.0** | Editor pack lokal multi-skenario: tambah, ganti judul, hapus, dan susun ulang skenario lewat form (tanpa JSON mentah), isian antar-skenario tidak hilang, ekspor memuat seluruh skenario, perubahan bertahan setelah reload | Dirilis (v1.3.0) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

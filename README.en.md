@@ -91,7 +91,7 @@ node --test web/test/*.test.js
   web `localStorage` and `~/.phishquest/leaderboard.json` for the CLI. No backend, no account.
 - CLI: `phishquest play --mode time-attack` and `phishquest leaderboard`.
 
-## Mixed mode with question count & scenario editor (v1.1)
+## Mixed mode with question count & scenario editor (v1.1 – v1.3)
 
 - **🎲 Campur Semua** — pick 5, 10, 20, or 40 questions. A count below 1 is rejected
   (`INVALID_COUNT`/exit 2); requests above the pool size are capped to what is available.
@@ -102,6 +102,11 @@ node --test web/test/*.test.js
   `emoji`), and each local pack shows either *content-ready* or the list of unmet rules:
   10 scenarios, 7/2/1 type mix, 3/4/3 difficulty, channels, 6:4 phishing:legit, ≥7 red-flag
   coverage, and id prefix. The rules match the content validator (v1.2).
+- **🗂️ One pack, many scenarios (v1.3)** — a scenario list with add, rename, delete and
+  move up/down, plus a per-scenario form (sender, body, link, answer options, red flags,
+  explanation). Switching scenarios keeps unsaved input, changes persist once every scenario is
+  valid and survive a reload, and exports include every scenario in the pack. Raw JSON stays
+  available under *Import*.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

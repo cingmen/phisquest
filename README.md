@@ -134,7 +134,7 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   `localStorage` web dan `~/.phishquest/leaderboard.json` di CLI. Tanpa backend dan tanpa akun.
 - CLI: `phishquest play --mode time-attack` dan `phishquest leaderboard`.
 
-## Mode Campur berjumlah soal & editor skenario (v1.1)
+## Mode Campur berjumlah soal & editor skenario (v1.1 – v1.3)
 
 - **🎲 Campur Semua** — pilih 5, 10, 20, atau 40 soal. Jumlah < 1 ditolak (`INVALID_COUNT`/
   exit 2) dan permintaan melebihi isi pool dipotong ke jumlah soal yang tersedia.
@@ -145,6 +145,11 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   `emoji`), dan setiap pack lokal diberi status *siap konten* atau daftar alasan yang belum
   terpenuhi: 10 skenario, komposisi tipe 7/2/1, kesulitan 3/4/3, kanal, 6:4 phishing:legit,
   cakupan ≥7 red flag, serta prefix id. Aturannya sama dengan validator konten (v1.2).
+- **🗂️ Satu pack, banyak skenario (v1.3)** — daftar skenario dengan tombol tambah, ganti judul,
+  hapus, dan naik/turun urutan, plus form isian per skenario (pengirim, isi pesan, tautan,
+  pilihan jawaban, red flag, penjelasan). Berpindah skenario tidak menghilangkan isian lain,
+  perubahan tersimpan setelah semua skenario valid dan tetap ada setelah reload, dan ekspor
+  memuat seluruh skenario pack. JSON mentah tetap tersedia lewat bagian *Impor*.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
