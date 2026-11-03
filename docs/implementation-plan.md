@@ -144,6 +144,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v1.2.0** | Ekspor editor menjadi pack `content/` lengkap + pemeriksa kesiapan pack (komposisi PRD §9.4, prefix id, field pack) dengan paritas validator JS↔Python | 1 hari | Dirilis (v1.2.0) |
 | **v1.3.0** | Editor pack lokal multi-skenario (tambah/ganti judul/hapus/urut ulang tanpa JSON mentah), persistensi perangkat, ekspor seluruh skenario | 1–2 hari | Dirilis (v1.3.0) |
 | **v1.4.0** | Pemilih `pack_id` konten + penyelarasan prefix id; draft editor belum valid tersimpan di kunci terpisah sehingga bertahan setelah reload tanpa menimpa pack valid | 1 hari | Dirilis (v1.4.0) |
+| **v1.5.0** | Penjaga bentrok `pack_id` (pack lain tidak tertimpa, draft tetap tersimpan) dan daftar draft di menu dengan tombol “Lanjutkan draft” | 1 hari | Dirilis (v1.5.0) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Belum dikerjakan |
 
 ## 10. Strategi Pengujian
@@ -185,7 +186,7 @@ fondasi  konten  engine  CLI    web    rilis
 
 Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP); M4–M5 menambah daya tarik demo web. Jangan tukar urutan M1 ← M2: engine tanpa konten nyata = test yang menguji buatan sendiri.
 
-## 13. Status v1.1 – v1.4
+## 13. Status v1.1 – v1.5
 
 - [x] Mode Terbatas Waktu (20 detik/soal + bonus kecepatan) — web & CLI, golden test dua bahasa
 - [x] Leaderboard lokal per perangkat — `pq_leaderboard_v1` (web) dan `leaderboard.json` (CLI)
@@ -199,4 +200,6 @@ Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP);
 - [x] Pemilih `pack_id` (empat ID bawaan + isian bebas) dan tombol “Selaraskan prefix id” — `pack_id` tak dikenal ditolak saat ekspor dengan pesan yang menyebut sebabnya
 - [x] Draft editor tersimpan di `pq_editor_draft_v1` (termasuk yang belum valid) dan dipulihkan saat editor dibuka; `pq_custom_packs_v1` tetap hanya berisi pack valid yang bisa dimainkan
 - [x] Uji baru: `web/test/editor-storage.test.js` (draft vs pack valid, id berubah, reset) dan paritas Python untuk keempat `pack_id` bawaan
+- [x] `findPackIdConflict()` + `currentConflict()` mencegah satu pack menimpa pack lain yang memakai `pack_id` sama; editor menyebut ID yang bentrok dan tetap menyimpan isian sebagai draft
+- [x] Menu menampilkan draft yang belum tersimpan sebagai pack valid dengan tombol “Lanjutkan draft” (aksi `editor-resume`)
 

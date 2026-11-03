@@ -134,7 +134,7 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   `localStorage` web dan `~/.phishquest/leaderboard.json` di CLI. Tanpa backend dan tanpa akun.
 - CLI: `phishquest play --mode time-attack` dan `phishquest leaderboard`.
 
-## Mode Campur berjumlah soal & editor skenario (v1.1 – v1.4)
+## Mode Campur berjumlah soal & editor skenario (v1.1 – v1.5)
 
 - **🎲 Campur Semua** — pilih 5, 10, 20, atau 40 soal. Jumlah < 1 ditolak (`INVALID_COUNT`/
   exit 2) dan permintaan melebihi isi pool dipotong ke jumlah soal yang tersedia.
@@ -155,6 +155,9 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   sendiri bisa mencapai status **siap konten**, dan ekspor menolak `pack_id` tak dikenal dengan
   alasan yang jelas. Isian yang belum valid disimpan sebagai draft terpisah di perangkat sehingga
   tetap ada setelah reload tanpa menimpa pack valid yang bisa dimainkan.
+- **🛡️ ID pack tak saling menimpa (v1.5)** — bila ID pack yang dipilih sudah dipakai pack lain di
+  perangkat, editor menjelaskan bentroknya dan tidak menimpa pack itu; isian tetap tersimpan sebagai
+  draft. Draft yang belum jadi pack valid muncul di menu dengan tombol **Lanjutkan draft**.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

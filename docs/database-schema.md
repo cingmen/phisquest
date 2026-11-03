@@ -379,6 +379,17 @@ terpilih tidak dikenal, badge kesiapan menyebut sebabnya dan ekspor ditolak (`ex
 pesan yang memuat id tersebut; tombol **Selaraskan prefix id** menomori ulang id skenario menjadi
 `{prefix}-001…` agar pack dari nol bisa mencapai status siap konten tanpa mengedit JSON.
 
+Sejak v1.5 `pack_id` tidak boleh dipakai dua pack sekaligus: `findPackIdConflict()` memeriksa pack
+tersimpan dan draft lain, lalu `persistEditorDraft()` menolak menulis ke `pq_custom_packs_v1` selama
+bentrok masih ada (draft tetap tersimpan, editor menyebut nama pack dan jumlah skenario yang bentrok).
+Dengan begitu mengganti ID pack tidak pernah menimpa pack lain secara diam-diam. Menu juga membaca
+`pq_editor_draft_v1` untuk menampilkan tombol **Lanjutkan draft** bagi draft yang belum tersimpan
+sebagai pack valid.
+
+Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
+sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
+menghapus keduanya.
+
 Batas yang tetap berlaku: pack lokal **tidak** otomatis menjadi pack `content/` baru, karena
 `validate_content.py` hanya mengenal empat `pack_id` di `content/manifest.json`. Pemeriksa kesiapan
 menunjukkan tepat aturan mana yang belum terpenuhi, sehingga hasil editor bisa digabungkan ke pack
