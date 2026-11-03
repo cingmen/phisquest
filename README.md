@@ -164,7 +164,8 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   salinannya langsung valid dan siap disunting. Sejak v1.6.1 penghapusan benar-benar permanen:
   autosave tidak membuat pack baru, dan draft yang pack sumbernya sudah dihapus ditandai
   **“pack sumber sudah dihapus”** — isian tetap aman, tetapi hanya tombol **Simpan skenario** yang
-  membuatnya kembali ke daftar main.
+  membuatnya kembali ke daftar main. Sejak v1.6.2 penanda ini juga berlaku untuk draft lama yang
+  dibuat sebelum v1.6.1.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

@@ -10,7 +10,7 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.6.1 (dirilis; riwayat di `implementation-plan.md`) |
+| Target rilis | v1.6.2 (dirilis; riwayat di `implementation-plan.md`) |
 | Terakhir diperbarui | 2026-11-03 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
@@ -432,6 +432,7 @@ stateDiagram-v2
 | **v1.5.0** | ID pack bentrok tidak lagi menimpa pack lain secara diam-diam (draft tetap aman dan alasannya dijelaskan), plus daftar draft tersimpan di menu dengan tombol “Lanjutkan draft” | Dirilis (v1.5.0) |
 | **v1.6.0** | Hapus satu pack tersimpan (konfirmasi menyebut nama pack, draft tidak ikut terhapus) dan aksi gandakan skenario dengan id baru sesuai prefix pack | Dirilis (v1.6.0) |
 | **v1.6.1** | Hapus pack bersifat permanen: autosave tidak lagi membuat pack baru, draft yang pack sumbernya terhapus ditandai jelas di editor/menu, dan hanya simpan eksplisit yang membuat pack kembali | Dirilis (v1.6.1) |
+| **v1.6.2** | Draft lama tanpa `source_pack_id` ikut dikenali sebagai draft yatim dari keberadaan pack di daftar main, dengan label dan jaminan autosave yang sama | Dirilis (v1.6.2) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

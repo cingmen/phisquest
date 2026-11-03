@@ -396,9 +396,11 @@ lewat `clearDraftPacks()`.
 Sejak v1.6.1 autosave (debounce input, `change`, dan `beforeunload`) tidak pernah menambah entri baru ke
 `pq_custom_packs_v1`: `savePlan()` hanya mengizinkan penulisan daftar main bila pack sudah ada di sana
 atau bila pengguna menekan **Simpan skenario**. Akibatnya pack yang dihapus tetap hilang meski draft-nya
-dilanjutkan dan halaman di-reload. Draft seperti itu disebut draft yatim (`draftIsOrphan()`), memakai
-`source_pack_id` yang tidak ada lagi di daftar main, dan ditandai di menu (“pack sumber sudah dihapus”)
-serta di editor (catatan bahwa isian aman tetapi hanya masuk daftar main lewat simpan eksplisit).
+dilanjutkan dan halaman di-reload. Draft seperti itu disebut draft yatim (`draftIsOrphan()`), dan ditandai di menu (“pack sumber sudah
+dihapus”) serta di editor (catatan bahwa isian aman tetapi hanya masuk daftar main lewat simpan
+eksplisit). Sejak v1.6.2 deteksi memakai keberadaan `pack_id` di `pq_custom_packs_v1`, bukan hanya
+`source_pack_id`, sehingga draft pra-v1.6.1 yang belum punya penanda ikut dikenali. Saat draft lama
+dibuka, `source_pack_id` di-backfill ke kunci draft saja — `pq_custom_packs_v1` tidak disentuh.
 
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`

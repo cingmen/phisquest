@@ -122,7 +122,8 @@ node --test web/test/*.test.js
   pack prefix, so the copy is immediately valid and ready to edit. Since v1.6.1 deletion is truly
   permanent: autosave never recreates a pack, and drafts whose source pack is gone are marked
   **“pack sumber sudah dihapus”** — the work stays safe, but only an explicit **Save scenario**
-  brings the pack back to the playable list.
+  brings the pack back to the playable list. Since v1.6.2 the marker also applies to older drafts
+  created before v1.6.1.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal
