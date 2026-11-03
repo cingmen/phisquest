@@ -548,6 +548,40 @@ export function nextScenarioId(existingIds = [], prefix = 'ew') {
 }
 
 /**
+ * Putuskan hasil penyimpanan editor tanpa menyentuh penyimpanan.
+ * Autosave hanya boleh memperbarui pack yang sudah ada di daftar main; membuat pack baru
+ * (termasuk draft yang pack sumbernya sudah dihapus) wajib lewat simpan eksplisit.
+ * @param {object} [options] - kondisi penyimpanan.
+ * @param {string[]} [options.problems] - masalah validasi skenario.
+ * @param {boolean} [options.conflict] - true bila ID pack bentrok dengan pack lain.
+ * @param {boolean} [options.inStore] - true bila pack sudah ada di daftar main.
+ * @param {boolean} [options.explicit] - true untuk aksi simpan yang dipilih pengguna.
+ * @returns {{stored: boolean, reason: 'invalid'|'conflict'|'draft-only'|null}} hasil.
+ */
+export function savePlan({
+  problems = [],
+  conflict = false,
+  inStore = false,
+  explicit = false,
+} = {}) {
+  if (problems.length) return { stored: false, reason: 'invalid' };
+  if (conflict) return { stored: false, reason: 'conflict' };
+  if (!inStore && !explicit) return { stored: false, reason: 'draft-only' };
+  return { stored: true, reason: null };
+}
+
+/**
+ * Draft yang pack sumbernya sudah tidak ada di daftar main.
+ * @param {object} draft - draft editor (memakai `source_pack_id`).
+ * @param {object[]} packs - pack yang saat ini ada di daftar main.
+ * @returns {boolean} true bila draft berasal dari pack yang sudah dihapus.
+ */
+export function draftIsOrphan(draft, packs = []) {
+  if (!draft || !draft.source_pack_id) return false;
+  return !packs.some((pack) => pack && pack.pack_id === draft.source_pack_id);
+}
+
+/**
  * Gandakan satu skenario dengan id baru yang mengikuti prefix pack.
  * Salinan diletakkan tepat setelah skenario asli dan memakai id berikutnya yang belum terpakai,
  * sehingga hasilnya langsung lolos `validateScenario`.

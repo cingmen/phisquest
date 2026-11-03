@@ -12,11 +12,13 @@ import {
   SAMPLE_PACK,
   alignScenarioPrefixes,
   createScenarioTemplate,
+  draftIsOrphan,
   duplicateScenario,
   exportBlocker,
   findPackIdConflict,
   moveScenario,
   parsePackText,
+  savePlan,
   toContentPack,
   validatePackShape,
   validateScenario,
@@ -199,6 +201,32 @@ test('memilih salah satu pack_id membuat pack dari nol siap konten', () => {
     assert.equal(readiness.ready, true);
     assert.ok(selected.scenarios.every((scenario) => scenario.id.startsWith(`${prefix}-`)));
   }
+});
+
+test('savePlan tidak pernah membuat pack baru dari autosave', () => {
+  assert.deepEqual(savePlan(), { stored: false, reason: 'draft-only' });
+  assert.deepEqual(savePlan({ inStore: false, explicit: false }), {
+    stored: false,
+    reason: 'draft-only',
+  });
+  assert.deepEqual(savePlan({ inStore: true, explicit: false }), { stored: true, reason: null });
+  assert.deepEqual(savePlan({ inStore: false, explicit: true }), { stored: true, reason: null });
+  assert.deepEqual(savePlan({ problems: ['body kosong'], inStore: true, explicit: true }), {
+    stored: false,
+    reason: 'invalid',
+  });
+  assert.deepEqual(savePlan({ conflict: true, inStore: false, explicit: true }), {
+    stored: false,
+    reason: 'conflict',
+  });
+});
+
+test('draft yatim dikenali saat pack sumbernya sudah dihapus', () => {
+  const draft = { pack_id: 'kustom', source_pack_id: 'kustom' };
+  assert.equal(draftIsOrphan(draft, []), true);
+  assert.equal(draftIsOrphan(draft, [{ pack_id: 'kustom' }]), false);
+  assert.equal(draftIsOrphan({ pack_id: 'kustom', source_pack_id: null }, []), false);
+  assert.equal(draftIsOrphan(null, []), false);
 });
 
 test('menggandakan skenario memberi id baru berprefix dan tetap valid', () => {

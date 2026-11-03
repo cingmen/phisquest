@@ -102,7 +102,7 @@ function renderDraftList(draftPacks) {
   const rows = draftPacks
     .map(
       (draft) =>
-        `<li><span>${escapeHtml(draft.name || draft.pack_id)} · ${draft.scenarios.length} skenario · belum tersimpan</span>` +
+        `<li><span>${escapeHtml(draft.name || draft.pack_id)} · ${draft.scenarios.length} skenario · ${draft.orphan ? 'pack sumber sudah dihapus' : 'belum tersimpan'}</span>` +
         `<button class="btn btn--ghost" data-action="editor-resume" data-pack="${escapeHtml(draft.pack_id)}">Lanjutkan draft</button></li>`,
     )
     .join('');
@@ -341,12 +341,17 @@ function renderScenarioForm(scenario, index, problems = []) {
  * @param {number} storedCount - jumlah skenario pada pack tersimpan yang bisa dimainkan.
  * @returns {string} HTML catatan draft.
  */
-export function draftNotice(draftActive, storedCount, draftProblem = '', conflict = null) {
+export function draftNotice(draftActive, storedCount, draftProblem = '', conflict = null, orphan = false) {
+  const orphanNote = orphan
+    ? '<div class="editor__draft editor__draft--orphan" role="status"><p>🗑️ Draft ini berasal dari pack yang sudah dihapus. Isian tetap aman di perangkat dan tidak masuk daftar main sampai kamu menekan <strong>Simpan skenario</strong>.</p></div>'
+    : '';
   if (conflict) {
-    return `<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
+    return `${orphanNote}<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
   }
   if (!draftActive) {
-    return '<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>';
+    return orphan
+      ? `${orphanNote}<p class="editor__draft">💾 Draft ini belum ada di daftar main. Simpan skenario untuk membuat pack baru.</p>`
+      : '<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>';
   }
   const stored =
     storedCount > 0
@@ -355,7 +360,7 @@ export function draftNotice(draftActive, storedCount, draftProblem = '', conflic
   const problem = draftProblem
     ? `<p>Masalah pertama: ${escapeHtml(draftProblem)}</p>`
     : '';
-  return `<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
+  return `${orphanNote}<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
 }
 
 /**
@@ -376,6 +381,7 @@ export function renderEditor({
   storedCount = 0,
   draftProblem = '',
   conflict = null,
+  orphan = false,
 } = {}) {
   const savedList = packs.length
     ? `<ul class="editor__packs">${packs
@@ -437,7 +443,7 @@ export function renderEditor({
           ${formField('pack-description', 'Deskripsi pack', pack.description || '')}
           ${formField('pack-emoji', 'Emoji pack', pack.emoji || '')}
         </div>
-        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict)}</div>
+        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict, orphan)}</div>
         <h3>Skenario (${pack.scenarios.length})</h3>
         <ol class="editor__scenario-list">${activeRows}</ol>
         <div class="btn-row">
