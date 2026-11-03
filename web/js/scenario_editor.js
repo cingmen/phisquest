@@ -621,15 +621,46 @@ export function draftStatus(draft, packs = []) {
 }
 
 /**
+ * Urutkan draft dari waktu edit terakhir (terbaru di atas); id dipakai sebagai pemecah seri.
+ * @param {object[]} drafts - daftar draft.
+ * @returns {object[]} salinan daftar yang sudah terurut.
+ */
+export function sortDrafts(drafts = []) {
+  return [...(Array.isArray(drafts) ? drafts : [])].sort((a, b) => {
+    const left = String((a && a.updated_at) || '');
+    const right = String((b && b.updated_at) || '');
+    if (left !== right) return left < right ? 1 : -1;
+    return String((a && a.pack_id) || '').localeCompare(String((b && b.pack_id) || ''));
+  });
+}
+
+/**
+ * Putuskan apakah draft boleh ditulis, berhenti karena isinya sama, atau berhenti karena versi
+ * di penyimpanan lebih baru (mis. tab lain menyimpan belakangan).
+ * @param {object} [options] - waktu versi tab ini, waktu versi tersimpan, dan status isi.
+ * @returns {{write: boolean, conflict: boolean, reason: string}} keputusan penulisan.
+ */
+export function draftWriteDecision({ incomingAt = '', storedAt = '', sameContent = false } = {}) {
+  const incoming = String(incomingAt || '');
+  const stored = String(storedAt || '');
+  if (!stored) return { write: true, conflict: false, reason: 'new' };
+  if (sameContent) return { write: false, conflict: false, reason: 'identical' };
+  if (stored > incoming) return { write: false, conflict: true, reason: 'remote-newer' };
+  return { write: true, conflict: false, reason: stored === incoming ? 'same-time' : 'newer' };
+}
+
+/**
  * Daftar draft siap tampil, termasuk draft yang isinya sama dengan pack tersimpan.
+ * Urutannya selalu dari waktu edit terakhir.
  * @param {object[]} drafts - draft dari perangkat.
  * @param {object[]} packs - pack yang ada di daftar main.
  * @returns {object[]} draft dengan status {orphan, identical, stored, label}.
  */
 export function listDrafts(drafts = [], packs = []) {
-  return (Array.isArray(drafts) ? drafts : [])
+  const rows = (Array.isArray(drafts) ? drafts : [])
     .filter((draft) => draft && typeof draft.pack_id === 'string' && draft.pack_id.trim())
     .map((draft) => ({ ...draft, ...draftStatus(draft, packs) }));
+  return sortDrafts(rows);
 }
 
 /**
@@ -640,7 +671,7 @@ export function listDrafts(drafts = [], packs = []) {
  */
 export function isTextEntryTarget(tagName, isContentEditable = false) {
   const tag = String(tagName || '').toUpperCase();
-  return isContentEditable === true || tag === 'INPUT' || tag === 'TEXTAREA';
+  return isContentEditable === true || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 }
 
 /**

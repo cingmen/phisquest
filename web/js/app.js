@@ -19,6 +19,7 @@ import {
   alignScenarioPrefixes,
   createScenarioTemplate,
   draftIsOrphan,
+  draftWriteDecision,
   duplicateScenario,
   exportBlocker,
   findPackIdConflict,
@@ -36,6 +37,7 @@ import {
   addCustomPack,
   clearCustomPacks,
   clearDraftPacks,
+  DRAFT_PACKS_KEY,
   exportAll,
   importAll,
   loadCustomPacks,
@@ -94,6 +96,8 @@ const state = {
   editorConflict: null,
   editorSourceId: null,
   editorOrphan: false,
+  editorDraftUpdatedAt: '',
+  editorDraftConflict: null,
   editorIndex: 0,
 };
 
@@ -214,6 +218,7 @@ function render() {
       draftProblem: active ? packProblems(active)[0] || '' : '',
       conflict: active ? state.editorConflict : null,
       orphan: active ? draftIsOrphan(active, state.customPacks) : false,
+      remoteConflict: active ? state.editorDraftConflict : null,
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -495,20 +500,41 @@ function currentConflict(pack) {
  * @param {{explicit?: boolean}} [options] - `explicit` untuk aksi simpan yang dipilih pengguna.
  * @returns {{stored: boolean, reason: 'invalid'|'conflict'|'draft-only'|null}} hasil penyimpanan.
  */
-function persistEditorDraft({ explicit = false } = {}) {
+function persistEditorDraft({ explicit = false, force = false } = {}) {
   const pack = state.editorPack;
   if (!pack) return { stored: false, reason: 'invalid' };
   const problems = packProblems(pack);
   state.editorErrors = problems;
 
-  try {
-    saveDraftPack(
-      { ...clonePack(pack), source_pack_id: state.editorSourceId || null },
-      state.editorDraftId,
-    );
-    state.editorDraftId = pack.pack_id;
-  } catch (error) {
-    handleError(error);
+  const storedDraft = loadDraftPacks().find((item) => item.pack_id === pack.pack_id);
+  const decision = draftWriteDecision({
+    incomingAt: state.editorDraftUpdatedAt,
+    storedAt: storedDraft ? String(storedDraft.updated_at || '') : '',
+    sameContent: storedDraft ? samePackContent(pack, storedDraft) : false,
+  });
+  const remoteNewer = decision.conflict && !force;
+  state.editorDraftConflict = remoteNewer
+    ? { updated_at: (storedDraft && storedDraft.updated_at) || null }
+    : null;
+  if (remoteNewer) {
+    state.editorConflict = currentConflict(pack);
+    const inStoreNow = state.customPacks.some((item) => item.pack_id === pack.pack_id);
+    state.editorOrphan = !inStoreNow && Boolean(state.editorDraftId || state.editorSourceId);
+    return { stored: false, reason: 'draft-conflict' };
+  }
+  if (decision.write || force) {
+    try {
+      const stamp = nowIso();
+      saveDraftPack(
+        { ...clonePack(pack), source_pack_id: state.editorSourceId || null, updated_at: stamp },
+        state.editorDraftId,
+      );
+      state.editorDraftId = pack.pack_id;
+      state.editorDraftUpdatedAt = stamp;
+      state.editorDraftConflict = null;
+    } catch (error) {
+      handleError(error);
+    }
   }
 
   const conflict = currentConflict(pack);
@@ -538,8 +564,13 @@ function persistEditorDraft({ explicit = false } = {}) {
     state.editorOrphan = false;
     try {
       // Draft ikut mencatat pack asal agar penghapusan pack nanti bisa dikenali sebagai draft yatim.
-      saveDraftPack({ ...clonePack(pack), source_pack_id: pack.pack_id }, state.editorDraftId);
+      const stamp = nowIso();
+      saveDraftPack(
+        { ...clonePack(pack), source_pack_id: pack.pack_id, updated_at: stamp },
+        state.editorDraftId,
+      );
       state.editorDraftId = pack.pack_id;
+      state.editorDraftUpdatedAt = stamp;
     } catch (error) {
       handleError(error);
     }
@@ -558,6 +589,9 @@ function persistEditorDraft({ explicit = false } = {}) {
 function saveFailureNote(result) {
   if (result.reason === 'conflict' && state.editorConflict) {
     return `belum tersimpan karena ID pack '${state.editorConflict.pack_id}' sudah dipakai pack lain (${state.editorConflict.scenarios} skenario); ganti ID pack untuk menyimpan`;
+  }
+  if (result.reason === 'draft-conflict') {
+    return 'tidak ditulis karena draft di tab lain lebih baru; muat versi terbaru atau timpa secara sadar';
   }
   if (result.reason === 'draft-only') {
     return 'belum masuk daftar main; tekan "Simpan skenario" untuk menyimpannya sebagai pack';
@@ -615,6 +649,7 @@ function refreshReadiness() {
       packProblems(pack)[0] || '',
       state.editorConflict,
       draftIsOrphan(pack, state.customPacks),
+      state.editorDraftConflict,
     );
   }
   const slot = document.getElementById('editor-readiness');
@@ -651,11 +686,46 @@ function openEditorPack(packId) {
   state.editorErrors = [];
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
+  state.editorDraftUpdatedAt = (draft && draft.updated_at) || '';
+  state.editorDraftConflict = null;
   if (draft && !draft.source_pack_id) backfillDraftSource(draft.pack_id);
   state.editorMessage =
     draft && stored && packProblems(draft).length
       ? `Draft belum valid dimuat. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
       : `Mengelola ${source.name} (${source.scenarios.length} skenario).`;
+  render();
+}
+
+/** Muat ulang draft aktif dari versi terbaru di perangkat (menggantikan isi tab ini). */
+function reloadDraftFromStorage() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  const draft = loadDraftPacks().find((item) => item.pack_id === pack.pack_id);
+  if (!draft) {
+    showToast('Draft itu sudah tidak ada di perangkat.');
+    render();
+    return;
+  }
+  state.editorPack = clonePack(draft);
+  state.editorDraftUpdatedAt = draft.updated_at || '';
+  state.editorDraftConflict = null;
+  state.editorConflict = currentConflict(state.editorPack);
+  state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
+  state.editorErrors = packProblems(state.editorPack);
+  state.editorIndex = Math.min(state.editorIndex, Math.max(state.editorPack.scenarios.length - 1, 0));
+  state.editorMessage =
+    'Draft dimuat ulang dari versi terbaru di perangkat (perubahan tab ini yang belum disimpan dibuang).';
+  render();
+}
+
+/** Timpa draft yang lebih baru dengan isi tab ini setelah konfirmasi. */
+function overwriteDraftFromTab() {
+  if (!state.editorPack) return;
+  if (!window.confirm('Timpa draft yang lebih baru dari tab lain dengan isi tab ini?')) return;
+  const result = persistEditorDraft({ force: true });
+  state.editorMessage = result.stored
+    ? 'Draft ditimpa dengan isi tab ini dan pack ikut diperbarui.'
+    : `Draft ditimpa dengan isi tab ini, tetapi pack ${saveFailureNote(result)}.`;
   render();
 }
 
@@ -706,6 +776,8 @@ function resumeDraft(packId) {
   state.editorErrors = packProblems(draft);
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(draft, state.customPacks);
+  state.editorDraftUpdatedAt = draft.updated_at || '';
+  state.editorDraftConflict = null;
   if (!draft.source_pack_id) backfillDraftSource(draft.pack_id);
   state.editorMessage = state.editorOrphan
     ? `Melanjutkan draft "${state.editorPack.name || packId}". Pack sumbernya sudah dihapus; tekan "Simpan skenario" untuk membuat pack baru di daftar main.`
@@ -1011,13 +1083,14 @@ function deleteCustomPacks() {
   if (!window.confirm('Hapus semua pack buatanmu di perangkat ini?')) return;
   clearCustomPacks();
   clearDraftPacks();
-  state.customPacks = [];
-  state.editorPack = null;
-  state.editorSavedId = null;
-  state.editorDraftId = null;
-  state.editorSourceId = null;
-  state.editorOrphan = false;
-  state.editorConflict = null;
+  state.customPacks = [];    state.editorPack = null;
+    state.editorSavedId = null;
+    state.editorDraftId = null;
+    state.editorSourceId = null;
+    state.editorOrphan = false;
+    state.editorDraftUpdatedAt = '';
+    state.editorDraftConflict = null;
+    state.editorConflict = null;
   state.editorIndex = 0;
   state.editorMessage = 'Pack lokal dihapus.';
   render();
@@ -1115,6 +1188,10 @@ function handleClick(event) {
     resumeDraft(target.dataset.pack);
   } else if (action === 'editor-drop-draft') {
     discardDraftById(target.dataset.pack);
+  } else if (action === 'editor-draft-refresh') {
+    reloadDraftFromStorage();
+  } else if (action === 'editor-draft-overwrite') {
+    overwriteDraftFromTab();
   } else if (action === 'editor-select') {
     editorSelectScenario(Number(target.dataset.index));
   } else if (action === 'editor-move-up') {
@@ -1242,6 +1319,10 @@ function bindEvents() {
       persistEditorDraft();
       refreshReadiness();
     }, 350);
+  });
+  window.addEventListener('storage', (event) => {
+    if (event.key !== DRAFT_PACKS_KEY) return;
+    if (state.screen === 'editor') render();
   });
   window.addEventListener('pq:storage-error', (event) => {
     const detail = event.detail || {};

@@ -342,17 +342,27 @@ function renderScenarioForm(scenario, index, problems = []) {
  * @param {number} storedCount - jumlah skenario pada pack tersimpan yang bisa dimainkan.
  * @returns {string} HTML catatan draft.
  */
-export function draftNotice(draftActive, storedCount, draftProblem = '', conflict = null, orphan = false) {
+export function draftNotice(
+  draftActive,
+  storedCount,
+  draftProblem = '',
+  conflict = null,
+  orphan = false,
+  remoteConflict = null,
+) {
   const orphanNote = orphan
     ? '<div class="editor__draft editor__draft--orphan" role="status"><p>🗑️ Draft ini berasal dari pack yang sudah dihapus. Isian tetap aman di perangkat dan tidak masuk daftar main sampai kamu menekan <strong>Simpan skenario</strong>.</p></div>'
     : '';
+  const remoteNote = remoteConflict
+    ? `<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ Draft di tab lain lebih baru${remoteConflict.updated_at ? ` (${escapeHtml(String(remoteConflict.updated_at))})` : ''}. Isi tab ini tidak ditulis agar perubahan terbaru tidak hilang.</p><div class="btn-row"><button class="btn btn--ghost" data-action="editor-draft-refresh">Muat versi terbaru</button><button class="btn btn--ghost" data-action="editor-draft-overwrite">Timpa dengan versi tab ini</button></div></div>`
+    : '';
   if (conflict) {
-    return `${orphanNote}<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
+    return `${orphanNote}${remoteNote}<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
   }
   if (!draftActive) {
     return orphan
-      ? `${orphanNote}<p class="editor__draft">💾 Draft ini belum ada di daftar main. Simpan skenario untuk membuat pack baru.</p>`
-      : '<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>';
+      ? `${orphanNote}${remoteNote}<p class="editor__draft">💾 Draft ini belum ada di daftar main. Simpan skenario untuk membuat pack baru.</p>`
+      : `${orphanNote}${remoteNote}<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>`;
   }
   const stored =
     storedCount > 0
@@ -361,7 +371,7 @@ export function draftNotice(draftActive, storedCount, draftProblem = '', conflic
   const problem = draftProblem
     ? `<p>Masalah pertama: ${escapeHtml(draftProblem)}</p>`
     : '';
-  return `${orphanNote}<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
+  return `${orphanNote}${remoteNote}<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
 }
 
 /**
@@ -384,6 +394,7 @@ export function renderEditor({
   draftProblem = '',
   conflict = null,
   orphan = false,
+  remoteConflict = null,
 } = {}) {
   const savedList = packs.length
     ? `<ul class="editor__packs">${packs
@@ -449,7 +460,7 @@ export function renderEditor({
           ${formField('pack-description', 'Deskripsi pack', pack.description || '')}
           ${formField('pack-emoji', 'Emoji pack', pack.emoji || '')}
         </div>
-        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict, orphan)}</div>
+        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict, orphan, remoteConflict)}</div>
         <h3>Skenario (${pack.scenarios.length})</h3>
         <p class="pack__meta">Pintasan: <kbd>Alt</kbd>+<kbd>D</kbd> menggandakan skenario yang sedang dibuka.</p>
         <ol class="editor__scenario-list">${activeRows}</ol>

@@ -14,6 +14,7 @@ import {
   createScenarioTemplate,
   draftIsOrphan,
   draftStatus,
+  draftWriteDecision,
   duplicateScenario,
   exportBlocker,
   findPackIdConflict,
@@ -23,6 +24,7 @@ import {
   parsePackText,
   samePackContent,
   savePlan,
+  sortDrafts,
   toContentPack,
   validatePackShape,
   validateScenario,
@@ -240,11 +242,78 @@ test('draft yatim dikenali dari daftar main, termasuk draft tanpa source_pack_id
   assert.equal(draftIsOrphan({}, []), false);
 });
 
+test('daftar draft diurutkan dari edit terbaru dengan label tetap benar', () => {
+  const packs = [{ pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-001' }] }];
+  const rows = listDrafts(
+    [
+      { pack_id: 'lama', name: 'Lama', updated_at: '2026-11-01T10:00:00.000Z', scenarios: [] },
+      { pack_id: 'baru', name: 'Baru', updated_at: '2026-11-03T10:00:00.000Z', scenarios: [] },
+      {
+        pack_id: 'office',
+        name: 'Office',
+        updated_at: '2026-11-02T10:00:00.000Z',
+        scenarios: [{ id: 'of-001' }],
+      },
+    ],
+    packs,
+  );
+  assert.deepEqual(
+    rows.map((row) => row.pack_id),
+    ['baru', 'office', 'lama'],
+  );
+  assert.equal(rows[0].label, 'pack sumber sudah dihapus');
+  assert.equal(rows[1].label, 'isinya sama dengan pack tersimpan');
+  assert.equal(rows[2].label, 'pack sumber sudah dihapus');
+  assert.deepEqual(
+    sortDrafts([
+      { pack_id: 'a', updated_at: '2026-01-01T00:00:00.000Z' },
+      { pack_id: 'b', updated_at: '2026-02-01T00:00:00.000Z' },
+    ]).map((draft) => draft.pack_id),
+    ['b', 'a'],
+  );
+  assert.deepEqual(sortDrafts([]), []);
+});
+
+test('penulisan draft menghormati versi yang lebih baru dari tab lain', () => {
+  assert.deepEqual(draftWriteDecision({}), { write: true, conflict: false, reason: 'new' });
+  assert.deepEqual(
+    draftWriteDecision({ incomingAt: 'T1', storedAt: 'T1', sameContent: true }),
+    { write: false, conflict: false, reason: 'identical' },
+  );
+  assert.deepEqual(
+    draftWriteDecision({ incomingAt: 'T1', storedAt: 'T2', sameContent: false }),
+    { write: false, conflict: true, reason: 'remote-newer' },
+  );
+  assert.deepEqual(
+    draftWriteDecision({ incomingAt: 'T2', storedAt: 'T1', sameContent: false }),
+    { write: true, conflict: false, reason: 'newer' },
+  );
+  assert.deepEqual(
+    draftWriteDecision({ incomingAt: 'T1', storedAt: 'T1', sameContent: false }),
+    { write: true, conflict: false, reason: 'same-time' },
+  );
+});
+
 test('daftar draft menampilkan draft identik dengan label yang jelas', () => {
   const stored = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-001' }] };
-  const identical = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-001' }] };
-  const changed = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-002' }] };
-  const orphan = { pack_id: 'hilang', name: 'Lama', scenarios: [] };
+  const identical = {
+    pack_id: 'office',
+    name: 'Office',
+    updated_at: '2026-11-03T10:00:00.000Z',
+    scenarios: [{ id: 'of-001' }],
+  };
+  const changed = {
+    pack_id: 'office',
+    name: 'Office',
+    updated_at: '2026-11-02T10:00:00.000Z',
+    scenarios: [{ id: 'of-002' }],
+  };
+  const orphan = {
+    pack_id: 'hilang',
+    name: 'Lama',
+    updated_at: '2026-11-01T10:00:00.000Z',
+    scenarios: [],
+  };
   const rows = listDrafts([identical, changed, orphan], [stored]);
   assert.equal(rows.length, 3);
   assert.equal(rows[0].label, 'isinya sama dengan pack tersimpan');
@@ -266,7 +335,8 @@ test('pintasan keyboard diabaikan saat fokus di kolom teks', () => {
   assert.equal(isTextEntryTarget('textarea'), true);
   assert.equal(isTextEntryTarget('div', true), true);
   assert.equal(isTextEntryTarget('div', false), false);
-  assert.equal(isTextEntryTarget('BUTTON'), false);
+  assert.equal(isTextEntryTarget('SELECT'), true);
+  assert.equal(isTextEntryTarget('button'), false);
   assert.equal(isTextEntryTarget(undefined), false);
 });
 
