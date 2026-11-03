@@ -362,9 +362,17 @@ export function renderGame({
  * @param {object} summary - SessionSummary.
  * @param {object} progress - objek Progress.
  * @param {object} scenarioMap - peta scenario_id → skenario untuk review.
+ * @param {string} packLabel - label pack yang ditampilkan di judul recap.
  * @returns {string} HTML layar recap.
  */
-export function renderRecap(summary, progress, scenarioMap = {}, leaderboard = [], rank = null) {
+export function renderRecap(
+  summary,
+  progress,
+  scenarioMap = {},
+  leaderboard = [],
+  rank = null,
+  packLabel = '',
+) {
   const accuracy = Math.round(summary.accuracy * 100);
   const badges = summary.badges_earned.length
     ? `<section class="card"><h3>Lencana baru</h3><div class="badge-grid">${summary.badges_earned
@@ -404,7 +412,7 @@ export function renderRecap(summary, progress, scenarioMap = {}, leaderboard = [
 
   return `<section class="hero">
       <h1>Sesi selesai! ${summary.accuracy >= 1 ? '🎉' : '🎣'}</h1>
-      <p>${escapeHtml(summary.pack_id || 'Campur Semua')}</p>
+      <p>${escapeHtml(packLabel || summary.pack_id || 'Campur Semua')}</p>
       ${renderLevelBar(progress)}
     </section>
     <section class="card">

@@ -179,6 +179,7 @@ function render() {
       state.scenarioMap,
       state.leaderboard,
       state.rank,
+      state.packLabel,
     );
   } else if (state.screen === 'badges') {
     dom.screens.badges.innerHTML = renderBadges(state.progress);
