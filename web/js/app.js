@@ -22,8 +22,11 @@ import {
   duplicateScenario,
   exportBlocker,
   findPackIdConflict,
+  isTextEntryTarget,
+  listDrafts,
   moveScenario,
   parsePackText,
+  samePackContent,
   savePlan,
   toContentPack,
   validatePackShape,
@@ -199,6 +202,7 @@ function render() {
       errors: state.editorErrors,
       message: state.editorMessage,
       packs: state.customPacks.map((pack) => ({ ...pack, readiness: validatePackShape(pack) })),
+      drafts: listDrafts(loadDraftPacks(), state.customPacks),
       pack: active,
       index: state.editorIndex,
       readiness: active ? validatePackShape(active) : null,
@@ -577,20 +581,6 @@ function backfillDraftSource(packId) {
 }
 
 /**
- * Bandingkan isi draft dengan pack tersimpan yang memakai ID sama.
- * @param {object} draft - draft editor.
- * @param {object} stored - pack tersimpan.
- * @returns {boolean} true bila isinya identik.
- */
-function samePackContent(draft, stored) {
-  if (!draft || !stored) return false;
-  return (
-    String(draft.name || '') === String(stored.name || '') &&
-    JSON.stringify(draft.scenarios || []) === JSON.stringify(stored.scenarios || [])
-  );
-}
-
-/**
  * Tanda isi pack tanpa id/label skenario, dipakai mendeteksi salinan pack setelah ID diganti.
  * @param {object} pack - pack lokal.
  * @returns {string} tanda isi pack.
@@ -608,12 +598,7 @@ function packSignature(pack) {
  * Draft yang isinya sama dengan pack tersimpan tidak perlu ditawarkan lagi.
  */
 function menuDrafts() {
-  return loadDraftPacks()
-    .filter((draft) => {
-      const stored = state.customPacks.find((pack) => pack.pack_id === draft.pack_id);
-      return !samePackContent(draft, stored);
-    })
-    .map((draft) => ({ ...draft, orphan: draftIsOrphan(draft, state.customPacks) }));
+  return listDrafts(loadDraftPacks(), state.customPacks);
 }
 
 /** Perbarui badge kesiapan + catatan draft tanpa membangun ulang form (fokus tidak hilang). */
@@ -671,6 +656,36 @@ function openEditorPack(packId) {
     draft && stored && packProblems(draft).length
       ? `Draft belum valid dimuat. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
       : `Mengelola ${source.name} (${source.scenarios.length} skenario).`;
+  render();
+}
+
+/** Buang satu draft dari daftar draft (tanpa menyentuh pack tersimpan). */
+function discardDraftById(packId) {
+  const draft = loadDraftPacks().find((item) => item.pack_id === packId);
+  if (!draft) {
+    showToast('Draft itu sudah tidak ada.');
+    render();
+    return;
+  }
+  if (!window.confirm(`Buang draft "${draft.name || packId}"? Isian di draft ini akan hilang.`)) return;
+  try {
+    removeDraftPack(packId);
+  } catch (error) {
+    handleError(error);
+    return;
+  }
+  if (state.editorPack && state.editorPack.pack_id === packId) {
+    const stored = state.customPacks.find((pack) => pack.pack_id === packId);
+    state.editorPack = stored ? clonePack(stored) : null;
+    state.editorSavedId = stored ? stored.pack_id : null;
+    state.editorDraftId = stored ? stored.pack_id : null;
+    state.editorSourceId = stored ? stored.pack_id : null;
+    state.editorOrphan = false;
+    state.editorConflict = null;
+    state.editorIndex = 0;
+    state.editorErrors = [];
+  }
+  state.editorMessage = `Draft "${draft.name || packId}" dibuang.`;
   render();
 }
 
@@ -1098,6 +1113,8 @@ function handleClick(event) {
     openEditorPack(target.dataset.pack);
   } else if (action === 'editor-resume') {
     resumeDraft(target.dataset.pack);
+  } else if (action === 'editor-drop-draft') {
+    discardDraftById(target.dataset.pack);
   } else if (action === 'editor-select') {
     editorSelectScenario(Number(target.dataset.index));
   } else if (action === 'editor-move-up') {
@@ -1147,12 +1164,24 @@ function handleClick(event) {
   }
 }
 
-/** Pintasan keyboard: P/L, 1–4, Enter. */
+/** Pintasan keyboard: Alt+D (editor), P/L, 1–4, Enter (permainan). */
 function handleKeydown(event) {
+  const target = event.target || {};
+  if (isTextEntryTarget(target.tagName, target.isContentEditable)) return;
+  const key = String(event.key || '').toUpperCase();
+  if (
+    state.screen === 'editor' &&
+    event.altKey &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    key === 'D' &&
+    state.editorPack
+  ) {
+    event.preventDefault();
+    editorDuplicateScenario(state.editorIndex);
+    return;
+  }
   if (state.screen !== 'game') return;
-  const tag = event.target && event.target.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-  const key = event.key.toUpperCase();
   if (state.lastResult) {
     if (key === 'ENTER') {
       event.preventDefault();

@@ -585,6 +585,65 @@ export function draftIsOrphan(draft, packs = []) {
 }
 
 /**
+ * Bandingkan isi dua pack (nama + skenario) tanpa memedulikan urutan kunci tambahan.
+ * @param {object} a - pack pertama.
+ * @param {object} b - pack kedua.
+ * @returns {boolean} true bila isinya identik.
+ */
+export function samePackContent(a, b) {
+  if (!a || !b) return false;
+  return (
+    String(a.name || '') === String(b.name || '') &&
+    JSON.stringify(a.scenarios || []) === JSON.stringify(b.scenarios || [])
+  );
+}
+
+/**
+ * Status satu draft terhadap daftar pack main.
+ * @param {object} draft - draft editor.
+ * @param {object[]} packs - pack yang ada di daftar main.
+ * @returns {{orphan: boolean, identical: boolean, stored: boolean, label: string}} status draft.
+ */
+export function draftStatus(draft, packs = []) {
+  const list = Array.isArray(packs) ? packs : [];
+  const orphan = draftIsOrphan(draft, list);
+  const stored = list.find((pack) => pack && pack.pack_id === (draft && draft.pack_id));
+  if (!stored) {
+    return { orphan: true, identical: false, stored: false, label: 'pack sumber sudah dihapus' };
+  }
+  const identical = samePackContent(draft, stored);
+  return {
+    orphan: false,
+    identical,
+    stored: true,
+    label: identical ? 'isinya sama dengan pack tersimpan' : 'belum tersimpan',
+  };
+}
+
+/**
+ * Daftar draft siap tampil, termasuk draft yang isinya sama dengan pack tersimpan.
+ * @param {object[]} drafts - draft dari perangkat.
+ * @param {object[]} packs - pack yang ada di daftar main.
+ * @returns {object[]} draft dengan status {orphan, identical, stored, label}.
+ */
+export function listDrafts(drafts = [], packs = []) {
+  return (Array.isArray(drafts) ? drafts : [])
+    .filter((draft) => draft && typeof draft.pack_id === 'string' && draft.pack_id.trim())
+    .map((draft) => ({ ...draft, ...draftStatus(draft, packs) }));
+}
+
+/**
+ * Apakah fokus berada di kolom teks, sehingga pintasan keyboard harus diabaikan.
+ * @param {string} tagName - nama tag elemen aktif.
+ * @param {boolean} isContentEditable - true bila elemen aktif contenteditable.
+ * @returns {boolean} true bila pengguna sedang mengetik.
+ */
+export function isTextEntryTarget(tagName, isContentEditable = false) {
+  const tag = String(tagName || '').toUpperCase();
+  return isContentEditable === true || tag === 'INPUT' || tag === 'TEXTAREA';
+}
+
+/**
  * Gandakan satu skenario dengan id baru yang mengikuti prefix pack.
  * Salinan diletakkan tepat setelah skenario asli dan memakai id berikutnya yang belum terpakai,
  * sehingga hasilnya langsung lolos `validateScenario`.

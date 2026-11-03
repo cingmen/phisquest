@@ -13,11 +13,15 @@ import {
   alignScenarioPrefixes,
   createScenarioTemplate,
   draftIsOrphan,
+  draftStatus,
   duplicateScenario,
   exportBlocker,
   findPackIdConflict,
+  isTextEntryTarget,
+  listDrafts,
   moveScenario,
   parsePackText,
+  samePackContent,
   savePlan,
   toContentPack,
   validatePackShape,
@@ -234,6 +238,36 @@ test('draft yatim dikenali dari daftar main, termasuk draft tanpa source_pack_id
   );
   assert.equal(draftIsOrphan(null, []), false);
   assert.equal(draftIsOrphan({}, []), false);
+});
+
+test('daftar draft menampilkan draft identik dengan label yang jelas', () => {
+  const stored = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-001' }] };
+  const identical = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-001' }] };
+  const changed = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-002' }] };
+  const orphan = { pack_id: 'hilang', name: 'Lama', scenarios: [] };
+  const rows = listDrafts([identical, changed, orphan], [stored]);
+  assert.equal(rows.length, 3);
+  assert.equal(rows[0].label, 'isinya sama dengan pack tersimpan');
+  assert.equal(rows[0].identical, true);
+  assert.equal(rows[1].label, 'belum tersimpan');
+  assert.equal(rows[1].identical, false);
+  assert.equal(rows[2].label, 'pack sumber sudah dihapus');
+  assert.equal(rows[2].orphan, true);
+  assert.equal(draftStatus(null, [stored]).label, 'pack sumber sudah dihapus');
+  assert.deepEqual(listDrafts([], [stored]), []);
+  assert.deepEqual(listDrafts([null, { pack_id: '   ' }], [stored]), []);
+  assert.equal(samePackContent(identical, stored), true);
+  assert.equal(samePackContent(changed, stored), false);
+  assert.equal(samePackContent(null, stored), false);
+});
+
+test('pintasan keyboard diabaikan saat fokus di kolom teks', () => {
+  assert.equal(isTextEntryTarget('INPUT'), true);
+  assert.equal(isTextEntryTarget('textarea'), true);
+  assert.equal(isTextEntryTarget('div', true), true);
+  assert.equal(isTextEntryTarget('div', false), false);
+  assert.equal(isTextEntryTarget('BUTTON'), false);
+  assert.equal(isTextEntryTarget(undefined), false);
 });
 
 test('menggandakan skenario memberi id baru berprefix dan tetap valid', () => {

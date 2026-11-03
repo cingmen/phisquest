@@ -97,16 +97,17 @@ export function statsLabels(progress) {
  * @param {object[]} draftPacks - draft dari perangkat.
  * @returns {string} HTML daftar draft (kosong bila tidak ada).
  */
-function renderDraftList(draftPacks) {
+function renderDraftList(draftPacks, hint = ' Lanjutkan agar isian tidak hilang.') {
   if (!draftPacks.length) return '';
   const rows = draftPacks
     .map(
       (draft) =>
-        `<li><span>${escapeHtml(draft.name || draft.pack_id)} · ${draft.scenarios.length} skenario · ${draft.orphan ? 'pack sumber sudah dihapus' : 'belum tersimpan'}</span>` +
-        `<button class="btn btn--ghost" data-action="editor-resume" data-pack="${escapeHtml(draft.pack_id)}">Lanjutkan draft</button></li>`,
+        `<li><span>${escapeHtml(draft.name || draft.pack_id)} · ${draft.scenarios.length} skenario · ${escapeHtml(draft.label || 'belum tersimpan')}</span>` +
+        `<span class="editor__row-actions"><button class="btn btn--ghost" data-action="editor-resume" data-pack="${escapeHtml(draft.pack_id)}">Lanjutkan</button>` +
+        `<button class="btn btn--ghost" data-action="editor-drop-draft" data-pack="${escapeHtml(draft.pack_id)}" aria-label="Buang draft ${escapeHtml(draft.name || draft.pack_id)}">Buang</button></span></li>`,
     )
     .join('');
-  return `<div class="menu__drafts"><p class="pack__meta">📝 Draft editor tersimpan di perangkat (${draftPacks.length}). Lanjutkan agar isian tidak hilang.</p><ul class="editor__packs">${rows}</ul></div>`;
+  return `<div class="menu__drafts"><p class="pack__meta">📝 Draft editor tersimpan di perangkat (${draftPacks.length}).${hint}</p><ul class="editor__packs">${rows}</ul></div>`;
 }
 
 export function renderMenu(manifest, progress, leaderboard = [], customPacks = [], draftPacks = []) {
@@ -373,6 +374,7 @@ export function renderEditor({
   errors = [],
   message = '',
   packs = [],
+  drafts = [],
   pack = null,
   index = 0,
   readiness = null,
@@ -421,6 +423,10 @@ export function renderEditor({
           .join('')}</ul></details>`
       : '';
 
+  const draftsList = drafts.length
+    ? renderDraftList(drafts, ' Pilih Lanjutkan untuk membuka draft lain.')
+    : '<p class="pack__meta">Belum ada draft tersimpan.</p>';
+
   const activePack = pack
     ? `<section class="editor__active">
         <div class="editor__pack-head">
@@ -445,6 +451,7 @@ export function renderEditor({
         </div>
         <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict, orphan)}</div>
         <h3>Skenario (${pack.scenarios.length})</h3>
+        <p class="pack__meta">Pintasan: <kbd>Alt</kbd>+<kbd>D</kbd> menggandakan skenario yang sedang dibuka.</p>
         <ol class="editor__scenario-list">${activeRows}</ol>
         <div class="btn-row">
           <button class="btn btn--primary" data-action="editor-add-scenario">+ Tambah skenario</button>
@@ -494,6 +501,8 @@ export function renderEditor({
       }
       <h3>Pack tersimpan</h3>
       ${savedList}
+      <h3>Draft di perangkat</h3>
+      ${draftsList}
       <div class="btn-row"><button class="btn btn--ghost" data-action="menu">Kembali ke menu</button></div>
     </section>`;
 }
