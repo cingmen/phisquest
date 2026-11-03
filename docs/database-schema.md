@@ -386,6 +386,13 @@ Dengan begitu mengganti ID pack tidak pernah menimpa pack lain secara diam-diam.
 `pq_editor_draft_v1` untuk menampilkan tombol **Lanjutkan draft** bagi draft yang belum tersimpan
 sebagai pack valid.
 
+Menghapus satu pack (v1.6) memakai `removeCustomPack(pack_id)` yang hanya menulis ulang
+`pq_custom_packs_v1`; `pq_editor_draft_v1` tidak disentuh, sehingga draft yang sedang diedit maupun
+draft yang berasal dari pack tersebut tetap ada. Bila pack yang dihapus sedang terbuka di editor,
+editor melepas pack aktif (draft tetap di perangkat) dan pesannya menyebut draft bisa dilanjutkan
+dari menu. `clearCustomPacks()` tetap dipakai tombol hapus semua dan baru saat itu draft ikut dibersihkan
+lewat `clearDraftPacks()`.
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.

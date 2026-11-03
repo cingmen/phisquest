@@ -116,6 +116,10 @@ node --test web/test/*.test.js
   another pack on this device, the editor explains the clash and leaves that pack untouched while
   keeping your input as a draft. Drafts that are not yet a valid pack appear on the menu with a
   **Resume draft** button.
+- **🗑️ Delete one pack & duplicate a scenario (v1.6)** — every saved pack has a **Delete** button
+  with a confirmation that names the pack; editor drafts (including drafts that came from that
+  pack) stay intact. In the editor, **⧉** copies the selected scenario with the next id for the
+  pack prefix, so the copy is immediately valid and ready to edit.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

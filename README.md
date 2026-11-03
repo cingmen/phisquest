@@ -158,6 +158,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 - **🛡️ ID pack tak saling menimpa (v1.5)** — bila ID pack yang dipilih sudah dipakai pack lain di
   perangkat, editor menjelaskan bentroknya dan tidak menimpa pack itu; isian tetap tersimpan sebagai
   draft. Draft yang belum jadi pack valid muncul di menu dengan tombol **Lanjutkan draft**.
+- **🗑️ Hapus satu pack & gandakan skenario (v1.6)** — setiap pack tersimpan punya tombol **Hapus**
+  dengan konfirmasi bernama; draft editor (termasuk draft yang berasal dari pack itu) tetap aman.
+  Di editor, tombol **⧉** menyalin skenario terpilih dengan id berikutnya sesuai prefix pack, jadi
+  salinannya langsung valid dan siap disunting.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

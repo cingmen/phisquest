@@ -10,7 +10,7 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.5.0 (dirilis; riwayat di `implementation-plan.md`) |
+| Target rilis | v1.6.0 (dirilis; riwayat di `implementation-plan.md`) |
 | Terakhir diperbarui | 2026-11-03 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
@@ -430,6 +430,7 @@ stateDiagram-v2
 | **v1.3.0** | Editor pack lokal multi-skenario: tambah, ganti judul, hapus, dan susun ulang skenario lewat form (tanpa JSON mentah), isian antar-skenario tidak hilang, ekspor memuat seluruh skenario, perubahan bertahan setelah reload | Dirilis (v1.3.0) |
 | **v1.4.0** | Pemilih `pack_id` konten + penyelarasan prefix id di editor, serta draft belum valid yang tersimpan terpisah di perangkat (`pq_editor_draft_v1`) tanpa menimpa pack yang bisa dimainkan | Dirilis (v1.4.0) |
 | **v1.5.0** | ID pack bentrok tidak lagi menimpa pack lain secara diam-diam (draft tetap aman dan alasannya dijelaskan), plus daftar draft tersimpan di menu dengan tombol “Lanjutkan draft” | Dirilis (v1.5.0) |
+| **v1.6.0** | Hapus satu pack tersimpan (konfirmasi menyebut nama pack, draft tidak ikut terhapus) dan aksi gandakan skenario dengan id baru sesuai prefix pack | Dirilis (v1.6.0) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
