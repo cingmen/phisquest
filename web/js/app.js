@@ -524,11 +524,29 @@ function saveFailureNote(result) {
   return 'belum tersimpan karena ada masalah validasi';
 }
 
-/** Draft editor yang belum tersimpan sebagai pack valid, untuk ditampilkan di menu. */
+/**
+ * Bandingkan isi draft dengan pack tersimpan yang memakai ID sama.
+ * @param {object} draft - draft editor.
+ * @param {object} stored - pack tersimpan.
+ * @returns {boolean} true bila isinya identik.
+ */
+function samePackContent(draft, stored) {
+  if (!draft || !stored) return false;
+  return (
+    draft.pack_id === stored.pack_id &&
+    String(draft.name || '') === String(stored.name || '') &&
+    JSON.stringify(draft.scenarios || []) === JSON.stringify(stored.scenarios || [])
+  );
+}
+
+/**
+ * Draft editor yang belum tersimpan sebagai pack valid, untuk ditampilkan di menu.
+ * Draft yang isinya sama dengan pack tersimpan tidak perlu ditawarkan lagi.
+ */
 function menuDrafts() {
   return loadDraftPacks().filter((draft) => {
     const stored = state.customPacks.find((pack) => pack.pack_id === draft.pack_id);
-    return !stored || packProblems(draft).length > 0;
+    return !samePackContent(draft, stored);
   });
 }
 
@@ -590,13 +608,14 @@ function resumeDraft(packId) {
     return;
   }
   const stored = state.customPacks.find((item) => item.pack_id === packId);
+  const samePack = samePackContent(draft, stored);
   state.editorPack = clonePack(draft);
-  state.editorSavedId = stored ? stored.pack_id : null;
+  state.editorSavedId = samePack ? stored.pack_id : null;
   state.editorDraftId = draft.pack_id;
   state.editorIndex = 0;
   state.editorErrors = packProblems(draft);
   state.editorConflict = currentConflict(state.editorPack);
-  state.editorMessage = stored
+  state.editorMessage = samePack
     ? `Melanjutkan draft. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
     : `Melanjutkan draft ${state.editorPack.name || packId}.`;
   showScreen('editor');
@@ -1022,6 +1041,7 @@ function bindEvents() {
     if (id.startsWith('pack-') || id.startsWith('scn-')) {
       flushEditor();
       persistEditorDraft();
+      refreshReadiness();
     }
   });
   document.addEventListener('input', (event) => {
