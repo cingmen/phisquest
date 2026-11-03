@@ -168,16 +168,25 @@ export function renderMenu(manifest, progress, leaderboard = [], customPacks = [
 export function renderEditor({ text = '', errors = [], message = '', packs = [] } = {}) {
   const list = packs.length
     ? `<ul class="editor__packs">${packs
-        .map(
-          (pack) =>
-            `<li><span>${escapeHtml(pack.name)} · ${pack.scenarios.length} skenario</span></li>`,
-        )
+        .map((pack) => {
+          const readiness = pack.readiness || { ready: false, issues: [] };
+          const badge = readiness.ready
+            ? '<span class="editor__ready">✅ siap konten</span>'
+            : '<span class="editor__not-ready">⚠️ belum siap konten</span>';
+          const detail =
+            readiness.ready || !readiness.issues.length
+              ? ''
+              : `<details class="editor__issues"><summary>${readiness.issues.length} alasan</summary><ul>${readiness.issues
+                  .map((issue) => `<li>${escapeHtml(issue)}</li>`)
+                  .join('')}</ul></details>`;
+          return `<li><span>${escapeHtml(pack.name)} · ${pack.scenarios.length} skenario ${badge}</span>${detail}</li>`;
+        })
         .join('')}</ul>`
     : '<p class="pack__meta">Belum ada pack lokal.</p>';
 
   return `<section class="card">
       <h2>Editor skenario</h2>
-      <p>Tempel satu skenario, array skenario, atau pack lengkap dalam format JSON. Validasi memakai aturan yang sama dengan validator konten untuk tiap skenario.</p>
+      <p>Tempel satu skenario, array skenario, atau pack lengkap dalam format JSON. Validasi memakai aturan yang sama dengan validator konten untuk tiap skenario, dan daftar pack di bawah menunjukkan kesiapan pack bila ingin dijadikan pack <code>content/</code> (10 skenario + komposisi PRD §9.4).</p>
       <textarea id="editor-input" class="editor__input" rows="14" spellcheck="false" aria-label="JSON skenario">${escapeHtml(text)}</textarea>
       <div class="btn-row">
         <button class="btn btn--primary" data-action="editor-save">Validasi &amp; simpan</button>

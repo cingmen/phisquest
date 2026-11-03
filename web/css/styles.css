@@ -927,3 +927,8 @@ a {
 .editor__errors ul { margin: 8px 0 0; padding-left: 20px; }
 .editor__packs { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
 .editor__packs li { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; }
+.editor__ready { color: #22C55E; font-weight: 600; }
+.editor__not-ready { color: #F59E0B; font-weight: 600; }
+.editor__issues { flex-basis: 100%; font-size: 0.85rem; color: rgba(226, 232, 240, 0.85); }
+.editor__issues summary { cursor: pointer; }
+.editor__issues ul { margin: 6px 0 0; padding-left: 20px; }

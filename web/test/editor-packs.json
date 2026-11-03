@@ -1,0 +1,73 @@
+{
+  "_note": "Dipakai web/test/editor.test.js dan tests/test_editor_pack_contract.py: setiap pack di 'invalid' harus ditolak aturan tingkat pack oleh validator JS maupun Python dengan pesan yang memuat 'expect'.",
+  "invalid": [
+    {
+      "name": "schema-lama",
+      "expect": "schema_version",
+      "pack": {
+        "schema_version": "2.0",
+        "pack_id": "office",
+        "name": "Pack kantor",
+        "description": "Latihan email kantor.",
+        "emoji": "🏢",
+        "scenarios": [
+          { "id": "of-101", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-102", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-103", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-104", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-105", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-106", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-107", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-108", "type": "phish_or_legit", "difficulty": "sulit", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-109", "type": "phish_or_legit", "difficulty": "sulit", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-110", "type": "phish_or_legit", "difficulty": "sulit", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] }
+        ]
+      }
+    },
+    {
+      "name": "sembilan-skenario",
+      "expect": "10 skenario",
+      "pack": {
+        "schema_version": "1.0",
+        "pack_id": "office",
+        "name": "Pack kantor",
+        "description": "Latihan email kantor.",
+        "emoji": "🏢",
+        "scenarios": [
+          { "id": "of-201", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-202", "type": "phish_or_legit", "difficulty": "mudah", "channel": "sms", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-203", "type": "phish_or_legit", "difficulty": "mudah", "channel": "sms", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-204", "type": "phish_or_legit", "difficulty": "sedang", "channel": "whatsapp", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-205", "type": "phish_or_legit", "difficulty": "sedang", "channel": "whatsapp", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-206", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-207", "type": "best_action", "difficulty": "sedang", "channel": "sms", "is_phish": false, "red_flags": [] },
+          { "id": "of-208", "type": "best_action", "difficulty": "sulit", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-209", "type": "spot_redflag", "difficulty": "sulit", "channel": "whatsapp", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] }
+        ]
+      }
+    },
+    {
+      "name": "komposisi-tipe",
+      "expect": "best_action",
+      "pack": {
+        "schema_version": "1.0",
+        "pack_id": "office",
+        "name": "Pack kantor",
+        "description": "Latihan email kantor.",
+        "emoji": "🏢",
+        "scenarios": [
+          { "id": "of-301", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-302", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-303", "type": "phish_or_legit", "difficulty": "mudah", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-304", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-305", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] },
+          { "id": "of-306", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-307", "type": "phish_or_legit", "difficulty": "sedang", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-308", "type": "phish_or_legit", "difficulty": "sulit", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-309", "type": "phish_or_legit", "difficulty": "sulit", "channel": "email", "is_phish": false, "red_flags": [] },
+          { "id": "of-310", "type": "phish_or_legit", "difficulty": "sulit", "channel": "email", "is_phish": true, "red_flags": ["DOMAIN_PALSU", "TEKANAN_WAKTU"] }
+        ]
+      }
+    }
+  ]
+}

@@ -8,6 +8,20 @@ export const TYPES = ['phish_or_legit', 'best_action', 'spot_redflag'];
 export const DIFFICULTIES = ['mudah', 'sedang', 'sulit'];
 export const CHANNELS = ['email', 'sms', 'whatsapp'];
 
+/** Versi skema pack yang diterima `scripts/validate_content.py`. */
+export const SCHEMA_VERSION = '1.0';
+
+/** Jumlah skenario wajib per pack konten. */
+export const SCENARIOS_PER_PACK = 10;
+
+/** Prefix id per pack konten yang dikenal validator. */
+export const PACK_PREFIX = {
+  'ewallet-bank': 'ew',
+  office: 'of',
+  'shopping-courier': 'sc',
+  'campus-gov': 'cg',
+};
+
 export const RED_FLAGS = [
   'PENGIRIM_TIDAK_WAJAR',
   'DOMAIN_PALSU',
@@ -72,6 +86,22 @@ export const REAL_BRAND_NAMES = [
 const DANGEROUS_SUFFIXES = ['.exe', '.apk', '.js', '.html', '.scr', '.bat', '.cmd', '.vbs', '.jar'];
 const ID_PATTERN = /^(ew|of|sc|cg)-[0-9]{3}$/;
 const DATETIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+07:00$/;
+
+/** Komposisi minimum tipe soal per pack (PRD §9.4). */
+const TYPE_MINIMUM = { phish_or_legit: 7, best_action: 2, spot_redflag: 1 };
+/** Komposisi tepat tingkat kesulitan per pack. */
+const DIFFICULTY_TARGET = { mudah: 3, sedang: 4, sulit: 3 };
+/** Komposisi minimum kanal per pack. */
+const CHANNEL_MINIMUM = { email: 3, sms: 3, whatsapp: 2 };
+/** Jumlah target phishing dan legit per pack. */
+const PHISH_TARGET = 6;
+const LEGIT_TARGET = 4;
+/** Cakupan minimum jenis red flag per pack. */
+const MIN_RED_FLAG_COVERAGE = 7;
+/** Deskripsi bawaan saat pack lokal tidak menyebutkannya. */
+const DEFAULT_PACK_DESCRIPTION = 'Pack buatan sendiri dari editor PhishQuest.';
+/** Emoji bawaan untuk pack lokal. */
+const DEFAULT_PACK_EMOJI = '🛠️';
 
 /**
  * Jumlah kata pada teks.
@@ -327,12 +357,16 @@ export function parsePackText(text, name = 'Pack lokal') {
   let scenarios;
   let packName = name;
   let packId = 'kustom';
+  let description = '';
+  let emoji = '';
   if (Array.isArray(data)) {
     scenarios = data;
   } else if (data && typeof data === 'object' && Array.isArray(data.scenarios)) {
     scenarios = data.scenarios;
     packName = typeof data.name === 'string' && data.name.trim() ? data.name.trim() : name;
     packId = typeof data.pack_id === 'string' && data.pack_id.trim() ? data.pack_id.trim() : packId;
+    description = typeof data.description === 'string' ? data.description : '';
+    emoji = typeof data.emoji === 'string' ? data.emoji : '';
   } else if (data && typeof data === 'object') {
     scenarios = [data];
   } else {
@@ -356,10 +390,133 @@ export function parsePackText(text, name = 'Pack lokal') {
     pack: {
       pack_id: packId,
       name: packName,
-      emoji: '🛠️',
+      description,
+      emoji: emoji.trim() ? emoji : '🛠️',
       scenarios: scenarios.map((scenario) => ({ ...scenario })),
     },
     errors: [],
+  };
+}
+
+/**
+ * Periksa kesiapan pack lokal bila dipakai sebagai pack `content/`.
+ *
+ * Aturan tingkat pack di sini mencerminkan `validate_pack` di
+ * `scripts/validate_content.py`. Aturan per-skenario tetap ditangani
+ * `validateScenario`, jadi hasil `ready: true` berarti seluruh skenario valid
+ * **dan** komposisi pack memenuhi PRD §9.4.
+ *
+ * @param {object} pack - pack lokal {pack_id, name, description, emoji, scenarios}.
+ * @returns {{ready: boolean, issues: string[]}} status dan daftar alasan.
+ */
+export function validatePackShape(pack) {
+  const issues = [];
+  if (!pack || typeof pack !== 'object' || Array.isArray(pack)) {
+    return { ready: false, issues: ['pack harus objek JSON {pack_id, name, scenarios}'] };
+  }
+
+  // Nilai yang dilengkapi `toContentPack` saat ekspor boleh kosong di pack lokal:
+  // yang dinilai adalah bentuk akhir berkas yang akan dipakai `content/`.
+  const shape = {
+    ...pack,
+    schema_version: pack.schema_version === undefined ? SCHEMA_VERSION : pack.schema_version,
+    description:
+      typeof pack.description === 'string' && pack.description.trim()
+        ? pack.description
+        : DEFAULT_PACK_DESCRIPTION,
+    emoji: typeof pack.emoji === 'string' && pack.emoji.trim() ? pack.emoji : DEFAULT_PACK_EMOJI,
+  };
+
+  if (shape.schema_version !== SCHEMA_VERSION) {
+    issues.push(`schema_version harus '${SCHEMA_VERSION}' agar diterima validator konten`);
+  }
+  const prefix = PACK_PREFIX[shape.pack_id];
+  if (!prefix) {
+    issues.push(
+      `pack_id harus salah satu dari ${Object.keys(PACK_PREFIX).join(', ')}; validator konten hanya mengenal pack bawaan`,
+    );
+  }
+  for (const key of ['pack_id', 'name', 'description', 'emoji']) {
+    if (typeof shape[key] !== 'string' || !shape[key].trim()) {
+      issues.push(`field pack '${key}' wajib string tidak kosong`);
+    }
+  }
+
+  const scenarios = shape.scenarios;
+  if (!Array.isArray(scenarios)) {
+    issues.push("field 'scenarios' wajib array");
+    return { ready: false, issues };
+  }
+  if (scenarios.length !== SCENARIOS_PER_PACK) {
+    issues.push(`pack wajib ${SCENARIOS_PER_PACK} skenario, ada ${scenarios.length}`);
+  }
+
+  const items = scenarios.filter((item) => item && typeof item === 'object' && !Array.isArray(item));
+  if (!items.length) return { ready: issues.length === 0, issues };
+
+  for (const [type, minimum] of Object.entries(TYPE_MINIMUM)) {
+    const count = items.filter((item) => item.type === type).length;
+    if (count < minimum) issues.push(`komposisi: ${type} ≥ ${minimum}, ada ${count}`);
+  }
+  for (const [difficulty, target] of Object.entries(DIFFICULTY_TARGET)) {
+    const count = items.filter((item) => item.difficulty === difficulty).length;
+    if (count !== target) {
+      issues.push(`komposisi: ${target} skenario '${difficulty}', ada ${count}`);
+    }
+  }
+  for (const [channel, minimum] of Object.entries(CHANNEL_MINIMUM)) {
+    const count = items.filter((item) => item.channel === channel).length;
+    if (count < minimum) issues.push(`komposisi: ≥ ${minimum} kanal ${channel}, ada ${count}`);
+  }
+
+  const phish = items.filter((item) => item.is_phish === true).length;
+  const legit = items.filter((item) => item.is_phish === false).length;
+  if (phish !== PHISH_TARGET || legit !== LEGIT_TARGET) {
+    issues.push(
+      `komposisi: target ${PHISH_TARGET} phishing / ${LEGIT_TARGET} legit, ada ${phish} / ${legit}`,
+    );
+  }
+
+  const flags = new Set();
+  for (const item of items) {
+    for (const flag of Array.isArray(item.red_flags) ? item.red_flags : []) flags.add(flag);
+  }
+  if (flags.size < MIN_RED_FLAG_COVERAGE) {
+    issues.push(`cakupan red flag ≥ ${MIN_RED_FLAG_COVERAGE} jenis, ada ${flags.size}`);
+  }
+
+  if (prefix) {
+    const seen = new Set();
+    for (const item of items) {
+      const id = String(item.id);
+      if (!id.startsWith(`${prefix}-`)) {
+        issues.push(`id '${id}' wajib berprefix '${prefix}-' untuk pack ini`);
+      }
+      if (seen.has(id)) issues.push(`id skenario duplikat: ${id}`);
+      seen.add(id);
+    }
+  }
+
+  return { ready: issues.length === 0, issues };
+}
+
+/**
+ * Bentuk pack lokal menjadi berkas pack `content/` (field pack lengkap).
+ * @param {object} pack - pack lokal.
+ * @returns {object} pack dengan schema_version, description, dan emoji.
+ */
+export function toContentPack(pack) {
+  const description =
+    typeof pack.description === 'string' && pack.description.trim()
+      ? pack.description.trim()
+      : DEFAULT_PACK_DESCRIPTION;
+  return {
+    schema_version: SCHEMA_VERSION,
+    pack_id: pack.pack_id,
+    name: pack.name,
+    description,
+    emoji: typeof pack.emoji === 'string' && pack.emoji.trim() ? pack.emoji : DEFAULT_PACK_EMOJI,
+    scenarios: (pack.scenarios || []).map((scenario) => ({ ...scenario })),
   };
 }
 

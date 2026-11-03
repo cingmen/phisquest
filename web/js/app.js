@@ -13,7 +13,7 @@ import {
   startSession,
 } from './engine.js';
 import { makeEntry } from './leaderboard.js';
-import { SAMPLE_PACK, parsePackText } from './scenario_editor.js';
+import { SAMPLE_PACK, parsePackText, toContentPack, validatePackShape } from './scenario_editor.js';
 import {
   addCustomPack,
   clearCustomPacks,
@@ -158,7 +158,7 @@ function render() {
       text: state.editorText,
       errors: state.editorErrors,
       message: state.editorMessage,
-      packs: state.customPacks,
+      packs: state.customPacks.map((pack) => ({ ...pack, readiness: validatePackShape(pack) })),
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -341,13 +341,17 @@ function saveEditorPack() {
     return;
   }
   state.editorErrors = [];
-  state.editorMessage = `Tersimpan: ${pack.name} (${pack.scenarios.length} skenario). Buka menu untuk memainkannya.`;
+  const readiness = validatePackShape(pack);
+  const readinessNote = readiness.ready
+    ? ' Pack ini sudah memenuhi aturan pack konten.'
+    : ` Belum siap jadi pack konten: ${readiness.issues[0]}.`;
+  state.editorMessage = `Tersimpan: ${pack.name} (${pack.scenarios.length} skenario).${readinessNote}`;
   state.editorText = '';
   render();
   announce('Pack lokal tersimpan.');
 }
 
-/** Ekspor pack lokal terakhir sebagai berkas content pack. */
+/** Ekspor pack lokal terakhir sebagai berkas pack content/ (field pack lengkap). */
 function exportCustomPack() {
   const pack = state.customPacks[state.customPacks.length - 1];
   if (!pack) {
@@ -355,7 +359,10 @@ function exportCustomPack() {
     return;
   }
   try {
-    const blob = new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' });
+    const readiness = validatePackShape(pack);
+    const blob = new Blob([JSON.stringify(toContentPack(pack), null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -364,6 +371,10 @@ function exportCustomPack() {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+    state.editorMessage = readiness.ready
+      ? `${pack.name} diekspor dan sudah siap menjadi pack content/.`
+      : `${pack.name} diekspor. Belum siap jadi pack content/: ${readiness.issues[0]}`;
+    render();
     showToast(`${pack.name} diekspor sebagai JSON.`);
   } catch (error) {
     handleError(error);

@@ -4,14 +4,21 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SAMPLE_PACK, parsePackText, validateScenario } from '../js/scenario_editor.js';
+import {
+  SAMPLE_PACK,
+  parsePackText,
+  toContentPack,
+  validatePackShape,
+  validateScenario,
+} from '../js/scenario_editor.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const cases = JSON.parse(readFileSync(resolve(here, 'editor-cases.json'), 'utf8'));
+const packCases = JSON.parse(readFileSync(resolve(here, 'editor-packs.json'), 'utf8'));
 
 test('skenario contoh lolos validasi editor', () => {
   for (const scenario of cases.valid) {
@@ -57,4 +64,65 @@ test('contoh bawaan editor tetap valid', () => {
   const { pack, errors } = parsePackText(SAMPLE_PACK);
   assert.deepEqual(errors, []);
   assert.equal(pack.scenarios.length, 2);
+});
+
+test('seluruh pack content/ dinyatakan siap oleh pemeriksa editor', () => {
+  const packsDir = resolve(here, '../../content/packs');
+  const files = readdirSync(packsDir).filter((file) => file.endsWith('.json'));
+  assert.ok(files.length > 0, 'content/packs tidak boleh kosong');
+  for (const file of files) {
+    const pack = JSON.parse(readFileSync(resolve(packsDir, file), 'utf8'));
+    const readiness = validatePackShape(pack);
+    assert.deepEqual(readiness.issues, [], `${file} seharusnya siap menjadi pack konten`);
+    assert.equal(readiness.ready, true);
+  }
+});
+
+test('pack contoh editor ditandai belum siap jadi pack konten', () => {
+  const { pack } = parsePackText(SAMPLE_PACK);
+  const readiness = validatePackShape(pack);
+  assert.equal(readiness.ready, false);
+  assert.ok(readiness.issues.some((issue) => issue.includes('10 skenario')));
+  assert.ok(readiness.issues.some((issue) => issue.includes('pack_id')));
+});
+
+test('pack dengan skenario bermasalah tidak dinyatakan siap', () => {
+  const contentPack = JSON.parse(
+    readFileSync(resolve(here, '../../content/packs/office.json'), 'utf8'),
+  );
+  const broken = {
+    ...contentPack,
+    scenarios: contentPack.scenarios.map((scenario, index) =>
+      index === 0 ? { ...scenario, id: 'ew-999' } : scenario,
+    ),
+  };
+  const readiness = validatePackShape(broken);
+  assert.equal(readiness.ready, false);
+  assert.ok(readiness.issues.some((issue) => issue.includes("prefix 'of-'")));
+});
+
+test('aturan pack yang sama menolak fixture bersama', () => {
+  for (const item of packCases.invalid) {
+    const readiness = validatePackShape(item.pack);
+    assert.equal(readiness.ready, false, `${item.name} seharusnya ditolak`);
+    assert.ok(
+      readiness.issues.some((issue) => issue.toLowerCase().includes(item.expect.toLowerCase())),
+      `${item.name}: pesan tidak memuat '${item.expect}' (${readiness.issues.join(' | ')})`,
+    );
+  }
+});
+
+test('ekspor pack melengkapi field tingkat pack', () => {
+  const exported = toContentPack({
+    pack_id: 'kustom',
+    name: 'Latihan saya',
+    description: '',
+    emoji: '',
+    scenarios: cases.valid,
+  });
+  assert.equal(exported.schema_version, '1.0');
+  assert.equal(exported.description, 'Pack buatan sendiri dari editor PhishQuest.');
+  assert.equal(exported.emoji, '🛠️');
+  assert.equal(exported.scenarios.length, cases.valid.length);
+  assert.notEqual(exported.scenarios[0], cases.valid[0]);
 });
