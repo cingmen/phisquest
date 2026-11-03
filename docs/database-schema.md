@@ -327,11 +327,12 @@ FROM scores;
 Entri: `score`, `max_score`, `accuracy` (0..1, 4 desimal), `pack_id` (`null` = campur),
 `mode` (`classic`/`time_attack`), `at`. Maksimum 10 entri; `reset` menghapus berkas ini.
 
-## 8. Pack lokal dari editor (v1.1, diperluas v1.2–v1.3)
+## 8. Pack lokal dari editor (v1.1, diperluas v1.2–v1.4)
 
 | Media | Kunci | Isi |
 |---|---|---|
 | Web | `localStorage` → `pq_custom_packs_v1` | array pack `{pack_id, name, description, emoji, scenarios[]}` hasil editor |
+| Web | `localStorage` → `pq_editor_draft_v1` | array draft pack yang sedang diedit; boleh belum lolos validasi |
 
 Pack lokal hanya hidup di perangkat, tidak pernah diunggah, dan tidak mengubah `content/`.
 `pack_id` yang sama menimpa pack lama; `reset` menghapus kunci ini. Skema tiap skenario divalidasi
@@ -359,11 +360,24 @@ skema konten. Skenario baru dibuat oleh `createScenarioTemplate()` dan sudah lol
 `validateScenario()` saat dibuat. Fixture `web/test/editor-pack-ready.json` (10 skenario + label
 lokal) dipakai kedua bahasa untuk membuktikan bentuk ekspor multi-skenario tetap diterima.
 
-Draft editor hidup di memori dan baru ditulis ke `pq_custom_packs_v1` setelah **seluruh** skenario
-pack lolos validasi; bila ada skenario bermasalah, perubahan ditahan di memori dan layar editor
-menyebut alasan pertamanya. Dengan begitu isi tersimpan selalu bisa dimainkan, sementara isian
-antar-skenario tidak hilang ketika pemain berpindah skenario (isian di-*flush* ke draft sebelum
-pindah). Kesiapan pack dihitung ulang dari seluruh skenario draft, bukan hanya yang sedang terbuka.
+Draft editor hidup di memori dan ditulis ke **dua** kunci berbeda (v1.4):
+
+| Kunci | Kapan ditulis | Isi |
+|---|---|---|
+| `pq_editor_draft_v1` | setiap perubahan isian (debound 350 ms + saat berpindah skenario/menutup tab) | draft apa adanya, termasuk yang belum valid |
+| `pq_custom_packs_v1` | hanya bila **seluruh** skenario pack lolos validasi | pack yang bisa dimainkan dari menu |
+
+Dengan pemisahan ini draft yang belum valid tetap ada setelah reload tanpa pernah menimpa pack valid
+yang bisa dimainkan. Saat editor dibuka, draft dipulihkan lebih dulu; layar editor menyebut bedanya
+(“Draft tersimpan di perangkat, tetapi belum lolos validasi. Menu tetap memainkan versi tersimpan”)
+dan menyediakan tombol **Buang draft**. `resetAll` menghapus kedua kunci. Isian antar-skenario tidak
+hilang karena form di-*flush* ke draft sebelum berpindah. Kesiapan pack dihitung ulang dari seluruh
+skenario draft, bukan hanya yang sedang terbuka.
+
+Pemilihan `pack_id` (v1.4) memakai empat ID bawaan `content/manifest.json` plus isian bebas. Bila id
+terpilih tidak dikenal, badge kesiapan menyebut sebabnya dan ekspor ditolak (`exportBlocker`) dengan
+pesan yang memuat id tersebut; tombol **Selaraskan prefix id** menomori ulang id skenario menjadi
+`{prefix}-001…` agar pack dari nol bisa mencapai status siap konten tanpa mengedit JSON.
 
 Batas yang tetap berlaku: pack lokal **tidak** otomatis menjadi pack `content/` baru, karena
 `validate_content.py` hanya mengenal empat `pack_id` di `content/manifest.json`. Pemeriksa kesiapan
