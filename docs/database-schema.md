@@ -327,11 +327,11 @@ FROM scores;
 Entri: `score`, `max_score`, `accuracy` (0..1, 4 desimal), `pack_id` (`null` = campur),
 `mode` (`classic`/`time_attack`), `at`. Maksimum 10 entri; `reset` menghapus berkas ini.
 
-## 8. Pack lokal dari editor (v1.1)
+## 8. Pack lokal dari editor (v1.1, diperluas v1.2)
 
 | Media | Kunci | Isi |
 |---|---|---|
-| Web | `localStorage` → `pq_custom_packs_v1` | array pack `{pack_id, name, emoji, scenarios[]}` hasil editor |
+| Web | `localStorage` → `pq_custom_packs_v1` | array pack `{pack_id, name, description, emoji, scenarios[]}` hasil editor |
 
 Pack lokal hanya hidup di perangkat, tidak pernah diunggah, dan tidak mengubah `content/`.
 `pack_id` yang sama menimpa pack lama; `reset` menghapus kunci ini. Skema tiap skenario divalidasi
@@ -339,8 +339,21 @@ di klien dengan aturan yang sama seperti `scripts/validate_content.py` (dibuktik
 `tests/test_editor_contract.py` + `web/test/editor.test.js`). Aturan komposisi pack (10 skenario,
 6:4 phish/legit, 3/4/3 kesulitan) tidak berlaku untuk pack lokal berisi satu skenario.
 
-Ekspor pack lokal menghasilkan JSON yang lolos aturan **per skenario**, tetapi belum menjadi pack
-`content/` yang sah: `validate_content.py` tetap menuntut 10 skenario, prefix id sesuai pack, serta
-`schema_version`, `description`, dan `emoji` di tingkat pack. Untuk menyumbangkan hasil editor ke
-`content/`, gabungkan skenarionya ke pack penuh lebih dulu lalu jalankan validator.
+Ekspor (v1.2) memakai `toContentPack()` sehingga berkas JSON selalu berbentuk pack `content/`:
+`schema_version`, `pack_id`, `name`, `description`, `emoji`, dan `scenarios`. Field yang tidak diisi
+pemain memakai nilai bawaan (`schema_version: "1.0"`, deskripsi "Pack buatan sendiri dari editor
+PhishQuest.", emoji 🛠️).
+
+`validatePackShape()` memeriksa aturan **tingkat pack** yang sama dengan `validate_pack` di
+`scripts/validate_content.py`: `schema_version`, `pack_id` yang dikenal (hanya empat pack bawaan),
+10 skenario, komposisi tipe (7/2/1), kesulitan (3/4/3), kanal (≥3 email, ≥3 SMS, ≥2 WhatsApp),
+6 phishing / 4 legit, cakupan ≥7 jenis red flag, dan prefix id sesuai pack. Hasilnya tampil pada
+daftar pack di layar editor; paritas dua bahasa dibuktikan `web/test/editor-packs.json` +
+`tests/test_editor_pack_contract.py`, dan `web/test/editor.test.js` memastikan seluruh
+`content/packs/*.json` dinyatakan siap oleh pemeriksa JS.
+
+Batas yang tetap berlaku: pack lokal **tidak** otomatis menjadi pack `content/` baru, karena
+`validate_content.py` hanya mengenal empat `pack_id` di `content/manifest.json`. Pemeriksa kesiapan
+menunjukkan tepat aturan mana yang belum terpenuhi, sehingga hasil editor bisa digabungkan ke pack
+penuh lalu divalidasi tanpa menebak.
 

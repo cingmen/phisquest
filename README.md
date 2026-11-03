@@ -141,6 +141,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 - **🛠️ Editor skenario** — tempel satu skenario, array, atau pack JSON. Validasi memakai aturan
   yang sama dengan `validate_content.py`, lalu simpan di perangkat (`pq_custom_packs_v1`),
   mainkan dari menu, atau ekspor sebagai berkas JSON pack. Tanpa backend dan tanpa akun.
+- **📦 Kesiapan pack** — ekspor memakai skema pack lengkap (`schema_version`, `description`,
+  `emoji`), dan setiap pack lokal diberi status *siap konten* atau daftar alasan yang belum
+  terpenuhi: 10 skenario, komposisi tipe 7/2/1, kesulitan 3/4/3, kanal, 6:4 phishing:legit,
+  cakupan ≥7 red flag, serta prefix id. Aturannya sama dengan validator konten (v1.2).
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

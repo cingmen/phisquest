@@ -141,6 +141,7 @@ fondasi  konten  engine  CLI    web    rilis
 | Versi | Isi | Perkiraan | Status |
 |-------|-----|-----------|--------|
 | **v1.1.0** | Mode Terbatas Waktu (20 dtk/soal + bonus kecepatan) & leaderboard lokal per perangkat; mode Campur dengan pilihan jumlah soal; mini editor skenario (tempel JSON → validasi → main) | 2–3 hari | Dirilis (v1.1.0), diverifikasi di CLI dan situs live |
+| **v1.2.0** | Ekspor editor menjadi pack `content/` lengkap + pemeriksa kesiapan pack (komposisi PRD §9.4, prefix id, field pack) dengan paritas validator JS↔Python | 1 hari | Dirilis (v1.2.0) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Belum dikerjakan |
 
 ## 10. Strategi Pengujian
@@ -182,10 +183,12 @@ fondasi  konten  engine  CLI    web    rilis
 
 Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP); M4–M5 menambah daya tarik demo web. Jangan tukar urutan M1 ← M2: engine tanpa konten nyata = test yang menguji buatan sendiri.
 
-## 13. Status v1.1
+## 13. Status v1.1 & v1.2
 
 - [x] Mode Terbatas Waktu (20 detik/soal + bonus kecepatan) — web & CLI, golden test dua bahasa
 - [x] Leaderboard lokal per perangkat — `pq_leaderboard_v1` (web) dan `leaderboard.json` (CLI)
 - [x] Mode Campur dengan jumlah soal pilihan — dropdown 5/10/20/40 di web, `--jumlah 5–40` di CLI; jumlah tak sah ditolak (`INVALID_COUNT`/exit 2), permintaan melebihi isi pool dipotong
 - [x] Mini editor skenario (tempel JSON → validasi → main) — `web/js/scenario_editor.js`, tersimpan di `pq_custom_packs_v1`, ekspor JSON, tanpa backend
+- [x] Ekspor pack lokal berbentuk `content/` lengkap (`toContentPack`) — `schema_version`, `description`, dan `emoji` terisi otomatis
+- [x] Pemeriksa kesiapan pack (`validatePackShape`) — aturan tingkat pack yang sama dengan `validate_pack`; status tampil di layar editor, paritas dibuktikan `web/test/editor-packs.json` + `tests/test_editor_pack_contract.py`
 

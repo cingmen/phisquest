@@ -98,6 +98,10 @@ node --test web/test/*.test.js
 - **🛠️ Scenario editor** — paste one scenario, an array, or a full JSON pack. Validation uses
   the same rules as `validate_content.py`, then saves to the device (`pq_custom_packs_v1`),
   plays from the menu, or exports a pack JSON file. No backend, no account.
+- **📦 Pack readiness** — exports use the full pack schema (`schema_version`, `description`,
+  `emoji`), and each local pack shows either *content-ready* or the list of unmet rules:
+  10 scenarios, 7/2/1 type mix, 3/4/3 difficulty, channels, 6:4 phishing:legit, ≥7 red-flag
+  coverage, and id prefix. The rules match the content validator (v1.2).
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal
