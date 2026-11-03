@@ -85,6 +85,7 @@ const state = {
   editorSavedId: null,
   editorDraftId: null,
   editorConflict: null,
+  editorSourceId: null,
   editorIndex: 0,
 };
 
@@ -489,7 +490,10 @@ function persistEditorDraft() {
   state.editorErrors = problems;
 
   try {
-    saveDraftPack(clonePack(pack), state.editorDraftId);
+    saveDraftPack(
+      { ...clonePack(pack), source_pack_id: state.editorSourceId || null },
+      state.editorDraftId,
+    );
     state.editorDraftId = pack.pack_id;
   } catch (error) {
     handleError(error);
@@ -502,12 +506,13 @@ function persistEditorDraft() {
   try {
     // Buang salinan lama (ID sebelumnya atau isi yang sama) agar tidak ada pack ganda.
     const droppedIds = new Set();
-    if (state.editorSavedId && state.editorSavedId !== pack.pack_id) {
-      droppedIds.add(state.editorSavedId);
+    for (const previousId of [state.editorSavedId, state.editorSourceId]) {
+      if (previousId && previousId !== pack.pack_id) droppedIds.add(previousId);
     }
+    const signature = packSignature(pack);
     for (const packItem of state.customPacks) {
       if (packItem.pack_id === pack.pack_id) continue;
-      if (samePackContent(pack, packItem)) droppedIds.add(packItem.pack_id);
+      if (packSignature(packItem) === signature) droppedIds.add(packItem.pack_id);
     }
     const others = state.customPacks.filter(
       (packItem) => packItem.pack_id !== pack.pack_id && !droppedIds.has(packItem.pack_id),
@@ -515,6 +520,7 @@ function persistEditorDraft() {
     state.customPacks = saveCustomPacks([...others, clonePack(pack)]);
     for (const droppedId of droppedIds) removeDraftPack(droppedId);
     state.editorSavedId = pack.pack_id;
+    state.editorSourceId = pack.pack_id;
   } catch (error) {
     handleError(error);
     return { stored: false, reason: 'invalid' };
@@ -546,6 +552,19 @@ function samePackContent(draft, stored) {
     String(draft.name || '') === String(stored.name || '') &&
     JSON.stringify(draft.scenarios || []) === JSON.stringify(stored.scenarios || [])
   );
+}
+
+/**
+ * Tanda isi pack tanpa id/label skenario, dipakai mendeteksi salinan pack setelah ID diganti.
+ * @param {object} pack - pack lokal.
+ * @returns {string} tanda isi pack.
+ */
+function packSignature(pack) {
+  const rows = (pack.scenarios || []).map((scenario) => {
+    const { id, label, ...rest } = scenario;
+    return rest;
+  });
+  return `${String(pack.name || '')}|${JSON.stringify(rows)}`;
 }
 
 /**
@@ -595,9 +614,11 @@ function openEditorPack(packId) {
   const draft = loadDraftPacks().find((pack) => pack.pack_id === packId);
   const source = draft || stored;
   if (!source) return;
-  state.editorPack = clonePack(source);
   const twin = state.customPacks.find((item) => samePackContent(source, item));
-  state.editorSavedId = twin ? twin.pack_id : null;
+  state.editorPack = clonePack(source);
+  state.editorSourceId =
+    (draft && draft.source_pack_id) || (stored ? stored.pack_id : null) || (twin ? twin.pack_id : null);
+  state.editorSavedId = state.editorSourceId;
   state.editorDraftId = draft ? draft.pack_id : null;
   state.editorIndex = 0;
   state.editorErrors = [];
@@ -619,7 +640,8 @@ function resumeDraft(packId) {
   }
   const twin = state.customPacks.find((item) => samePackContent(draft, item));
   state.editorPack = clonePack(draft);
-  state.editorSavedId = twin ? twin.pack_id : null;
+  state.editorSourceId = draft.source_pack_id || (twin ? twin.pack_id : null);
+  state.editorSavedId = state.editorSourceId;
   state.editorDraftId = draft.pack_id;
   state.editorIndex = 0;
   state.editorErrors = packProblems(draft);
@@ -642,6 +664,7 @@ function createEditorPack() {
   state.editorSavedId = null;
   state.editorDraftId = null;
   state.editorConflict = null;
+  state.editorSourceId = null;
   state.editorIndex = 0;
   state.editorErrors = [];
   const result = persistEditorDraft();
@@ -801,6 +824,7 @@ function discardEditorDraft() {
   state.editorPack = stored ? clonePack(stored) : null;
   state.editorSavedId = stored ? stored.pack_id : null;
   state.editorDraftId = stored ? stored.pack_id : null;
+  state.editorSourceId = stored ? stored.pack_id : null;
   state.editorConflict = null;
   state.editorIndex = 0;
   state.editorErrors = [];
@@ -857,6 +881,7 @@ function deleteCustomPacks() {
   state.editorPack = null;
   state.editorSavedId = null;
   state.editorDraftId = null;
+  state.editorSourceId = null;
   state.editorConflict = null;
   state.editorIndex = 0;
   state.editorMessage = 'Pack lokal dihapus.';
