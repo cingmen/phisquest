@@ -500,20 +500,20 @@ function persistEditorDraft() {
   if (problems.length) return { stored: false, reason: 'invalid' };
   if (conflict) return { stored: false, reason: 'conflict' };
   try {
-    // Buang salinan lama dengan isi sama (mis. setelah ID pack diganti) agar tidak jadi pack ganda.
-    const staleIds = state.customPacks
-      .filter(
-        (packItem) =>
-          packItem.pack_id !== pack.pack_id &&
-          packItem.pack_id !== state.editorSavedId &&
-          samePackContent(pack, packItem),
-      )
-      .map((packItem) => packItem.pack_id);
+    // Buang salinan lama (ID sebelumnya atau isi yang sama) agar tidak ada pack ganda.
+    const droppedIds = new Set();
+    if (state.editorSavedId && state.editorSavedId !== pack.pack_id) {
+      droppedIds.add(state.editorSavedId);
+    }
+    for (const packItem of state.customPacks) {
+      if (packItem.pack_id === pack.pack_id) continue;
+      if (samePackContent(pack, packItem)) droppedIds.add(packItem.pack_id);
+    }
     const others = state.customPacks.filter(
-      (packItem) => packItem.pack_id !== pack.pack_id && !staleIds.includes(packItem.pack_id),
+      (packItem) => packItem.pack_id !== pack.pack_id && !droppedIds.has(packItem.pack_id),
     );
     state.customPacks = saveCustomPacks([...others, clonePack(pack)]);
-    for (const staleId of staleIds) removeDraftPack(staleId);
+    for (const droppedId of droppedIds) removeDraftPack(droppedId);
     state.editorSavedId = pack.pack_id;
   } catch (error) {
     handleError(error);
@@ -596,7 +596,8 @@ function openEditorPack(packId) {
   const source = draft || stored;
   if (!source) return;
   state.editorPack = clonePack(source);
-  state.editorSavedId = stored ? stored.pack_id : null;
+  const twin = state.customPacks.find((item) => samePackContent(source, item));
+  state.editorSavedId = twin ? twin.pack_id : null;
   state.editorDraftId = draft ? draft.pack_id : null;
   state.editorIndex = 0;
   state.editorErrors = [];
@@ -616,16 +617,15 @@ function resumeDraft(packId) {
     render();
     return;
   }
-  const stored = state.customPacks.find((item) => item.pack_id === packId);
-  const samePack = samePackContent(draft, stored);
+  const twin = state.customPacks.find((item) => samePackContent(draft, item));
   state.editorPack = clonePack(draft);
-  state.editorSavedId = samePack ? stored.pack_id : null;
+  state.editorSavedId = twin ? twin.pack_id : null;
   state.editorDraftId = draft.pack_id;
   state.editorIndex = 0;
   state.editorErrors = packProblems(draft);
   state.editorConflict = currentConflict(state.editorPack);
-  state.editorMessage = samePack
-    ? `Melanjutkan draft. Versi tersimpan (${stored.scenarios.length} skenario) tetap bisa dimainkan.`
+  state.editorMessage = twin
+    ? `Melanjutkan draft. Versi tersimpan (${twin.scenarios.length} skenario) tetap bisa dimainkan.`
     : `Melanjutkan draft ${state.editorPack.name || packId}.`;
   showScreen('editor');
 }
