@@ -149,6 +149,9 @@ node --test web/test/*.test.js
   banner offers **Merge with this tab's version**: non-overlapping changes from both sides are kept,
   scenario deletions you did not touch are respected, and genuinely conflicting fields are named so
   you can review them.
+- **🔍 Merge preview (v1.6.10)** — before a draft is merged, **Merge preview** lists every field that
+  would change with values from both tabs, flags the conflicting ones, and writes nothing until you
+  press **Apply merge**.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

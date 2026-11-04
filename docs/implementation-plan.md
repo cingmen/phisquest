@@ -155,6 +155,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v1.6.7** | `deleteScenarioShortcut()` menghapus skenario aktif lewat Alt+Backspace/Alt+Delete dengan konfirmasi, pengaman fokus/dialog/skenario terakhir, pemindahan fokus, dan pengumuman live region | 1 hari | Dirilis (v1.6.7) |
 | **v1.6.8** | `scenarioNavShortcut()` memindahkan pilihan skenario lewat Alt+↑/Alt+↓ tanpa berputar di ujung, dan uji integrasi `web/test/two-tab.test.js` menutup alur konflik/penghapusan/pemulihan antar-tab | 1 hari | Dirilis (v1.6.8) |
 | **v1.6.9** | `mergeDraftPack()` menggabungkan draft antar-tab tiga arah per field (termasuk penghapusan skenario), dengan tombol **Gabungkan dengan versi tab ini** di banner konflik dan laporan field yang bentrok | 1 hari | Dirilis (v1.6.9) |
+| **v1.6.10** | `draftMergePreview()` menampilkan field yang akan berubah beserta nilai kedua tab dan menandai bentrok; **Terapkan gabungan** baru menulis draft setelah pengguna memeriksa | 1 hari | Dirilis (v1.6.10) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Belum dikerjakan |
 
 ## 10. Strategi Pengujian
@@ -219,7 +220,7 @@ Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP);
 - [x] Deteksi yatim tidak bergantung pada `source_pack_id`: draft lama tanpa penanda tetap dilabeli bila `pack_id`-nya tidak ada di `pq_custom_packs_v1`, dan `source_pack_id` di-backfill hanya di kunci draft
 - [x] `listDrafts()`/`draftStatus()` menampilkan semua draft (termasuk yang identik dengan pack tersimpan) di menu dan layar editor, dengan tombol Lanjutkan dan Buang
 - [x] Pintasan `Alt+D` menggandakan skenario aktif; `isTextEntryTarget()` mematikan pintasan saat fokus di input/textarea/contenteditable
-- [x] `CHANGELOG.md` mencatat riwayat v1.6.0–v1.6.9
+- [x] `CHANGELOG.md` mencatat riwayat v1.6.0–v1.6.10
 - [x] `draftWriteDecision()` membandingkan `updated_at` tab ini dengan versi di penyimpanan: versi lama tidak ditulis, konflik ditampilkan dengan tombol **Muat versi terbaru**/**Timpa dengan versi tab ini**
 - [x] `sortDrafts()`/`listDrafts()` mengurutkan draft dari edit terbaru tanpa mengubah label status
 - [x] `isTextEntryTarget()` juga mengabaikan pintasan saat fokus di elemen `select`
@@ -229,4 +230,5 @@ Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP);
 - [x] `scenarioNavShortcut()` memindahkan pilihan skenario lewat **Alt+↑**/**Alt+↓** tanpa berputar di ujung daftar
 - [x] Uji integrasi `web/test/two-tab.test.js` menyusun konflik `updated_at`, penghapusan draft, penyegaran menu, dan pemulihan tanpa DOM
 - [x] `mergeDraftPack()` menggabungkan draft tiga arah per field: perubahan satu sisi diambil, penghapusan skenario dihormati, dan field bentrok memakai isi tab ini sambil dilaporkan
+- [x] `draftMergePreview()` mendaftar perubahan dan bentrok sebelum ditulis, dan pratinjau bisa ditutup atau hilang otomatis saat draft dimuat ulang/dipulihkan
 

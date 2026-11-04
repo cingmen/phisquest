@@ -10,7 +10,7 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.6.9 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Target rilis | v1.6.10 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
 | Terakhir diperbarui | 2026-11-04 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
@@ -440,6 +440,7 @@ stateDiagram-v2
 | **v1.6.7** | Pintasan **Alt+Backspace**/**Alt+Delete** menghapus skenario aktif setelah konfirmasi, dengan pengaman saat fokus di kolom isian, dialog terbuka, atau skenario tinggal satu; tombol hapus berlabel jelas dan fokus/pengumuman tetap terjaga | Dirilis (v1.6.7) |
 | **v1.6.8** | Pintasan **Alt+↑**/**Alt+↓** berpindah antar-skenario tanpa berputar di ujung daftar, plus uji integrasi dua tab yang menyusun konflik, penghapusan draft, penyegaran menu, dan pemulihan secara otomatis | Dirilis (v1.6.8) |
 | **v1.6.9** | Konflik draft antar-tab bisa digabung per field lewat **Gabungkan dengan versi tab ini**; perubahan yang tidak bertabrakan diambil keduanya, penghapusan skenario dihormati, dan field yang bentrok dilaporkan | Dirilis (v1.6.9) |
+| **v1.6.10** | **Pratinjau gabungan** menampilkan field yang akan berubah beserta nilai dari kedua tab dan menandai bentrok sebelum apa pun ditulis | Dirilis (v1.6.10) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

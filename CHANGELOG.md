@@ -3,6 +3,14 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.10 — 2026-11-04
+
+- Banner konflik draft antar-tab kini menawarkan **Pratinjau gabungan**: `draftMergePreview()`
+  mendaftar setiap field yang akan berubah beserta nilai dari tab ini dan dari tab lain, menandai
+  field yang bentrok, dan tidak menulis apa pun sampai pengguna menekan **Terapkan gabungan**.
+- Pratinjau bisa ditutup tanpa efek samping; pratinjau otomatis hilang saat draft dimuat ulang,
+  dipulihkan, atau ditulis ulang agar daftar perubahannya tidak pernah basi.
+
 ## v1.6.9 — 2026-11-04
 
 - Konflik draft antar-tab kini punya pilihan **Gabungkan dengan versi tab ini**: `mergeDraftPack()`

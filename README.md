@@ -191,6 +191,9 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   menawarkan **Gabungkan dengan versi tab ini**: perubahan yang tidak bertabrakan diambil dari kedua
   sisi, penghapusan skenario yang tidak disentuh dihormati, dan field yang benar-benar bentrok disebut
   namanya agar mudah diperiksa.
+- **🔍 Pratinjau gabungan (v1.6.10)** — sebelum draft digabung, **Pratinjau gabungan** mendaftar
+  field yang akan berubah beserta nilai dari tab ini dan tab lain, menandai yang bentrok, dan baru
+  menulis setelah **Terapkan gabungan** ditekan.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
