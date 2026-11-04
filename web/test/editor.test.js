@@ -27,6 +27,7 @@ import {
   parsePackText,
   samePackContent,
   savePlan,
+  scenarioNavShortcut,
   sortDrafts,
   toContentPack,
   validatePackShape,
@@ -471,6 +472,50 @@ test('pintasan hapus skenario hanya menyala saat aman', () => {
   });
   assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', index: -1 }), {
     delete: false,
+    reason: 'index',
+  });
+});
+
+test('pintasan Alt+panah berpindah skenario dan berhenti di ujung daftar', () => {
+  const base = { altKey: true, scenarioCount: 3 };
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowDown', index: 0 }), {
+    move: 1,
+    reason: 'ok',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowUp', index: 2 }), {
+    move: -1,
+    reason: 'ok',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowUp', index: 0 }), {
+    move: 0,
+    reason: 'edge',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowDown', index: 2 }), {
+    move: 0,
+    reason: 'edge',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowDown', index: 0, altKey: false }), {
+    move: 0,
+    reason: 'modifier',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowDown', index: 0, ctrlKey: true }), {
+    move: 0,
+    reason: 'modifier',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowLeft', index: 1 }), {
+    move: 0,
+    reason: 'key',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowDown', index: 1, isTextEntry: true }), {
+    move: 0,
+    reason: 'text-entry',
+  });
+  assert.deepEqual(scenarioNavShortcut({ ...base, key: 'ArrowDown', index: 1, dialogOpen: true }), {
+    move: 0,
+    reason: 'dialog-open',
+  });
+  assert.deepEqual(scenarioNavShortcut({ altKey: true, key: 'ArrowDown', scenarioCount: 0, index: 0 }), {
+    move: 0,
     reason: 'index',
   });
 });

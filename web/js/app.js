@@ -32,6 +32,7 @@ import {
   parsePackText,
   samePackContent,
   savePlan,
+  scenarioNavShortcut,
   toContentPack,
   validatePackShape,
   validateScenario,
@@ -1379,7 +1380,7 @@ function handleKeydown(event) {
   }
   if (state.screen === 'editor') {
     const pack = state.editorPack;
-    const decision = deleteScenarioShortcut({
+    const shared = {
       key: event.key,
       altKey: event.altKey,
       ctrlKey: event.ctrlKey,
@@ -1388,10 +1389,16 @@ function handleKeydown(event) {
       scenarioCount: pack ? pack.scenarios.length : 0,
       index: state.editorIndex,
       dialogOpen: Boolean(document.querySelector('dialog[open], [aria-modal="true"]')),
-    });
-    if (decision.delete) {
+    };
+    if (deleteScenarioShortcut(shared).delete) {
       event.preventDefault();
       editorDeleteActiveScenario();
+      return;
+    }
+    const nav = scenarioNavShortcut(shared);
+    if (nav.move) {
+      event.preventDefault();
+      editorSelectScenario(state.editorIndex + nav.move);
     }
     return;
   }

@@ -741,6 +741,39 @@ export function deleteScenarioShortcut({
 }
 
 /**
+ * Putuskan apakah penekanan tombol harus memindahkan pilihan ke skenario sebelumnya/berikutnya.
+ * Pintasan Alt+↑ dan Alt+↓ hanya bergerak selama skenario tujuan ada; di ujung daftar tidak ada
+ * gerakan sama sekali supaya pilihan tidak berputar tanpa disadari.
+ * @param {object} [options] - tombol, modifier, status fokus, jumlah skenario, indeks, dan dialog.
+ * @returns {{move: number, reason: 'ok'|'key'|'modifier'|'text-entry'|'dialog-open'|'index'|'edge'}} arah gerak (-1/0/1).
+ */
+export function scenarioNavShortcut({
+  key = '',
+  altKey = false,
+  ctrlKey = false,
+  metaKey = false,
+  isTextEntry = false,
+  scenarioCount = 0,
+  index = 0,
+  dialogOpen = false,
+} = {}) {
+  const pressed = String(key || '').toUpperCase();
+  if (isTextEntry) return { move: 0, reason: 'text-entry' };
+  if (dialogOpen) return { move: 0, reason: 'dialog-open' };
+  if (!altKey || ctrlKey || metaKey) return { move: 0, reason: 'modifier' };
+  const step = pressed === 'ARROWUP' ? -1 : pressed === 'ARROWDOWN' ? 1 : 0;
+  if (!step) return { move: 0, reason: 'key' };
+  const count = Number(scenarioCount) || 0;
+  const position = Number(index);
+  if (!Number.isInteger(position) || position < 0 || position >= count) {
+    return { move: 0, reason: 'index' };
+  }
+  const target = position + step;
+  if (target < 0 || target >= count) return { move: 0, reason: 'edge' };
+  return { move: step, reason: 'ok' };
+}
+
+/**
  * Apakah fokus berada di kolom teks, sehingga pintasan keyboard harus diabaikan.
  * @param {string} tagName - nama tag elemen aktif.
  * @param {boolean} isContentEditable - true bila elemen aktif contenteditable.
