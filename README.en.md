@@ -142,6 +142,9 @@ node --test web/test/*.test.js
   the open scenario after confirmation, never fires while typing in a field, and stays off when only
   one scenario is left. Each row keeps a **🗑️ Hapus** button, and focus moves to the replacement row
   after deletion.
+- **🧭 Move between scenarios from the keyboard (v1.6.8)** — **Alt+↑** and **Alt+↓** move the editor
+  selection without wrapping around the ends. The two-tab flow (updated_at conflicts, draft
+  deletion, menu refresh, recovery) is now covered by an automated integration test.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

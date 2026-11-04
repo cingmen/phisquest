@@ -3,6 +3,16 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.8 — 2026-11-04
+
+- Pintasan **Alt+↑**/**Alt+↓** memindahkan pilihan antar-skenario di editor tanpa berputar di ujung
+  daftar; tetap tidak menyala saat fokus di kolom isian atau saat dialog terbuka. Petunjuk pintasan
+  dan `aria-keyshortcuts` pada baris skenario ikut diperbarui.
+- Uji integrasi `web/test/two-tab.test.js` menyusun urutan antar-tab lewat `storage.js` dan fungsi
+  keputusan editor (konflik `updated_at`, penghapusan draft, penyegaran menu, dan pemulihan), sehingga
+  alur dua tab tidak lagi hanya dibuktikan manual di browser.
+- `scenarioNavShortcut()` diuji di `web/test/editor.test.js`.
+
 ## v1.6.7 — 2026-11-04
 
 - Pintasan **Alt+Backspace** (atau **Alt+Delete**) menghapus skenario yang sedang dibuka di editor

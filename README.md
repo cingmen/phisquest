@@ -184,6 +184,9 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   skenario yang sedang dibuka setelah konfirmasi, tanpa mengganggu pengetikan di kolom isian dan
   tanpa menyala saat skenario tinggal satu. Tombol **🗑️ Hapus** tetap ada di tiap baris, dan fokus
   berpindah ke baris pengganti setelah penghapusan.
+- **🧭 Pindah skenario dari keyboard (v1.6.8)** — **Alt+↑** dan **Alt+↓** memindahkan pilihan
+  antar-skenario di editor tanpa berputar di ujung daftar. Alur dua tab (konflik `updated_at`,
+  penghapusan draft, penyegaran menu, pemulihan) kini ditutup uji integrasi otomatis.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
