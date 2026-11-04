@@ -145,6 +145,10 @@ node --test web/test/*.test.js
 - **🧭 Move between scenarios from the keyboard (v1.6.8)** — **Alt+↑** and **Alt+↓** move the editor
   selection without wrapping around the ends. The two-tab flow (updated_at conflicts, draft
   deletion, menu refresh, recovery) is now covered by an automated integration test.
+- **🧩 Merge drafts across tabs (v1.6.9)** — when another tab holds a newer draft, the conflict
+  banner offers **Merge with this tab's version**: non-overlapping changes from both sides are kept,
+  scenario deletions you did not touch are respected, and genuinely conflicting fields are named so
+  you can review them.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

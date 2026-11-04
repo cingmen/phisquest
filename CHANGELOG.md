@@ -3,6 +3,17 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.9 — 2026-11-04
+
+- Konflik draft antar-tab kini punya pilihan **Gabungkan dengan versi tab ini**: `mergeDraftPack()`
+  memakai leluhur bersama untuk mengambil perubahan yang hanya ada di satu sisi (nama, deskripsi,
+  emoji, dan field skenario), menambahkan skenario baru dari tab lain, serta menghormati penghapusan
+  skenario yang tidak diubah di sisi lain.
+- Field yang diubah berbeda di kedua sisi tetap memakai isi tab ini dan dilaporkan jumlahnya beserta
+  namanya di pesan editor (misalnya `name` atau `ew-002.body`), sehingga pengguna tahu apa yang perlu
+  diperiksa sebelum menekan **Timpa**.
+- `mergeDraftPack()` dan aturan tiga arah per field diuji di `web/test/editor.test.js`.
+
 ## v1.6.8 — 2026-11-04
 
 - Pintasan **Alt+↑**/**Alt+↓** memindahkan pilihan antar-skenario di editor tanpa berputar di ujung

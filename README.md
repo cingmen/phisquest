@@ -187,6 +187,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 - **🧭 Pindah skenario dari keyboard (v1.6.8)** — **Alt+↑** dan **Alt+↓** memindahkan pilihan
   antar-skenario di editor tanpa berputar di ujung daftar. Alur dua tab (konflik `updated_at`,
   penghapusan draft, penyegaran menu, pemulihan) kini ditutup uji integrasi otomatis.
+- **🧩 Gabungkan draft antar-tab (v1.6.9)** — saat draft di tab lain lebih baru, banner konflik kini
+  menawarkan **Gabungkan dengan versi tab ini**: perubahan yang tidak bertabrakan diambil dari kedua
+  sisi, penghapusan skenario yang tidak disentuh dihormati, dan field yang benar-benar bentrok disebut
+  namanya agar mudah diperiksa.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
