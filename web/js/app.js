@@ -19,6 +19,7 @@ import {
   alignScenarioPrefixes,
   createScenarioTemplate,
   draftIsOrphan,
+  draftDeletionNotice,
   draftWriteDecision,
   duplicateScenario,
   exportBlocker,
@@ -99,6 +100,7 @@ const state = {
   editorOrphan: false,
   editorDraftUpdatedAt: '',
   editorDraftConflict: null,
+  editorDraftLost: null,
   editorIndex: 0,
 };
 
@@ -220,6 +222,7 @@ function render() {
       conflict: active ? state.editorConflict : null,
       orphan: active ? draftIsOrphan(active, state.customPacks) : false,
       remoteConflict: active ? state.editorDraftConflict : null,
+      draftLost: active ? state.editorDraftLost : null,
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -494,6 +497,26 @@ function currentConflict(pack) {
 }
 
 /**
+ * Perbarui status draft aktif yang mungkin sudah dihapus di tab lain.
+ * Isi editor tidak disentuh; status ini hanya memunculkan pemberitahuan dan tombol pemulihan.
+ */
+function syncDraftLostState() {
+  const pack = state.editorPack;
+  if (!pack) {
+    state.editorDraftLost = null;
+    return;
+  }
+  const storedPack = state.customPacks.find((item) => item.pack_id === pack.pack_id) || null;
+  const status = draftDeletionNotice({
+    draftId: state.editorDraftId,
+    storedDrafts: loadDraftPacks(),
+    pack,
+    storedPack,
+  });
+  state.editorDraftLost = status.lost ? status : null;
+}
+
+/**
  * Simpan draft editor ke perangkat; daftar main hanya diperbarui bila diizinkan.
  * Autosave menulis draft dan memperbarui pack yang **sudah ada** di daftar main, tetapi tidak
  * pernah membuat pack baru. Membuat pack baru — termasuk draft yang pack sumbernya sudah
@@ -510,6 +533,11 @@ function persistEditorDraft({ explicit = false, force = false } = {}) {
   state.editorErrors = problems;
 
   const storedDraft = loadDraftPacks().find((item) => item.pack_id === pack.pack_id);
+  syncDraftLostState();
+  if (state.editorDraftLost && !force && !explicit) {
+    state.editorConflict = currentConflict(pack);
+    return { stored: false, reason: 'draft-deleted' };
+  }
   const decision = draftWriteDecision({
     incomingAt: state.editorDraftUpdatedAt,
     storedAt: storedDraft ? String(storedDraft.updated_at || '') : '',
@@ -539,6 +567,7 @@ function persistEditorDraft({ explicit = false, force = false } = {}) {
       handleError(error);
     }
   }
+  syncDraftLostState();
 
   const conflict = currentConflict(pack);
   state.editorConflict = conflict;
@@ -596,6 +625,9 @@ function saveFailureNote(result) {
   if (result.reason === 'draft-conflict') {
     return 'tidak ditulis karena draft di tab lain lebih baru; muat versi terbaru atau timpa secara sadar';
   }
+  if (result.reason === 'draft-deleted') {
+    return 'tidak ditulis karena draft ini sudah dihapus di tab lain; tekan "Simpan ulang sebagai draft" untuk memulihkannya';
+  }
   if (result.reason === 'draft-only') {
     return 'belum masuk daftar main; tekan "Simpan skenario" untuk menyimpannya sebagai pack';
   }
@@ -643,6 +675,7 @@ function refreshReadiness() {
   const pack = state.editorPack;
   if (!pack) return;
   const stored = state.customPacks.find((item) => item.pack_id === pack.pack_id);
+  syncDraftLostState();
   const note = document.getElementById('editor-draft-note');
   if (note) {
     state.editorConflict = currentConflict(pack);
@@ -653,6 +686,7 @@ function refreshReadiness() {
       state.editorConflict,
       draftIsOrphan(pack, state.customPacks),
       state.editorDraftConflict,
+      state.editorDraftLost,
     );
   }
   const slot = document.getElementById('editor-readiness');
@@ -691,6 +725,7 @@ function openEditorPack(packId) {
   state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
   state.editorDraftUpdatedAt = (draft && draft.updated_at) || '';
   state.editorDraftConflict = null;
+  state.editorDraftLost = null;
   if (draft && !draft.source_pack_id) backfillDraftSource(draft.pack_id);
   state.editorMessage =
     draft && stored && packProblems(draft).length
@@ -705,6 +740,7 @@ function reloadDraftFromStorage() {
   if (!pack) return;
   const draft = loadDraftPacks().find((item) => item.pack_id === pack.pack_id);
   if (!draft) {
+    syncDraftLostState();
     showToast('Draft itu sudah tidak ada di perangkat.');
     render();
     return;
@@ -729,6 +765,28 @@ function overwriteDraftFromTab() {
   state.editorMessage = result.stored
     ? 'Draft ditimpa dengan isi tab ini dan pack ikut diperbarui.'
     : `Draft ditimpa dengan isi tab ini, tetapi pack ${saveFailureNote(result)}.`;
+  render();
+}
+
+/** Simpan ulang isi editor sebagai draft setelah draft aktif dihapus di tab lain. */
+function restoreDeletedDraft() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  try {
+    const stamp = nowIso();
+    saveDraftPack(
+      { ...clonePack(pack), source_pack_id: state.editorSourceId || null, updated_at: stamp },
+      state.editorDraftId || null,
+    );
+    state.editorDraftId = pack.pack_id;
+    state.editorDraftUpdatedAt = stamp;
+    state.editorDraftLost = null;
+    state.editorDraftConflict = null;
+  } catch (error) {
+    handleError(error);
+    return;
+  }
+  state.editorMessage = `Draft "${pack.name || pack.pack_id}" disimpan ulang dari isi editor ini.`;
   render();
 }
 
@@ -757,6 +815,7 @@ function discardDraftById(packId) {
     state.editorConflict = null;
     state.editorIndex = 0;
     state.editorErrors = [];
+    state.editorDraftLost = null;
   }
   state.editorMessage = `Draft "${draft.name || packId}" dibuang.`;
   render();
@@ -781,6 +840,7 @@ function resumeDraft(packId) {
   state.editorOrphan = draftIsOrphan(draft, state.customPacks);
   state.editorDraftUpdatedAt = draft.updated_at || '';
   state.editorDraftConflict = null;
+  state.editorDraftLost = null;
   if (!draft.source_pack_id) backfillDraftSource(draft.pack_id);
   state.editorMessage = state.editorOrphan
     ? `Melanjutkan draft "${state.editorPack.name || packId}". Pack sumbernya sudah dihapus; tekan "Simpan skenario" untuk membuat pack baru di daftar main.`
@@ -803,6 +863,7 @@ function createEditorPack() {
   state.editorDraftId = null;
   state.editorConflict = null;
   state.editorSourceId = null;
+  state.editorDraftLost = null;
   state.editorIndex = 0;
   state.editorErrors = [];
   const result = persistEditorDraft({ explicit: true });
@@ -1195,6 +1256,8 @@ function handleClick(event) {
     reloadDraftFromStorage();
   } else if (action === 'editor-draft-overwrite') {
     overwriteDraftFromTab();
+  } else if (action === 'editor-draft-restore') {
+    restoreDeletedDraft();
   } else if (action === 'editor-select') {
     editorSelectScenario(Number(target.dataset.index));
   } else if (action === 'editor-move-up') {
@@ -1328,6 +1391,7 @@ function bindEvents() {
     state.customPacks = loadCustomPacks();
     if (state.screen === 'editor') {
       state.editorConflict = state.editorPack ? currentConflict(state.editorPack) : null;
+      syncDraftLostState();
       render();
     }
   });

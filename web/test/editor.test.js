@@ -12,6 +12,7 @@ import {
   SAMPLE_PACK,
   alignScenarioPrefixes,
   createScenarioTemplate,
+  draftDeletionNotice,
   draftIsOrphan,
   draftStatus,
   draftWriteDecision,
@@ -292,6 +293,43 @@ test('penulisan draft menghormati versi yang lebih baru dari tab lain', () => {
     draftWriteDecision({ incomingAt: 'T1', storedAt: 'T1', sameContent: false }),
     { write: true, conflict: false, reason: 'same-time' },
   );
+});
+
+test('draft yang dihapus di tab lain terdeteksi dan bisa disimpan ulang', () => {
+  const pack = { pack_id: 'kustom', name: 'Kustom', scenarios: [{ id: 'ew-001' }] };
+  assert.deepEqual(draftDeletionNotice({}), {
+    lost: false,
+    reason: 'untracked',
+    packId: null,
+    recoverable: false,
+  });
+  const present = draftDeletionNotice({
+    draftId: 'kustom',
+    storedDrafts: [{ pack_id: 'kustom' }],
+    pack,
+    storedPack: null,
+  });
+  assert.deepEqual(present, {
+    lost: false,
+    reason: 'present',
+    packId: 'kustom',
+    recoverable: false,
+  });
+  assert.deepEqual(draftDeletionNotice({ draftId: 'kustom', storedDrafts: [], pack, storedPack: null }), {
+    lost: true,
+    reason: 'deleted-elsewhere',
+    packId: 'kustom',
+    recoverable: true,
+  });
+  const mirrored = draftDeletionNotice({
+    draftId: 'kustom',
+    storedDrafts: [{ pack_id: 'lain' }],
+    pack,
+    storedPack: pack,
+  });
+  assert.equal(mirrored.lost, true);
+  assert.equal(mirrored.recoverable, false);
+  assert.equal(draftDeletionNotice({ draftId: '', pack }).lost, false);
 });
 
 test('daftar draft menampilkan draft identik dengan label yang jelas', () => {

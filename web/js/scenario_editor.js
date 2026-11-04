@@ -650,6 +650,30 @@ export function draftWriteDecision({ incomingAt = '', storedAt = '', sameContent
 }
 
 /**
+ * Deteksi draft yang sedang dibuka di editor sudah dihapus di tab lain.
+ * Draft dianggap hilang hanya bila editor memang melacak sebuah draft dan draft itu tidak ada
+ * lagi di perangkat; isi editor tetap dianggap utuh dan bisa disimpan ulang.
+ * @param {object} [options] - id draft terlacak, daftar draft di perangkat, isi editor, dan pack tersimpan.
+ * @returns {{lost: boolean, reason: string, packId: string|null, recoverable: boolean}} status draft.
+ */
+export function draftDeletionNotice({
+  draftId = '',
+  storedDrafts = [],
+  pack = null,
+  storedPack = null,
+} = {}) {
+  const tracked = String(draftId || '').trim();
+  if (!tracked || !pack) {
+    return { lost: false, reason: 'untracked', packId: null, recoverable: false };
+  }
+  const drafts = Array.isArray(storedDrafts) ? storedDrafts : [];
+  const present = drafts.some((draft) => draft && draft.pack_id === tracked);
+  if (present) return { lost: false, reason: 'present', packId: tracked, recoverable: false };
+  const recoverable = !storedPack || !samePackContent(pack, storedPack);
+  return { lost: true, reason: 'deleted-elsewhere', packId: tracked, recoverable };
+}
+
+/**
  * Daftar draft siap tampil, termasuk draft yang isinya sama dengan pack tersimpan.
  * Urutannya selalu dari waktu edit terakhir.
  * @param {object[]} drafts - draft dari perangkat.
