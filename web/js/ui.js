@@ -358,23 +358,32 @@ export function draftNotice(
   orphan = false,
   remoteConflict = null,
   draftLost = null,
+  mergePreview = null,
 ) {
   const orphanNote = orphan
     ? '<div class="editor__draft editor__draft--orphan" role="status"><p>🗑️ Draft ini berasal dari pack yang sudah dihapus. Isian tetap aman di perangkat dan tidak masuk daftar main sampai kamu menekan <strong>Simpan skenario</strong>.</p></div>'
     : '';
   const remoteNote = remoteConflict
-    ? `<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ Draft di tab lain lebih baru${remoteConflict.updated_at ? ` (${escapeHtml(String(remoteConflict.updated_at))})` : ''}. Isi tab ini tidak ditulis agar perubahan terbaru tidak hilang.</p><div class="btn-row"><button class="btn btn--ghost" data-action="editor-draft-refresh">Muat versi terbaru</button><button class="btn btn--ghost" data-action="editor-draft-merge">Gabungkan dengan versi tab ini</button><button class="btn btn--ghost" data-action="editor-draft-overwrite">Timpa dengan versi tab ini</button></div></div>`
+    ? `<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ Draft di tab lain lebih baru${remoteConflict.updated_at ? ` (${escapeHtml(String(remoteConflict.updated_at))})` : ''}. Isi tab ini tidak ditulis agar perubahan terbaru tidak hilang.</p><div class="btn-row"><button class="btn btn--ghost" data-action="editor-draft-refresh">Muat versi terbaru</button><button class="btn btn--ghost" data-action="editor-draft-preview">Pratinjau gabungan</button><button class="btn btn--ghost" data-action="editor-draft-overwrite">Timpa dengan versi tab ini</button></div></div>`
+    : '';
+  const mergeNote = mergePreview
+    ? `<div class="editor__draft editor__draft--merge" role="status"><p>🔀 Pratinjau gabungan: ${mergePreview.changes.length} perubahan akan diterapkan, ${mergePreview.conflicts.length} di antaranya bentrok dan memakai isi tab ini.</p><ul class="editor__merge-list">${mergePreview.changes
+        .map((change) => {
+          const where = change.id ? `${escapeHtml(change.id)}` : 'pack';
+          return `<li><strong>${escapeHtml(change.field)}</strong> · ${where} · tab ini: ${escapeHtml(change.ours)} · tab lain: ${escapeHtml(change.theirs)}${change.conflict ? ' <span class="editor__not-ready">bentrok · pakai tab ini</span>' : ''}</li>`;
+        })
+        .join('')}</ul><div class="btn-row"><button class="btn btn--primary" data-action="editor-draft-merge">Terapkan gabungan</button><button class="btn btn--ghost" data-action="editor-draft-preview-close">Tutup pratinjau</button></div></div>`
     : '';
   const lostNote = draftLost
     ? `<div class="editor__draft editor__draft--lost" role="status"><p>🗑️ Draft ini dihapus di tab lain. Isi yang sedang kamu buka tetap ada di sini dan belum ditulis ulang otomatis.${draftLost.recoverable ? ' Simpan ulang agar kembali menjadi draft.' : ' Isi editor sudah sama dengan pack tersimpan, tetapi kamu tetap bisa menyimpannya sebagai draft lagi.'}</p><div class="btn-row"><button class="btn btn--ghost" data-action="editor-draft-restore">Simpan ulang sebagai draft</button></div></div>`
     : '';
   if (conflict) {
-    return `${orphanNote}${remoteNote}${lostNote}<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
+    return `${orphanNote}${remoteNote}${mergeNote}${lostNote}<div class="editor__draft editor__draft--conflict" role="status"><p>⚠️ ID pack '${escapeHtml(conflict.pack_id)}' sudah dipakai pack lain (${conflict.scenarios} skenario). Perubahan ini tetap tersimpan sebagai draft dan tidak menimpa pack tersebut.</p><p>Ganti ID pack di atas (atau kelola pack lama) agar versi ini bisa disimpan dan dimainkan.</p></div>`;
   }
   if (!draftActive) {
     return orphan
-      ? `${orphanNote}${remoteNote}${lostNote}<p class="editor__draft">💾 Draft ini belum ada di daftar main. Simpan skenario untuk membuat pack baru.</p>`
-      : `${orphanNote}${remoteNote}${lostNote}<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>`;
+      ? `${orphanNote}${remoteNote}${mergeNote}${lostNote}<p class="editor__draft">💾 Draft ini belum ada di daftar main. Simpan skenario untuk membuat pack baru.</p>`
+      : `${orphanNote}${remoteNote}${mergeNote}${lostNote}<p class="editor__draft">💾 Draft editor tersimpan di perangkat dan sama dengan versi yang bisa dimainkan.</p>`;
   }
   const stored =
     storedCount > 0
@@ -383,7 +392,7 @@ export function draftNotice(
   const problem = draftProblem
     ? `<p>Masalah pertama: ${escapeHtml(draftProblem)}</p>`
     : '';
-  return `${orphanNote}${remoteNote}${lostNote}<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
+  return `${orphanNote}${remoteNote}${mergeNote}${lostNote}<div class="editor__draft editor__draft--pending" role="status"><p>📝 Draft tersimpan di perangkat, tetapi belum lolos validasi. ${stored}</p>${problem}<button class="btn btn--ghost" data-action="editor-discard-draft">Buang draft, pakai versi tersimpan</button></div>`;
 }
 
 /**
@@ -405,9 +414,10 @@ export function renderEditor({
   storedCount = 0,
   draftProblem = '',
   conflict = null,
-  orphan = false,
-  remoteConflict = null,
+  orphan = false,  remoteConflict = null,
   draftLost = null,
+  mergePreview = null,
+
 } = {}) {
   const savedList = packs.length
     ? `<ul class="editor__packs">${packs
@@ -473,7 +483,7 @@ export function renderEditor({
           ${formField('pack-description', 'Deskripsi pack', pack.description || '')}
           ${formField('pack-emoji', 'Emoji pack', pack.emoji || '')}
         </div>
-        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict, orphan, remoteConflict, draftLost)}</div>
+        <div id="editor-draft-note">${draftNotice(draftActive, storedCount, draftProblem, conflict, orphan, remoteConflict, draftLost, mergePreview)}</div>
         <h3>Skenario (${pack.scenarios.length})</h3>
         <p class="pack__meta">Pintasan: <kbd>Alt</kbd>+<kbd>D</kbd> menggandakan, <kbd>Alt</kbd>+<kbd>Backspace</kbd> (atau <kbd>Alt</kbd>+<kbd>Delete</kbd>) menghapus skenario yang sedang dibuka setelah konfirmasi, dan <kbd>Alt</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd> berpindah antar-skenario.</p>
         <ol class="editor__scenario-list">${activeRows}</ol>

@@ -16,6 +16,7 @@ import {
   draftDeletionNotice,
   draftIsOrphan,
   draftListChange,
+  draftMergePreview,
   draftStatus,
   draftWriteDecision,
   duplicateScenario,
@@ -483,6 +484,56 @@ test('penghapusan skenario antar-tab dihormati kecuali isinya diubah setelah itu
   });
   assert.deepEqual(keptDeleted.conflicts, []);
   assert.equal(keptDeleted.pack.scenarios.length, 1);
+});
+
+test('pratinjau gabungan menyebut asal tiap perubahan tanpa menulis apa pun', () => {
+  const base = {
+    pack_id: 'kustom',
+    name: 'Awal',
+    description: 'deskripsi awal',
+    emoji: '🛠️',
+    scenarios: [{ id: 'ew-001', body: 'isi' }],
+  };
+  const ours = { ...base, name: 'Nama tab ini' };
+  const theirs = {
+    ...base,
+    description: 'Deskripsi tab lain',
+    scenarios: [
+      { id: 'ew-001', body: 'isi' },
+      { id: 'ew-002', body: 'tambahan' },
+    ],
+  };
+  const preview = draftMergePreview({ base, ours, theirs });
+  assert.equal(preview.merged, true);
+  assert.deepEqual(preview.conflicts, []);
+  const byField = Object.fromEntries(
+    preview.changes.map((change) => [`${change.scope}:${change.field}`, change]),
+  );
+  assert.equal(byField['pack:name'].from, 'ours');
+  assert.equal(byField['pack:description'].from, 'theirs');
+  assert.equal(byField['pack:description'].theirs, 'Deskripsi tab lain');
+  assert.equal(byField['scenario:skenario'].id, 'ew-002');
+  assert.equal(byField['scenario:skenario'].from, 'theirs');
+  // Pratinjau hanya membaca: isi tab ini tidak berubah.
+  assert.equal(ours.name, 'Nama tab ini');
+
+  // Kedua sisi mengubah field yang sama: tercatat bentrok dan pratinjau memakai isi tab ini.
+  const conflicted = draftMergePreview({
+    base,
+    ours: { ...base, name: 'Versi tab ini' },
+    theirs: { ...base, name: 'Versi tab lain' },
+  });
+  assert.equal(conflicted.changes.length, 1);
+  assert.equal(conflicted.changes[0].conflict, true);
+  assert.equal(conflicted.changes[0].from, 'ours');
+  assert.deepEqual(conflicted.conflicts, [{ scope: 'pack', id: null, field: 'name' }]);
+
+  assert.deepEqual(draftMergePreview({ base, ours, theirs: ours }), {
+    changes: [],
+    conflicts: [],
+    merged: true,
+  });
+  assert.deepEqual(draftMergePreview({ ours }), { changes: [], conflicts: [], merged: false });
 });
 
 test('daftar draft menampilkan draft identik dengan label yang jelas', () => {

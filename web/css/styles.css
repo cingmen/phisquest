@@ -961,6 +961,8 @@ a {
 .editor__draft--conflict { padding: 12px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.08); display: grid; gap: 6px; }
 .editor__draft--orphan { padding: 12px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.55); background: rgba(148, 163, 184, 0.12); margin-bottom: 8px; }
 .editor__draft--lost { padding: 12px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.08); display: grid; gap: 6px; }
+.editor__draft--merge { padding: 12px; border-radius: 12px; border: 1px solid rgba(124, 58, 237, 0.45); background: rgba(124, 58, 237, 0.1); display: grid; gap: 8px; }
+.editor__merge-list { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.82rem; }
 .menu__drafts { margin-top: 12px; }
 .menu__notice { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.08); font-size: 0.85rem; }
 #editor-readiness { display: grid; gap: 6px; }

@@ -790,6 +790,107 @@ export function mergeDraftPack({ base = null, ours = null, theirs = null } = {})
   return { pack: merged, conflicts, merged: true };
 }
 
+/** Ringkas nilai field untuk ditampilkan di pratinjau (maksimal 60 karakter). */
+function shortValue(value) {
+  if (value === undefined) return '—';
+  const text = typeof value === 'string' ? value : JSON.stringify(value);
+  const trimmed = String(text ?? '');
+  if (!trimmed) return '(kosong)';
+  return trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+}
+
+/**
+ * Pratinjau penggabungan draft tanpa menulis apa pun: field mana yang akan berubah, dari sisi mana,
+ * dan mana yang bentrok. Hasilnya dipakai editor sebelum pengguna menekan "Terapkan gabungan".
+ * @param {object} [options] - versi dasar, isi tab ini, dan draft tersimpan.
+ * @returns {{changes: object[], conflicts: object[], merged: boolean}} ringkasan perubahan.
+ */
+export function draftMergePreview({ base = null, ours = null, theirs = null } = {}) {
+  if (!ours || !theirs) return { changes: [], conflicts: [], merged: false };
+  const { conflicts } = mergeDraftPack({ base, ours, theirs });
+  const changes = [];
+
+  for (const field of PACK_MERGE_FIELDS) {
+    if (sameValue(ours[field], theirs[field])) continue;
+    const baseValue = base ? base[field] : undefined;
+    const result = pickField(baseValue, ours[field], theirs[field]);
+    changes.push({
+      scope: 'pack',
+      id: null,
+      field,
+      from: result.conflict ? 'ours' : sameValue(result.value, theirs[field]) ? 'theirs' : 'ours',
+      conflict: result.conflict,
+      ours: shortValue(ours[field]),
+      theirs: shortValue(theirs[field]),
+    });
+  }
+
+  const oursList = Array.isArray(ours.scenarios) ? ours.scenarios : [];
+  const theirsList = Array.isArray(theirs.scenarios) ? theirs.scenarios : [];
+  const baseList = Array.isArray(base && base.scenarios) ? base.scenarios : [];
+  const byId = (list) =>
+    new Map(
+      list
+        .filter((scenario) => scenario && scenario.id != null)
+        .map((scenario) => [String(scenario.id), scenario]),
+    );
+  const baseMap = byId(baseList);
+  const oursMap = byId(oursList);
+  const theirsMap = byId(theirsList);
+  const order = theirsList.map((scenario) => String(scenario && scenario.id));
+  for (const scenario of oursList) {
+    const id = String(scenario && scenario.id);
+    if (!order.includes(id)) order.push(id);
+  }
+
+  for (const id of order) {
+    const mine = oursMap.get(id);
+    const other = theirsMap.get(id);
+    if (mine && other) {
+      if (sameValue(mine, other)) continue;
+      const keys = new Set([...Object.keys(mine), ...Object.keys(other)]);
+      const ancestor = baseMap.get(id) || null;
+      for (const key of keys) {
+        if (key === 'id' || sameValue(mine[key], other[key])) continue;
+        const result = pickField(ancestor ? ancestor[key] : undefined, mine[key], other[key]);
+        changes.push({
+          scope: 'scenario',
+          id,
+          field: key,
+          from: result.conflict ? 'ours' : sameValue(result.value, other[key]) ? 'theirs' : 'ours',
+          conflict: result.conflict,
+          ours: shortValue(mine[key]),
+          theirs: shortValue(other[key]),
+        });
+      }
+      continue;
+    }
+    if (mine) {
+      changes.push({
+        scope: 'scenario',
+        id,
+        field: 'skenario',
+        from: 'ours',
+        conflict: false,
+        ours: 'dipertahankan',
+        theirs: 'tidak ada di draft tersimpan',
+      });
+      continue;
+    }
+    changes.push({
+      scope: 'scenario',
+      id,
+      field: 'skenario',
+      from: 'theirs',
+      conflict: false,
+      ours: 'tidak ada di tab ini',
+      theirs: 'ditambahkan',
+    });
+  }
+
+  return { changes, conflicts, merged: true };
+}
+
 /**
  * Bandingkan dua potret daftar draft untuk mendeteksi draft yang dihapus di tab lain.
  * Perubahan ditentukan oleh id draft; `name` hanya dibawa untuk merangkai pesan ke pengguna.

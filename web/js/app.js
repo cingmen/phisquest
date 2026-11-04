@@ -22,6 +22,7 @@ import {
   draftIsOrphan,
   draftDeletionNotice,
   draftListChange,
+  draftMergePreview,
   draftWriteDecision,
   duplicateScenario,
   exportBlocker,
@@ -104,6 +105,7 @@ const state = {
   editorOrphan: false,
   editorDraftUpdatedAt: '',
   editorDraftBase: null,
+  editorDraftPreview: null,
   editorDraftConflict: null,
   editorDraftLost: null,
   editorIndex: 0,
@@ -231,6 +233,7 @@ function render() {
       orphan: active ? draftIsOrphan(active, state.customPacks) : false,
       remoteConflict: active ? state.editorDraftConflict : null,
       draftLost: active ? state.editorDraftLost : null,
+      mergePreview: active ? state.editorDraftPreview : null,
     });
   } else if (state.screen === 'game' && state.session) {
     const position = state.session.answeredCount + (state.lastResult ? 0 : 1);
@@ -558,6 +561,7 @@ function persistEditorDraft({ explicit = false, force = false } = {}) {
   state.editorDraftConflict = remoteNewer
     ? { updated_at: (storedDraft && storedDraft.updated_at) || null }
     : null;
+  state.editorDraftPreview = null;
   if (remoteNewer) {
     state.editorConflict = currentConflict(pack);
     const inStoreNow = state.customPacks.some((item) => item.pack_id === pack.pack_id);
@@ -714,6 +718,7 @@ function refreshReadiness() {
       draftIsOrphan(pack, state.customPacks),
       state.editorDraftConflict,
       state.editorDraftLost,
+      state.editorDraftPreview,
     );
   }
   const slot = document.getElementById('editor-readiness');
@@ -752,6 +757,7 @@ function openEditorPack(packId) {
   state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
   state.editorDraftUpdatedAt = (draft && draft.updated_at) || '';
   state.editorDraftBase = draft ? clonePack(draft) : null;
+  state.editorDraftPreview = null;
   state.editorDraftConflict = null;
   state.editorDraftLost = null;
   if (draft && !draft.source_pack_id) backfillDraftSource(draft.pack_id);
@@ -776,6 +782,7 @@ function reloadDraftFromStorage() {
   state.editorPack = clonePack(draft);
   state.editorDraftUpdatedAt = draft.updated_at || '';
   state.editorDraftBase = clonePack(draft);
+  state.editorDraftPreview = null;
   state.editorDraftConflict = null;
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
@@ -798,6 +805,34 @@ function overwriteDraftFromTab() {
 }
 
 /**
+ * Tampilkan pratinjau perubahan yang akan diterapkan oleh penggabungan, tanpa menulis apa pun.
+ */
+function previewDraftMerge() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  const draft = loadDraftPacks().find((item) => item.pack_id === pack.pack_id);
+  if (!draft) {
+    state.editorDraftPreview = null;
+    syncDraftLostState();
+    showToast('Draft itu sudah tidak ada di perangkat.');
+    render();
+    return;
+  }
+  const preview = draftMergePreview({ base: state.editorDraftBase, ours: pack, theirs: draft });
+  state.editorDraftPreview = preview.merged ? preview : null;
+  state.editorMessage = preview.merged
+    ? `Pratinjau gabungan: ${preview.changes.length} perubahan, ${preview.conflicts.length} bentrok. Tekan "Terapkan gabungan" untuk menulis draft.`
+    : 'Tidak ada draft tersimpan untuk digabung.';
+  render();
+}
+
+/** Tutup panel pratinjau gabungan tanpa mengubah draft. */
+function closeDraftMergePreview() {
+  state.editorDraftPreview = null;
+  render();
+}
+
+/**
  * Gabungkan isi tab ini dengan draft yang lebih baru dari tab lain memakai leluhur bersama.
  * Field yang hanya diubah satu sisi diambil apa adanya; field yang bentrok memakai isi tab ini dan
  * jumlahnya dilaporkan di pesan editor.
@@ -813,6 +848,7 @@ function mergeDraftFromStorage() {
     return;
   }
   const result = mergeDraftPack({ base: state.editorDraftBase, ours: pack, theirs: draft });
+  state.editorDraftPreview = null;
   if (!result.pack) return;
   state.editorPack = result.pack;
   state.editorIndex = Math.min(
@@ -845,6 +881,7 @@ function restoreDeletedDraft() {
     state.editorDraftId = pack.pack_id;
     state.editorDraftUpdatedAt = stamp;
     state.editorDraftBase = clonePack(pack);
+    state.editorDraftPreview = null;
     state.editorDraftLost = null;
     state.editorDraftConflict = null;
   } catch (error) {
@@ -905,6 +942,7 @@ function resumeDraft(packId) {
   state.editorOrphan = draftIsOrphan(draft, state.customPacks);
   state.editorDraftUpdatedAt = draft.updated_at || '';
   state.editorDraftBase = clonePack(draft);
+  state.editorDraftPreview = null;
   state.editorDraftConflict = null;
   state.editorDraftLost = null;
   if (!draft.source_pack_id) backfillDraftSource(draft.pack_id);
@@ -1357,6 +1395,10 @@ function handleClick(event) {
     overwriteDraftFromTab();
   } else if (action === 'editor-draft-merge') {
     mergeDraftFromStorage();
+  } else if (action === 'editor-draft-preview') {
+    previewDraftMerge();
+  } else if (action === 'editor-draft-preview-close') {
+    closeDraftMergePreview();
   } else if (action === 'editor-draft-restore') {
     restoreDeletedDraft();
   } else if (action === 'editor-select') {
