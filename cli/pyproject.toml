@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phishquest"
-version = "1.6.6"
+version = "1.6.7"
 description = "Game edukasi anti-phishing berbahasa Indonesia untuk terminal (Rich)."
 requires-python = ">=3.10"
 license = { text = "MIT" }

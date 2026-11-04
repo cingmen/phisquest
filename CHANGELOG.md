@@ -3,6 +3,17 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.7 — 2026-11-04
+
+- Pintasan **Alt+Backspace** (atau **Alt+Delete**) menghapus skenario yang sedang dibuka di editor
+  setelah konfirmasi. Pintasan tidak menyala saat fokus di kolom isian, saat ada dialog terbuka, saat
+  belum ada skenario, dan saat skenario tinggal satu sehingga pack tidak kosong karena salah tekan.
+- Tombol hapus per baris kini berlabel **🗑️ Hapus** dengan `aria-keyshortcuts`, dan petunjuk pintasan
+  di editor menyebut cara menghapus. Setelah penghapusan, fokus pindah ke baris pengganti atau tombol
+  **+ Tambah skenario**, dan pesan hasil masuk ke live region.
+- `deleteScenarioShortcut()` memutuskan kapan pintasan boleh jalan dan diuji di
+  `web/test/editor.test.js`.
+
 ## v1.6.6 — 2026-11-04
 
 - Draft yang dihapus di tab lain kini juga terlihat saat pengguna berada di luar editor: event

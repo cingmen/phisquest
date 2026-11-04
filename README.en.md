@@ -138,6 +138,10 @@ node --test web/test/*.test.js
 - **🧭 Draft list stays live (v1.6.6)** — a draft deleted in another tab is also noticed while you
   are on the menu: the list updates itself and a short notice appears, so **Resume** never points at
   a draft that no longer exists.
+- **⌨️ Delete scenarios from the keyboard (v1.6.7)** — **Alt+Backspace** (or **Alt+Delete**) deletes
+  the open scenario after confirmation, never fires while typing in a field, and stays off when only
+  one scenario is left. Each row keeps a **🗑️ Hapus** button, and focus moves to the replacement row
+  after deletion.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

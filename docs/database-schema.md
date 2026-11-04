@@ -425,6 +425,10 @@ untuk `pq_editor_draft_v1`, `draftListChange()` membandingkan potret daftar draf
 isi terbaru; draft yang hilang dilaporkan lewat toast, `role="status"`, dan catatan di menu, lalu
 daftar di layar menu dibangun ulang. Tidak ada data baru yang ditulis oleh mekanisme ini.
 
+Sejak v1.6.7 penghapusan skenario lewat pintasan **Alt+Backspace**/**Alt+Delete** memakai jalur
+penyimpanan yang sama dengan tombol hapus: `pq_editor_draft_v1` ditulis ulang lewat `persistEditorDraft()`
+dan pack tersimpan hanya ikut diperbarui bila isinya valid. Tidak ada kunci atau field baru.
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.

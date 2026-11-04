@@ -180,6 +180,10 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 - **🧭 Daftar draft ikut hidup (v1.6.6)** — penghapusan draft di tab lain juga terdeteksi saat kamu
   berada di menu: daftar draft langsung menyesuaikan dan ada pemberitahuan singkat, jadi tombol
   **Lanjutkan** tidak pernah menunjuk draft yang sudah tidak ada.
+- **⌨️ Hapus skenario dari keyboard (v1.6.7)** — **Alt+Backspace** (atau **Alt+Delete**) menghapus
+  skenario yang sedang dibuka setelah konfirmasi, tanpa mengganggu pengetikan di kolom isian dan
+  tanpa menyala saat skenario tinggal satu. Tombol **🗑️ Hapus** tetap ada di tiap baris, dan fokus
+  berpindah ke baris pengganti setelah penghapusan.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
