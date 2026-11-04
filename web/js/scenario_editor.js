@@ -709,6 +709,38 @@ export function listDrafts(drafts = [], packs = []) {
 }
 
 /**
+ * Putuskan apakah penekanan tombol harus menghapus skenario yang sedang dibuka di editor.
+ * Pintasan hanya Alt+Backspace atau Alt+Delete, tidak aktif saat pengguna mengetik, saat ada
+ * dialog terbuka, saat tidak ada skenario, dan saat skenario tinggal satu (agar pack tidak kosong
+ * karena satu tekan tombol yang tidak disengaja).
+ * @param {object} [options] - tombol, modifier, status fokus, jumlah skenario, indeks, dan dialog.
+ * @returns {{delete: boolean, reason: 'ok'|'key'|'modifier'|'text-entry'|'dialog-open'|'last-scenario'|'index'}} keputusan.
+ */
+export function deleteScenarioShortcut({
+  key = '',
+  altKey = false,
+  ctrlKey = false,
+  metaKey = false,
+  isTextEntry = false,
+  scenarioCount = 0,
+  index = -1,
+  dialogOpen = false,
+} = {}) {
+  const pressed = String(key || '').toUpperCase();
+  if (isTextEntry) return { delete: false, reason: 'text-entry' };
+  if (dialogOpen) return { delete: false, reason: 'dialog-open' };
+  if (!altKey || ctrlKey || metaKey) return { delete: false, reason: 'modifier' };
+  if (pressed !== 'BACKSPACE' && pressed !== 'DELETE') return { delete: false, reason: 'key' };
+  const count = Number(scenarioCount) || 0;
+  if (count <= 1) return { delete: false, reason: 'last-scenario' };
+  const position = Number(index);
+  if (!Number.isInteger(position) || position < 0 || position >= count) {
+    return { delete: false, reason: 'index' };
+  }
+  return { delete: true, reason: 'ok' };
+}
+
+/**
  * Apakah fokus berada di kolom teks, sehingga pintasan keyboard harus diabaikan.
  * @param {string} tagName - nama tag elemen aktif.
  * @param {boolean} isContentEditable - true bila elemen aktif contenteditable.

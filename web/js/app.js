@@ -18,6 +18,7 @@ import {
   SAMPLE_PACK,
   alignScenarioPrefixes,
   createScenarioTemplate,
+  deleteScenarioShortcut,
   draftIsOrphan,
   draftDeletionNotice,
   draftListChange,
@@ -953,6 +954,23 @@ function editorMoveScenario(index, delta) {
   render();
 }
 
+/**
+ * Pindahkan fokus ke tempat yang masuk akal setelah sebuah skenario dihapus: baris skenario
+ * pengganti, atau tombol tambah skenario bila pack sudah kosong.
+ */
+function focusAfterScenarioDelete() {
+  window.requestAnimationFrame(() => {
+    const pack = state.editorPack;
+    const target =
+      pack && pack.scenarios.length
+        ? document.querySelector(
+            `.editor__row[data-action="editor-select"][data-index="${state.editorIndex}"]`,
+          )
+        : document.querySelector('[data-action="editor-add-scenario"]');
+    if (target) target.focus();
+  });
+}
+
 /** Hapus satu skenario dari pack aktif setelah konfirmasi. */
 function editorDeleteScenario(index) {
   flushEditor();
@@ -961,12 +979,26 @@ function editorDeleteScenario(index) {
   const label = pack.scenarios[index].label || pack.scenarios[index].id;
   if (!window.confirm(`Hapus skenario "${label}" dari pack ini?`)) return;
   pack.scenarios.splice(index, 1);
-  state.editorIndex = Math.min(state.editorIndex, Math.max(pack.scenarios.length - 1, 0));
+  // Pilihan tidak berpindah bila yang dihapus ada di bawahnya; kalau di atasnya, indeks bergeser.
+  if (index < state.editorIndex) state.editorIndex -= 1;
+  state.editorIndex = Math.min(
+    Math.max(state.editorIndex, 0),
+    Math.max(pack.scenarios.length - 1, 0),
+  );
   const result = persistEditorDraft();
   state.editorMessage = result.stored
-    ? `Skenario dihapus. Sisa ${pack.scenarios.length} skenario di pack ini.`
-    : `Skenario dihapus, tetapi pack ${saveFailureNote(result)}.`;
+    ? `Skenario "${label}" dihapus. Sisa ${pack.scenarios.length} skenario di pack ini.`
+    : `Skenario "${label}" dihapus, tetapi pack ${saveFailureNote(result)}.`;
   render();
+  announce(state.editorMessage);
+  focusAfterScenarioDelete();
+}
+
+/** Hapus skenario yang sedang dibuka lewat pintasan Alt+Backspace/Alt+Delete. */
+function editorDeleteActiveScenario() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  editorDeleteScenario(state.editorIndex);
 }
 
 /** Simpan skenario aktif setelah divalidasi. */
@@ -1343,6 +1375,24 @@ function handleKeydown(event) {
   ) {
     event.preventDefault();
     editorDuplicateScenario(state.editorIndex);
+    return;
+  }
+  if (state.screen === 'editor') {
+    const pack = state.editorPack;
+    const decision = deleteScenarioShortcut({
+      key: event.key,
+      altKey: event.altKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      isTextEntry: false,
+      scenarioCount: pack ? pack.scenarios.length : 0,
+      index: state.editorIndex,
+      dialogOpen: Boolean(document.querySelector('dialog[open], [aria-modal="true"]')),
+    });
+    if (decision.delete) {
+      event.preventDefault();
+      editorDeleteActiveScenario();
+    }
     return;
   }
   if (state.screen !== 'game') return;

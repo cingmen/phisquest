@@ -12,6 +12,7 @@ import {
   SAMPLE_PACK,
   alignScenarioPrefixes,
   createScenarioTemplate,
+  deleteScenarioShortcut,
   draftDeletionNotice,
   draftIsOrphan,
   draftListChange,
@@ -416,6 +417,62 @@ test('pintasan keyboard diabaikan saat fokus di kolom teks', () => {
   assert.equal(isTextEntryTarget('SELECT'), true);
   assert.equal(isTextEntryTarget('button'), false);
   assert.equal(isTextEntryTarget(undefined), false);
+});
+
+test('pintasan hapus skenario hanya menyala saat aman', () => {
+  const base = { altKey: true, scenarioCount: 3, index: 1 };
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace' }), {
+    delete: true,
+    reason: 'ok',
+  });
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Delete' }), {
+    delete: true,
+    reason: 'ok',
+  });
+  // Tanpa Alt, atau dengan Ctrl/Meta, tombol tidak dipakai sebagai pintasan hapus.
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', altKey: false }), {
+    delete: false,
+    reason: 'modifier',
+  });
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', ctrlKey: true }), {
+    delete: false,
+    reason: 'modifier',
+  });
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', metaKey: true }), {
+    delete: false,
+    reason: 'modifier',
+  });
+  // Tombol lain tidak menghapus apa pun.
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'D' }), {
+    delete: false,
+    reason: 'key',
+  });
+  // Fokus di kolom isian dan dialog terbuka selalu menang.
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', isTextEntry: true }), {
+    delete: false,
+    reason: 'text-entry',
+  });
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', dialogOpen: true }), {
+    delete: false,
+    reason: 'dialog-open',
+  });
+  // Skenario terakhir tidak boleh hilang lewat pintasan, dan indeks harus menunjuk skenario nyata.
+  assert.deepEqual(
+    deleteScenarioShortcut({ altKey: true, key: 'Backspace', scenarioCount: 1, index: 0 }),
+    { delete: false, reason: 'last-scenario' },
+  );
+  assert.deepEqual(
+    deleteScenarioShortcut({ altKey: true, key: 'Backspace', scenarioCount: 0, index: 0 }),
+    { delete: false, reason: 'last-scenario' },
+  );
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', index: 3 }), {
+    delete: false,
+    reason: 'index',
+  });
+  assert.deepEqual(deleteScenarioShortcut({ ...base, key: 'Backspace', index: -1 }), {
+    delete: false,
+    reason: 'index',
+  });
 });
 
 test('menggandakan skenario memberi id baru berprefix dan tetap valid', () => {
