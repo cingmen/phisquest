@@ -174,6 +174,9 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   lebih lama tidak menimpa draft yang lebih baru, dan editor menawarkan **Muat versi terbaru** atau
   **Timpa dengan versi tab ini**. Daftar draft diurutkan dari edit terbaru, dan pintasan Alt+D juga
   diabaikan saat fokus di dropdown.
+- **🗑️ Draft yang dihapus di tab lain (v1.6.5)** — bila draft yang sedang terbuka ternyata dihapus
+  dari tab lain, editor memberi tahu dan berhenti menulis ulang draft itu diam-diam; isi tab tetap
+  aman dan bisa dikembalikan lewat **Simpan ulang sebagai draft**.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal

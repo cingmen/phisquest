@@ -132,6 +132,9 @@ node --test web/test/*.test.js
   content never overwrites a newer draft, and the editor offers **Load latest version** or
   **Overwrite with this tab's version**. The draft list is sorted newest-first, and Alt+D is ignored
   while a dropdown has focus.
+- **🗑️ Draft deleted in another tab (v1.6.5)** — when the draft open in this tab is deleted
+  elsewhere, the editor says so and stops silently recreating it; the content stays safe and can be
+  restored with **Save back as draft**.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

@@ -150,6 +150,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v1.6.2** | Deteksi draft yatim memakai keberadaan pack di daftar main, sehingga draft pra-v1.6.1 tanpa `source_pack_id` ikut dilabeli dan tetap aman dari autosave | 1 hari | Dirilis (v1.6.2) |
 | **v1.6.3** | Daftar draft di layar editor, penyingkapan draft identik, pintasan Alt+D, dan `CHANGELOG.md` | 1 hari | Dirilis (v1.6.3) |
 | **v1.6.4** | Penggabungan draft antar-tab berbasis `updated_at` dengan permukaan konflik, urutan draft terbaru-dulu, dan pengabaian pintasan di `select` | 1 hari | Dirilis (v1.6.4) |
+| **v1.6.5** | Deteksi draft yang dihapus di tab lain: pemberitahuan di editor, autosave tidak menulis ulang diam-diam, dan tombol **Simpan ulang sebagai draft** | 1 hari | Dirilis (v1.6.5) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Belum dikerjakan |
 
 ## 10. Strategi Pengujian
@@ -214,8 +215,9 @@ Bila waktu terbatas: M0–M3 sudah menghasilkan **CLI yang bisa dirilis** (MVP);
 - [x] Deteksi yatim tidak bergantung pada `source_pack_id`: draft lama tanpa penanda tetap dilabeli bila `pack_id`-nya tidak ada di `pq_custom_packs_v1`, dan `source_pack_id` di-backfill hanya di kunci draft
 - [x] `listDrafts()`/`draftStatus()` menampilkan semua draft (termasuk yang identik dengan pack tersimpan) di menu dan layar editor, dengan tombol Lanjutkan dan Buang
 - [x] Pintasan `Alt+D` menggandakan skenario aktif; `isTextEntryTarget()` mematikan pintasan saat fokus di input/textarea/contenteditable
-- [x] `CHANGELOG.md` mencatat riwayat v1.6.0–v1.6.4
+- [x] `CHANGELOG.md` mencatat riwayat v1.6.0–v1.6.5
 - [x] `draftWriteDecision()` membandingkan `updated_at` tab ini dengan versi di penyimpanan: versi lama tidak ditulis, konflik ditampilkan dengan tombol **Muat versi terbaru**/**Timpa dengan versi tab ini**
 - [x] `sortDrafts()`/`listDrafts()` mengurutkan draft dari edit terbaru tanpa mengubah label status
 - [x] `isTextEntryTarget()` juga mengabaikan pintasan saat fokus di elemen `select`
+- [x] `draftDeletionNotice()` mendeteksi draft aktif yang dihapus di tab lain; autosave berhenti menulis ulang draft itu dan editor menawarkan **Simpan ulang sebagai draft**
 

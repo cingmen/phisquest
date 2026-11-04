@@ -10,8 +10,8 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.6.4 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
-| Terakhir diperbarui | 2026-11-03 |
+| Target rilis | v1.6.5 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Terakhir diperbarui | 2026-11-04 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
 ---
@@ -435,6 +435,7 @@ stateDiagram-v2
 | **v1.6.2** | Draft lama tanpa `source_pack_id` ikut dikenali sebagai draft yatim dari keberadaan pack di daftar main, dengan label dan jaminan autosave yang sama | Dirilis (v1.6.2) |
 | **v1.6.3** | Daftar draft di layar editor (lanjutkan/buang), draft identik dengan pack tersimpan tetap ditawarkan dengan labelnya, dan pintasan Alt+D untuk gandakan skenario | Dirilis (v1.6.3) |
 | **v1.6.4** | Penyimpanan draft antar-tab memakai `updated_at` + penggabungan deterministik dengan pilihan Muat/Timpa, daftar draft terurut edit terbaru, dan pintasan diabaikan di `select` | Dirilis (v1.6.4) |
+| **v1.6.5** | Editor mendeteksi draft yang dihapus di tab lain, menahan autosave agar tidak menulis ulang diam-diam, dan menyediakan tombol **Simpan ulang sebagai draft** | Dirilis (v1.6.5) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)

@@ -3,6 +3,16 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.5 — 2026-11-04
+
+- Editor mengenali draft yang sedang dibuka ternyata dihapus di tab lain. Isi editor tidak ditulis
+  ulang diam-diam dan tidak hilang; muncul pemberitahuan “draft ini dihapus di tab lain” beserta
+  tombol **Simpan ulang sebagai draft** untuk memulihkan isi tab tersebut.
+- Selama draft masih hilang, autosave berhenti menulis draft itu agar pemberitahuan tidak lepas
+  tanpa disadari; **Simpan skenario** tetap boleh membuatnya kembali ke daftar main.
+- `draftDeletionNotice()` memutuskan status draft (hadir, dihapus, masih bisa dipulihkan) dan diuji
+  di `web/test/editor.test.js`.
+
 ## v1.6.4 — 2026-11-03
 
 - Penyimpanan draft antar-tab memakai `updated_at` dan penggabungan deterministik: tab dengan versi

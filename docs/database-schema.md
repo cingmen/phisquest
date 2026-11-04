@@ -414,6 +414,12 @@ dibatalkan dan editor menampilkan pilihan **Muat versi terbaru** (mengganti isi 
 dengan versi tab ini** (konfirmasi lalu menulis dengan `updated_at` baru). Dengan begitu dua tab pada
 draft yang sama tidak saling menimpa diam-diam.
 
+Sejak v1.6.5 editor juga memeriksa apakah draft yang sedang dibuka masih ada di
+`pq_editor_draft_v1`. Bila draft itu dihapus dari tab lain, `draftDeletionNotice()` menandainya
+sebagai dihapus: autosave tidak menulis ulang draft tersebut (agar pemberitahuan tidak lepas),
+isi editor tetap utuh di memori, dan tombol **Simpan ulang sebagai draft** menulisnya kembali dengan
+`updated_at` baru. Menyimpan skenario secara eksplisit tetap boleh membuat pack baru.
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.
