@@ -962,4 +962,5 @@ a {
 .editor__draft--orphan { padding: 12px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.55); background: rgba(148, 163, 184, 0.12); margin-bottom: 8px; }
 .editor__draft--lost { padding: 12px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.08); display: grid; gap: 6px; }
 .menu__drafts { margin-top: 12px; }
+.menu__notice { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.08); font-size: 0.85rem; }
 #editor-readiness { display: grid; gap: 6px; }

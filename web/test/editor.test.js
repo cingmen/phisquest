@@ -14,6 +14,7 @@ import {
   createScenarioTemplate,
   draftDeletionNotice,
   draftIsOrphan,
+  draftListChange,
   draftStatus,
   draftWriteDecision,
   duplicateScenario,
@@ -330,6 +331,45 @@ test('draft yang dihapus di tab lain terdeteksi dan bisa disimpan ulang', () => 
   assert.equal(mirrored.lost, true);
   assert.equal(mirrored.recoverable, false);
   assert.equal(draftDeletionNotice({ draftId: '', pack }).lost, false);
+});
+
+test('draft yang dihapus di tab lain terlihat dari potret daftar draft', () => {
+  const before = [
+    { pack_id: 'kustom', name: 'Pack lokal 1', updated_at: 'T1' },
+    { pack_id: 'lain', name: 'Pack lain' },
+  ];
+  const removedOne = draftListChange(before, [{ pack_id: 'kustom', name: 'Pack lokal 1' }]);
+  assert.equal(removedOne.changed, true);
+  assert.deepEqual(removedOne.removed, [{ pack_id: 'lain', name: 'Pack lain' }]);
+  assert.deepEqual(removedOne.added, []);
+
+  const addedOne = draftListChange(before, [...before, { pack_id: 'baru', name: 'Baru' }]);
+  assert.deepEqual(addedOne.added, [{ pack_id: 'baru', name: 'Baru' }]);
+  assert.deepEqual(addedOne.removed, []);
+
+  assert.deepEqual(draftListChange(before, before), { changed: false, removed: [], added: [] });
+  // Ganti nama saja bukan penghapusan atau penambahan draft.
+  assert.equal(
+    draftListChange(before, [
+      { pack_id: 'kustom', name: 'Diganti' },
+      { pack_id: 'lain', name: 'Pack lain' },
+    ]).changed,
+    false,
+  );
+  // Entri tanpa id yang sah diabaikan, dan masukan kosong tidak melempar galat.
+  assert.deepEqual(draftListChange(undefined, [{ pack_id: '  ', name: 'kosong' }]), {
+    changed: false,
+    removed: [],
+    added: [],
+  });
+  assert.deepEqual(draftListChange(before, []), {
+    changed: true,
+    removed: [
+      { pack_id: 'kustom', name: 'Pack lokal 1' },
+      { pack_id: 'lain', name: 'Pack lain' },
+    ],
+    added: [],
+  });
 });
 
 test('daftar draft menampilkan draft identik dengan label yang jelas', () => {

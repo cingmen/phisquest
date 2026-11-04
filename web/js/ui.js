@@ -110,7 +110,14 @@ function renderDraftList(draftPacks, hint = ' Lanjutkan agar isian tidak hilang.
   return `<div class="menu__drafts"><p class="pack__meta">📝 Draft editor tersimpan di perangkat (${draftPacks.length}).${hint}</p><ul class="editor__packs">${rows}</ul></div>`;
 }
 
-export function renderMenu(manifest, progress, leaderboard = [], customPacks = [], draftPacks = []) {
+export function renderMenu(
+  manifest,
+  progress,
+  leaderboard = [],
+  customPacks = [],
+  draftPacks = [],
+  notice = '',
+) {
   const packs = manifest.packs
     .map((pack) => {
       const stats = (progress.packs && progress.packs[pack.pack_id]) || {};
@@ -156,6 +163,7 @@ export function renderMenu(manifest, progress, leaderboard = [], customPacks = [
       <h3>Editor skenario</h3>
       <p class="pack__meta">Tempel JSON skenario, validasi, simpan di perangkat ini, lalu mainkan atau ekspor.</p>
       <button class="btn btn--ghost" data-action="editor-open">Buka editor</button>
+      ${notice ? `<p class="menu__notice" role="status">🗑️ ${escapeHtml(notice)}</p>` : ''}
       ${renderDraftList(draftPacks)}
       ${
         customPacks.length

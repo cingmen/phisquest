@@ -674,6 +674,27 @@ export function draftDeletionNotice({
 }
 
 /**
+ * Bandingkan dua potret daftar draft untuk mendeteksi draft yang dihapus di tab lain.
+ * Perubahan ditentukan oleh id draft; `name` hanya dibawa untuk merangkai pesan ke pengguna.
+ * @param {object[]} previousDrafts - potret daftar draft sebelum kejadian penyimpanan.
+ * @param {object[]} nextDrafts - daftar draft terbaru dari perangkat.
+ * @returns {{changed: boolean, removed: object[], added: object[]}} beda kedua daftar.
+ */
+export function draftListChange(previousDrafts = [], nextDrafts = []) {
+  const rowsOf = (list) =>
+    (Array.isArray(list) ? list : [])
+      .filter((draft) => draft && typeof draft.pack_id === 'string' && draft.pack_id.trim())
+      .map((draft) => ({ pack_id: draft.pack_id, name: String(draft.name || '') }));
+  const previous = rowsOf(previousDrafts);
+  const next = rowsOf(nextDrafts);
+  const previousIds = new Set(previous.map((draft) => draft.pack_id));
+  const nextIds = new Set(next.map((draft) => draft.pack_id));
+  const removed = previous.filter((draft) => !nextIds.has(draft.pack_id));
+  const added = next.filter((draft) => !previousIds.has(draft.pack_id));
+  return { changed: removed.length > 0 || added.length > 0, removed, added };
+}
+
+/**
  * Daftar draft siap tampil, termasuk draft yang isinya sama dengan pack tersimpan.
  * Urutannya selalu dari waktu edit terakhir.
  * @param {object[]} drafts - draft dari perangkat.

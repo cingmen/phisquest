@@ -20,6 +20,7 @@ import {
   createScenarioTemplate,
   draftIsOrphan,
   draftDeletionNotice,
+  draftListChange,
   draftWriteDecision,
   duplicateScenario,
   exportBlocker,
@@ -102,6 +103,8 @@ const state = {
   editorDraftConflict: null,
   editorDraftLost: null,
   editorIndex: 0,
+  draftSnapshot: [],
+  menuNotice: '',
 };
 
 const packCache = new Map();
@@ -197,6 +200,7 @@ function render() {
           state.leaderboard,
           state.customPacks,
           menuDrafts(),
+          state.menuNotice,
         )
       : '<section class="card"><p>Memuat konten…</p></section>';
   } else if (state.screen === 'editor') {
@@ -209,7 +213,7 @@ function render() {
       errors: state.editorErrors,
       message: state.editorMessage,
       packs: state.customPacks.map((pack) => ({ ...pack, readiness: validatePackShape(pack) })),
-      drafts: listDrafts(loadDraftPacks(), state.customPacks),
+      drafts: listDrafts(readDrafts(), state.customPacks),
       pack: active,
       index: state.editorIndex,
       readiness: active ? validatePackShape(active) : null,
@@ -255,6 +259,7 @@ function render() {
 
 /** Pindah layar. */
 function showScreen(name) {
+  if (name !== 'menu') state.menuNotice = '';
   state.screen = name;
   render();
 }
@@ -665,11 +670,25 @@ function packSignature(pack) {
 }
 
 /**
+ * Baca draft dari perangkat sekaligus menyimpan potret daftar untuk mendeteksi penghapusan
+ * yang dilakukan tab lain lewat event `storage`.
+ * @returns {object[]} draft terbaru dari perangkat.
+ */
+function readDrafts() {
+  const drafts = loadDraftPacks();
+  state.draftSnapshot = drafts.map((draft) => ({
+    pack_id: draft.pack_id,
+    name: String(draft.name || ''),
+  }));
+  return drafts;
+}
+
+/**
  * Draft editor yang belum tersimpan sebagai pack valid, untuk ditampilkan di menu.
  * Draft yang isinya sama dengan pack tersimpan tidak perlu ditawarkan lagi.
  */
 function menuDrafts() {
-  return listDrafts(loadDraftPacks(), state.customPacks);
+  return listDrafts(readDrafts(), state.customPacks);
 }
 
 /** Perbarui badge kesiapan + catatan draft tanpa membangun ulang form (fokus tidak hilang). */
@@ -1391,11 +1410,33 @@ function bindEvents() {
   window.addEventListener('storage', (event) => {
     if (event.key !== DRAFT_PACKS_KEY && event.key !== CUSTOM_PACKS_KEY) return;
     state.customPacks = loadCustomPacks();
+    const drafts = loadDraftPacks();
+    const change = draftListChange(state.draftSnapshot, drafts);
+    state.draftSnapshot = drafts.map((draft) => ({
+      pack_id: draft.pack_id,
+      name: String(draft.name || ''),
+    }));
     if (state.screen === 'editor') {
       state.editorConflict = state.editorPack ? currentConflict(state.editorPack) : null;
       syncDraftLostState();
       render();
+      return;
     }
+    // Di luar editor tidak ada isi yang bisa dipulihkan, tetapi daftar draft di layar ini tetap
+    // harus cocok dengan penyimpanan agar tombol "Lanjutkan" tidak menunjuk draft yang hilang.
+    if (change.removed.length) {
+      const names = change.removed
+        .map((draft) => `"${draft.name || draft.pack_id}"`)
+        .join(', ');
+      const text =
+        change.removed.length === 1
+          ? `Draft ${names} dihapus di tab lain; daftar draft di layar ini ikut diperbarui.`
+          : `${change.removed.length} draft (${names}) dihapus di tab lain; daftar draft di layar ini ikut diperbarui.`;
+      if (state.screen === 'menu') state.menuNotice = text;
+      showToast(text);
+      announce(text);
+    }
+    if (state.screen === 'menu') render();
   });
   window.addEventListener('pq:storage-error', (event) => {
     const detail = event.detail || {};
