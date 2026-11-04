@@ -536,6 +536,8 @@ function persistEditorDraft({ explicit = false, force = false } = {}) {
   syncDraftLostState();
   if (state.editorDraftLost && !force && !explicit) {
     state.editorConflict = currentConflict(pack);
+    state.editorMessage =
+      'Isi tab ini tidak ditulis ke draft karena draft itu sudah dihapus di tab lain. Tekan "Simpan ulang sebagai draft" untuk memulihkannya.';
     return { stored: false, reason: 'draft-deleted' };
   }
   const decision = draftWriteDecision({
