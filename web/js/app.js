@@ -28,6 +28,7 @@ import {
   findPackIdConflict,
   isTextEntryTarget,
   listDrafts,
+  mergeDraftPack,
   moveScenario,
   parsePackText,
   samePackContent,
@@ -102,6 +103,7 @@ const state = {
   editorSourceId: null,
   editorOrphan: false,
   editorDraftUpdatedAt: '',
+  editorDraftBase: null,
   editorDraftConflict: null,
   editorDraftLost: null,
   editorIndex: 0,
@@ -571,6 +573,7 @@ function persistEditorDraft({ explicit = false, force = false } = {}) {
       );
       state.editorDraftId = pack.pack_id;
       state.editorDraftUpdatedAt = stamp;
+      state.editorDraftBase = clonePack(pack);
       state.editorDraftConflict = null;
     } catch (error) {
       handleError(error);
@@ -612,6 +615,7 @@ function persistEditorDraft({ explicit = false, force = false } = {}) {
       );
       state.editorDraftId = pack.pack_id;
       state.editorDraftUpdatedAt = stamp;
+      state.editorDraftBase = clonePack(pack);
     } catch (error) {
       handleError(error);
     }
@@ -747,6 +751,7 @@ function openEditorPack(packId) {
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
   state.editorDraftUpdatedAt = (draft && draft.updated_at) || '';
+  state.editorDraftBase = draft ? clonePack(draft) : null;
   state.editorDraftConflict = null;
   state.editorDraftLost = null;
   if (draft && !draft.source_pack_id) backfillDraftSource(draft.pack_id);
@@ -770,6 +775,7 @@ function reloadDraftFromStorage() {
   }
   state.editorPack = clonePack(draft);
   state.editorDraftUpdatedAt = draft.updated_at || '';
+  state.editorDraftBase = clonePack(draft);
   state.editorDraftConflict = null;
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(state.editorPack, state.customPacks);
@@ -791,6 +797,41 @@ function overwriteDraftFromTab() {
   render();
 }
 
+/**
+ * Gabungkan isi tab ini dengan draft yang lebih baru dari tab lain memakai leluhur bersama.
+ * Field yang hanya diubah satu sisi diambil apa adanya; field yang bentrok memakai isi tab ini dan
+ * jumlahnya dilaporkan di pesan editor.
+ */
+function mergeDraftFromStorage() {
+  const pack = state.editorPack;
+  if (!pack) return;
+  const draft = loadDraftPacks().find((item) => item.pack_id === pack.pack_id);
+  if (!draft) {
+    syncDraftLostState();
+    showToast('Draft itu sudah tidak ada di perangkat.');
+    render();
+    return;
+  }
+  const result = mergeDraftPack({ base: state.editorDraftBase, ours: pack, theirs: draft });
+  if (!result.pack) return;
+  state.editorPack = result.pack;
+  state.editorIndex = Math.min(
+    state.editorIndex,
+    Math.max(state.editorPack.scenarios.length - 1, 0),
+  );
+  state.editorErrors = packProblems(state.editorPack);
+  // Penggabungan adalah tindakan sadar: tulis draft walaupun versi tab lain lebih baru.
+  const saved = persistEditorDraft({ force: true });
+  const conflictNote = result.conflicts.length
+    ? `${result.conflicts.length} field bentrok memakai isi tab ini (${result.conflicts
+        .map((item) => (item.id ? `${item.id}.${item.field}` : item.field))
+        .join(', ')}).`
+    : 'Tidak ada field yang bentrok.';
+  state.editorMessage = `Draft digabung dengan versi tab lain. ${conflictNote}`;
+  if (!saved.stored) state.editorMessage += ` Pack ${saveFailureNote(saved)}.`;
+  render();
+}
+
 /** Simpan ulang isi editor sebagai draft setelah draft aktif dihapus di tab lain. */
 function restoreDeletedDraft() {
   const pack = state.editorPack;
@@ -803,6 +844,7 @@ function restoreDeletedDraft() {
     );
     state.editorDraftId = pack.pack_id;
     state.editorDraftUpdatedAt = stamp;
+    state.editorDraftBase = clonePack(pack);
     state.editorDraftLost = null;
     state.editorDraftConflict = null;
   } catch (error) {
@@ -862,6 +904,7 @@ function resumeDraft(packId) {
   state.editorConflict = currentConflict(state.editorPack);
   state.editorOrphan = draftIsOrphan(draft, state.customPacks);
   state.editorDraftUpdatedAt = draft.updated_at || '';
+  state.editorDraftBase = clonePack(draft);
   state.editorDraftConflict = null;
   state.editorDraftLost = null;
   if (!draft.source_pack_id) backfillDraftSource(draft.pack_id);
@@ -887,6 +930,7 @@ function createEditorPack() {
   state.editorConflict = null;
   state.editorSourceId = null;
   state.editorDraftLost = null;
+  state.editorDraftBase = null;
   state.editorIndex = 0;
   state.editorErrors = [];
   const result = persistEditorDraft({ explicit: true });
@@ -1207,6 +1251,7 @@ function deleteCustomPacks() {
     state.editorSourceId = null;
     state.editorOrphan = false;
     state.editorDraftUpdatedAt = '';
+    state.editorDraftBase = null;
     state.editorDraftConflict = null;
     state.editorConflict = null;
   state.editorIndex = 0;
@@ -1310,6 +1355,8 @@ function handleClick(event) {
     reloadDraftFromStorage();
   } else if (action === 'editor-draft-overwrite') {
     overwriteDraftFromTab();
+  } else if (action === 'editor-draft-merge') {
+    mergeDraftFromStorage();
   } else if (action === 'editor-draft-restore') {
     restoreDeletedDraft();
   } else if (action === 'editor-select') {

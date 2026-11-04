@@ -23,6 +23,7 @@ import {
   findPackIdConflict,
   isTextEntryTarget,
   listDrafts,
+  mergeDraftPack,
   moveScenario,
   parsePackText,
   samePackContent,
@@ -372,6 +373,116 @@ test('draft yang dihapus di tab lain terlihat dari potret daftar draft', () => {
     ],
     added: [],
   });
+});
+
+test('penggabungan tiga arah mengambil perubahan yang tidak bertabrakan', () => {
+  const base = {
+    pack_id: 'kustom',
+    name: 'Pack lokal 1',
+    description: '',
+    emoji: '🛠️',
+    scenarios: [
+      { id: 'ew-001', label: 'Asli', body: 'isi asli', type: 'email' },
+      { id: 'ew-002', label: 'Kedua', body: 'isi kedua', type: 'email' },
+    ],
+  };
+  const ours = {
+    ...base,
+    name: 'Nama dari tab ini',
+    scenarios: [
+      { id: 'ew-001', label: 'Asli', body: 'isi dari tab ini', type: 'email' },
+      { id: 'ew-002', label: 'Kedua', body: 'isi kedua', type: 'email' },
+    ],
+  };
+  const theirs = {
+    ...base,
+    scenarios: [
+      { id: 'ew-001', label: 'Judul dari tab lain', body: 'isi asli', type: 'email' },
+      { id: 'ew-002', label: 'Kedua', body: 'isi kedua', type: 'email' },
+      { id: 'ew-003', label: 'Tambahan tab lain', body: 'baru', type: 'email' },
+    ],
+  };
+
+  const merged = mergeDraftPack({ base, ours, theirs });
+  assert.equal(merged.merged, true);
+  assert.deepEqual(merged.conflicts, []);
+  assert.equal(merged.pack.name, 'Nama dari tab ini');
+  assert.equal(merged.pack.scenarios.length, 3);
+  assert.equal(merged.pack.scenarios[0].label, 'Judul dari tab lain');
+  assert.equal(merged.pack.scenarios[0].body, 'isi dari tab ini');
+  assert.equal(merged.pack.scenarios[2].id, 'ew-003');
+});
+
+test('penggabungan tiga arah menandai field yang bentrok dan memakai isi tab ini', () => {
+  const base = { pack_id: 'kustom', name: 'Awal', scenarios: [{ id: 'ew-001', body: 'isi' }] };
+  const ours = { ...base, name: 'Versi tab ini' };
+  const theirs = { ...base, name: 'Versi tab lain' };
+  const merged = mergeDraftPack({ base, ours, theirs });
+  assert.equal(merged.pack.name, 'Versi tab ini');
+  assert.deepEqual(merged.conflicts, [{ scope: 'pack', id: null, field: 'name' }]);
+
+  // Tanpa leluhur bersama, semua field berbeda dianggap bentrok dan isi tab ini dipakai.
+  const noBase = mergeDraftPack({ ours, theirs });
+  assert.equal(noBase.pack.name, 'Versi tab ini');
+  assert.ok(noBase.conflicts.length > 0);
+  assert.equal(mergeDraftPack({ ours }).merged, false);
+});
+
+test('penghapusan skenario antar-tab dihormati kecuali isinya diubah setelah itu', () => {
+  const base = {
+    pack_id: 'kustom',
+    name: 'Pack',
+    scenarios: [
+      { id: 'ew-001', body: 'satu' },
+      { id: 'ew-002', body: 'dua' },
+    ],
+  };
+  // Tab lain menghapus skenario kedua yang tidak kita sentuh: ikuti penghapusan tanpa bentrok.
+  const untouched = mergeDraftPack({
+    base,
+    ours: base,
+    theirs: { ...base, scenarios: [{ id: 'ew-001', body: 'satu' }] },
+  });
+  assert.deepEqual(untouched.conflicts, []);
+  assert.deepEqual(
+    untouched.pack.scenarios.map((scenario) => scenario.id),
+    ['ew-001'],
+  );
+
+  // Kita mengubah skenario yang dihapus tab lain: isi kita dipertahankan dan bentrok dicatat.
+  const changed = mergeDraftPack({
+    base,
+    ours: { ...base, scenarios: [{ id: 'ew-001', body: 'satu' }, { id: 'ew-002', body: 'dua diubah' }] },
+    theirs: { ...base, scenarios: [{ id: 'ew-001', body: 'satu' }] },
+  });
+  assert.deepEqual(
+    changed.pack.scenarios.map((scenario) => scenario.id),
+    ['ew-001', 'ew-002'],
+  );
+  assert.deepEqual(changed.conflicts, [
+    { scope: 'scenario', id: 'ew-002', field: 'deleted-elsewhere' },
+  ]);
+
+  // Kita menghapus skenario yang diubah tab lain: versi tab lain dipulihkan dan bentrok dicatat.
+  const restored = mergeDraftPack({
+    base,
+    ours: { ...base, scenarios: [{ id: 'ew-001', body: 'satu' }] },
+    theirs: { ...base, scenarios: [{ id: 'ew-001', body: 'satu' }, { id: 'ew-002', body: 'dua dari tab lain' }] },
+  });
+  assert.deepEqual(
+    restored.pack.scenarios.map((scenario) => scenario.body),
+    ['satu', 'dua dari tab lain'],
+  );
+  assert.deepEqual(restored.conflicts, [{ scope: 'scenario', id: 'ew-002', field: 'deleted-here' }]);
+
+  // Kita menghapus skenario yang tidak diubah tab lain: penghapusan dipertahankan.
+  const keptDeleted = mergeDraftPack({
+    base,
+    ours: { ...base, scenarios: [{ id: 'ew-001', body: 'satu' }] },
+    theirs: base,
+  });
+  assert.deepEqual(keptDeleted.conflicts, []);
+  assert.equal(keptDeleted.pack.scenarios.length, 1);
 });
 
 test('daftar draft menampilkan draft identik dengan label yang jelas', () => {
