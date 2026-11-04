@@ -3,6 +3,15 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.6 — 2026-11-04
+
+- Draft yang dihapus di tab lain kini juga terlihat saat pengguna berada di luar editor: event
+  `storage` membandingkan potret daftar draft, menu langsung menyegarkan daftarnya, dan muncul
+  pemberitahuan “draft dihapus di tab lain” supaya tombol **Lanjutkan** tidak menunjuk draft yang
+  sudah tidak ada.
+- `draftListChange()` melaporkan draft yang hilang/bertambah di antara dua potret daftar, dan diuji
+  di `web/test/editor.test.js`.
+
 ## v1.6.5 — 2026-11-04
 
 - Editor mengenali draft yang sedang dibuka ternyata dihapus di tab lain. Isi editor tidak ditulis

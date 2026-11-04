@@ -420,6 +420,11 @@ sebagai dihapus: autosave tidak menulis ulang draft tersebut (agar pemberitahuan
 isi editor tetap utuh di memori, dan tombol **Simpan ulang sebagai draft** menulisnya kembali dengan
 `updated_at` baru. Menyimpan skenario secara eksplisit tetap boleh membuat pack baru.
 
+Sejak v1.6.6 penghapusan itu juga dikenali di luar editor. Setiap kali tab menerima event `storage`
+untuk `pq_editor_draft_v1`, `draftListChange()` membandingkan potret daftar draft sebelumnya dengan
+isi terbaru; draft yang hilang dilaporkan lewat toast, `role="status"`, dan catatan di menu, lalu
+daftar di layar menu dibangun ulang. Tidak ada data baru yang ditulis oleh mekanisme ini.
+
 Aturan jangka panjang: `pq_custom_packs_v1` adalah sumber kebenaran untuk isi yang bisa dimainkan,
 sedangkan `pq_editor_draft_v1` adalah salinan kerja; `pack_id` unik di kedua kunci dan `resetAll`
 menghapus keduanya.

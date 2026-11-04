@@ -135,6 +135,9 @@ node --test web/test/*.test.js
 - **🗑️ Draft deleted in another tab (v1.6.5)** — when the draft open in this tab is deleted
   elsewhere, the editor says so and stops silently recreating it; the content stays safe and can be
   restored with **Save back as draft**.
+- **🧭 Draft list stays live (v1.6.6)** — a draft deleted in another tab is also noticed while you
+  are on the menu: the list updates itself and a short notice appears, so **Resume** never points at
+  a draft that no longer exists.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
 ## Ethics & legal

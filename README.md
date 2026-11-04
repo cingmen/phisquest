@@ -177,6 +177,9 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 - **🗑️ Draft yang dihapus di tab lain (v1.6.5)** — bila draft yang sedang terbuka ternyata dihapus
   dari tab lain, editor memberi tahu dan berhenti menulis ulang draft itu diam-diam; isi tab tetap
   aman dan bisa dikembalikan lewat **Simpan ulang sebagai draft**.
+- **🧭 Daftar draft ikut hidup (v1.6.6)** — penghapusan draft di tab lain juga terdeteksi saat kamu
+  berada di menu: daftar draft langsung menyesuaikan dan ada pemberitahuan singkat, jadi tombol
+  **Lanjutkan** tidak pernah menunjuk draft yang sudah tidak ada.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
 ## Etika & legal
