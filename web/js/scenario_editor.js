@@ -681,6 +681,18 @@ function sameValue(left, right) {
 }
 
 /**
+ * Apakah dua nilai field sama secara makna: daftar seperti `red_flags` dibandingkan tanpa
+ * memperhatikan urutan, karena urutan centang di form bukan perubahan isi.
+ */
+function sameFieldValue(left, right) {
+  if (Array.isArray(left) && Array.isArray(right)) {
+    const key = (list) => list.map((item) => JSON.stringify(item ?? null)).sort().join('\n');
+    return key(left) === key(right);
+  }
+  return sameValue(left, right);
+}
+
+/**
  * Aturan tiga arah untuk satu field: hanya sisi yang berubah yang menang.
  * Bila kedua sisi berubah dengan nilai berbeda, isi tab ini dipakai dan bentrok dicatat.
  * @param {*} baseValue - nilai pada versi dasar (leluhur bersama).
@@ -689,9 +701,9 @@ function sameValue(left, right) {
  * @returns {{value: *, conflict: boolean}} nilai hasil dan status bentrok.
  */
 function pickField(baseValue, oursValue, theirsValue) {
-  if (sameValue(oursValue, theirsValue)) return { value: oursValue, conflict: false };
-  if (sameValue(oursValue, baseValue)) return { value: theirsValue, conflict: false };
-  if (sameValue(theirsValue, baseValue)) return { value: oursValue, conflict: false };
+  if (sameFieldValue(oursValue, theirsValue)) return { value: oursValue, conflict: false };
+  if (sameFieldValue(oursValue, baseValue)) return { value: theirsValue, conflict: false };
+  if (sameFieldValue(theirsValue, baseValue)) return { value: oursValue, conflict: false };
   return { value: oursValue, conflict: true };
 }
 
@@ -811,14 +823,14 @@ export function draftMergePreview({ base = null, ours = null, theirs = null } = 
   const changes = [];
 
   for (const field of PACK_MERGE_FIELDS) {
-    if (sameValue(ours[field], theirs[field])) continue;
+    if (sameFieldValue(ours[field], theirs[field])) continue;
     const baseValue = base ? base[field] : undefined;
     const result = pickField(baseValue, ours[field], theirs[field]);
     changes.push({
       scope: 'pack',
       id: null,
       field,
-      from: result.conflict ? 'ours' : sameValue(result.value, theirs[field]) ? 'theirs' : 'ours',
+      from: result.conflict ? 'ours' : sameFieldValue(result.value, theirs[field]) ? 'theirs' : 'ours',
       conflict: result.conflict,
       ours: shortValue(ours[field]),
       theirs: shortValue(theirs[field]),
@@ -851,13 +863,13 @@ export function draftMergePreview({ base = null, ours = null, theirs = null } = 
       const keys = new Set([...Object.keys(mine), ...Object.keys(other)]);
       const ancestor = baseMap.get(id) || null;
       for (const key of keys) {
-        if (key === 'id' || sameValue(mine[key], other[key])) continue;
+        if (key === 'id' || sameFieldValue(mine[key], other[key])) continue;
         const result = pickField(ancestor ? ancestor[key] : undefined, mine[key], other[key]);
         changes.push({
           scope: 'scenario',
           id,
           field: key,
-          from: result.conflict ? 'ours' : sameValue(result.value, other[key]) ? 'theirs' : 'ours',
+          from: result.conflict ? 'ours' : sameFieldValue(result.value, other[key]) ? 'theirs' : 'ours',
           conflict: result.conflict,
           ours: shortValue(mine[key]),
           theirs: shortValue(other[key]),

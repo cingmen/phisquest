@@ -536,6 +536,52 @@ test('pratinjau gabungan menyebut asal tiap perubahan tanpa menulis apa pun', ()
   assert.deepEqual(draftMergePreview({ ours }), { changes: [], conflicts: [], merged: false });
 });
 
+test('urutan red_flags yang berbeda bukan perubahan maupun bentrok', () => {
+  const base = {
+    pack_id: 'kustom',
+    name: 'Pack',
+    description: '',
+    emoji: '🛠️',
+    scenarios: [
+      { id: 'ew-001', body: 'isi', red_flags: ['DOMAIN_PALSU', 'TEKANAN_WAKTU'] },
+    ],
+  };
+  const ours = { ...base, name: 'Nama tab ini' };
+  const theirs = {
+    ...base,
+    scenarios: [
+      { id: 'ew-001', body: 'isi', red_flags: ['TEKANAN_WAKTU', 'DOMAIN_PALSU'] },
+    ],
+  };
+  assert.deepEqual(draftMergePreview({ base, ours, theirs }).changes.map((c) => c.field), [
+    'name',
+  ]);
+  const merged = mergeDraftPack({ base, ours, theirs });
+  assert.deepEqual(merged.conflicts, []);
+  assert.deepEqual(merged.pack.scenarios[0].red_flags, ['DOMAIN_PALSU', 'TEKANAN_WAKTU']);
+
+  // Isi red_flags yang benar-benar berbeda tetap dilaporkan dan diambil dari sisi yang berubah.
+  const changed = draftMergePreview({
+    base,
+    ours,
+    theirs: {
+      ...base,
+      scenarios: [{ id: 'ew-001', body: 'isi', red_flags: ['DOMAIN_PALSU', 'MEMINTA_DATA_SENSITIF'] }],
+    },
+  });
+  const flagChange = changed.changes.find((change) => change.field === 'red_flags');
+  assert.equal(flagChange.from, 'theirs');
+  assert.equal(flagChange.conflict, false);
+  assert.deepEqual(mergeDraftPack({
+    base,
+    ours,
+    theirs: {
+      ...base,
+      scenarios: [{ id: 'ew-001', body: 'isi', red_flags: ['DOMAIN_PALSU', 'MEMINTA_DATA_SENSITIF'] }],
+    },
+  }).conflicts, []);
+});
+
 test('daftar draft menampilkan draft identik dengan label yang jelas', () => {
   const stored = { pack_id: 'office', name: 'Office', scenarios: [{ id: 'of-001' }] };
   const identical = {
