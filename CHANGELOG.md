@@ -3,6 +3,12 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v1.6.11 — 2026-11-04
+
+- Perbandingan field saat menggabung draft kini mengabaikan urutan daftar: `red_flags` yang sama
+  dengan urutan centang berbeda tidak lagi muncul sebagai perubahan di pratinjau maupun sebagai
+  bentrok palsu. Isi daftar yang benar-benar berbeda tetap dilaporkan dan diambil dari sisi yang berubah.
+
 ## v1.6.10 — 2026-11-04
 
 - Banner konflik draft antar-tab kini menawarkan **Pratinjau gabungan**: `draftMergePreview()`
