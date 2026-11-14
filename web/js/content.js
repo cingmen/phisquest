@@ -34,6 +34,7 @@ function contentCandidates() {
 
 const CONTENT_CANDIDATES = contentCandidates();
 let contentBase = null;
+const translationCache = new Map();
 
 /**
  * Tentukan basis URL konten yang tersedia.
@@ -59,11 +60,97 @@ export async function resolveContentBase() {
 }
 
 /**
- * Muat manifest.json.
+ * Muat berkas terjemahan konten untuk locale non-Indonesia.
+ * @param {string} locale - kode locale (mis. "en").
+ * @param {string} directory - basis konten.
+ * @returns {Promise<object|null>} terjemahan atau null untuk "id".
+ */
+async function loadTranslations(locale, directory) {
+  if (!locale || locale === 'id') return null;
+  const key = `${directory}:${locale}`;
+  if (translationCache.has(key)) return translationCache.get(key);
+  try {
+    const response = await fetch(`${directory}i18n/${locale}.json`, { cache: 'no-cache' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!data || !data.scenarios || typeof data.scenarios !== 'object') {
+      throw new Error('struktur terjemahan tidak valid');
+    }
+    translationCache.set(key, data);
+    return data;
+  } catch (error) {
+    throw new PQError(
+      'CONTENT_UNAVAILABLE',
+      `Terjemahan konten '${locale}' gagal dimuat.`,
+    );
+  }
+}
+
+/**
+ * Terapkan terjemahan pack pada nama/deskripsi dan setiap skenario.
+ * @param {object} pack - pack asli (tidak diubah).
+ * @param {object|null} translations - isi i18n/<locale>.json.
+ * @returns {object} salinan pack berbahasa target.
+ */
+export function applyPackTranslation(pack, translations) {
+  if (!translations) return pack;
+  const meta = (translations.packs && translations.packs[pack.pack_id]) || {};
+  const scenarios = (pack.scenarios || []).map((scenario) => {
+    const entry = (translations.scenarios && translations.scenarios[scenario.id]) || null;
+    if (!entry) return scenario;
+    const next = {
+      ...scenario,
+      subject: entry.subject !== undefined ? entry.subject : scenario.subject,
+      body: entry.body || scenario.body,
+      explanation: entry.explanation || scenario.explanation,
+      teach: {
+        ...scenario.teach,
+        ...(entry.teach || {}),
+      },
+    };
+    if (Array.isArray(scenario.options) && entry.options) {
+      next.options = scenario.options.map((option) => ({
+        ...option,
+        text: entry.options[option.id] || option.text,
+      }));
+    }
+    if (scenario.attachment && entry.attachment_name) {
+      next.attachment = { ...scenario.attachment, name: entry.attachment_name };
+    }
+    return next;
+  });
+  return {
+    ...pack,
+    name: meta.name || pack.name,
+    description: meta.description || pack.description,
+    scenarios,
+  };
+}
+
+/**
+ * Terapkan terjemahan nama/deskripsi pack pada manifest.
+ * @param {object} manifest - manifest asli.
+ * @param {object|null} translations - isi i18n/<locale>.json.
+ * @returns {object} salinan manifest berbahasa target.
+ */
+export function applyManifestTranslation(manifest, translations) {
+  if (!translations || !translations.packs) return manifest;
+  return {
+    ...manifest,
+    packs: manifest.packs.map((pack) => ({
+      ...pack,
+      ...(translations.packs[pack.pack_id] || {}),
+    })),
+  };
+}
+
+/**
+ * Muat manifest.json, dengan terjemahan bila locale bukan "id".
  * @param {string|null} [base] - basis konten; default hasil resolveContentBase.
+ * @param {string} [locale] - locale tampilan.
  * @returns {Promise<object>} manifest tervalidasi.
  */
-export async function loadManifest(base = null) {
+export async function loadManifest(base = null, locale = 'id') {
   const directory = base || (await resolveContentBase());
   let data;
   try {
@@ -79,18 +166,19 @@ export async function loadManifest(base = null) {
   if (!Array.isArray(data.packs) || data.packs.length === 0) {
     throw new PQError('CONTENT_INVALID', 'Manifest tidak memuat pack.');
   }
-  return data;
+  return applyManifestTranslation(data, await loadTranslations(locale, directory));
 }
 
 /**
  * Muat satu pack berdasarkan id.
  * @param {string} packId - id pack dari manifest.
  * @param {string|null} [base] - basis konten.
+ * @param {string} [locale] - locale tampilan.
  * @returns {Promise<object>} pack tervalidasi.
  */
-export async function loadPack(packId, base = null) {
+export async function loadPack(packId, base = null, locale = 'id') {
   const directory = base || (await resolveContentBase());
-  const manifest = await loadManifest(directory);
+  const manifest = await loadManifest(directory, locale);
   const entry = manifest.packs.find((pack) => pack.pack_id === packId);
   if (!entry) throw new PQError('CONTENT_INVALID', `Pack '${packId}' tidak ada di manifest.`);
   let data;
@@ -107,20 +195,21 @@ export async function loadPack(packId, base = null) {
   if (!Array.isArray(data.scenarios) || data.scenarios.length === 0) {
     throw new PQError('CONTENT_INVALID', `Pack '${packId}' tidak berisi skenario.`);
   }
-  return data;
+  return applyPackTranslation(data, await loadTranslations(locale, directory));
 }
 
 /**
  * Muat semua pack (mode Campur).
  * @param {string|null} [base] - basis konten.
+ * @param {string} [locale] - locale tampilan.
  * @returns {Promise<object[]>} daftar pack.
  */
-export async function loadAllPacks(base = null) {
+export async function loadAllPacks(base = null, locale = 'id') {
   const directory = base || (await resolveContentBase());
-  const manifest = await loadManifest(directory);
+  const manifest = await loadManifest(directory, locale);
   const packs = [];
   for (const entry of manifest.packs) {
-    packs.push(await loadPack(entry.pack_id, directory));
+    packs.push(await loadPack(entry.pack_id, directory, locale));
   }
   return packs;
 }

@@ -1,0 +1,436 @@
+{
+  "schema_version": "1.0",
+  "locale": "en",
+  "packs": {
+    "campus-gov": {
+      "name": "Campus & Government",
+      "description": "Fake scholarships, graduation invitations, agency letters, and tax messages that ask for personal data."
+    },
+    "ewallet-bank": {
+      "name": "E-Wallet & Banking",
+      "description": "Messages from banks and digital wallets: suspicious transactions, OTPs, refunds, and data updates."
+    },
+    "office": {
+      "name": "Office Life",
+      "description": "Work email, vendor invoices, attendance SMS, and odd requests from a boss who suddenly appears."
+    },
+    "shopping-courier": {
+      "name": "Shopping & Couriers",
+      "description": "Order notifications, held packages, couriers asking for extra fees, and refunds that look too sweet."
+    }
+  },
+  "scenarios": {
+    "cg-001": {
+      "subject": "🎓 CONGRATULATIONS! You Have Won a Rp12,000,000 Scholarship - Confirm Today",
+      "body": "Dear Student,\n\nBased on our system selection, you have been chosen to receive a Rp12,000,000 merit scholarship. To disburse the funds, provide your bank account number, national ID number (NIK), and a photo of your ID card through the form below within 24 hours. If you do not confirm today, the funds will be transferred to a reserve recipient.\n\nForm: http://kampusnusantara-scholarship.example/daftar\n\nScholarship Committee",
+      "explanation": "The official campus domain is kampusnusantara.example, not kampusnusantara-scholarship.example. Real scholarships never ask for an ID-card photo through a sudden form with a 24-hour deadline.",
+      "teach": {
+        "tip": "Campus scholarships are announced through the academic portal, not through a sudden email containing a form.",
+        "verify_how": "Check the announcement on the campus academic portal or ask the student affairs office in person."
+      }
+    },
+    "cg-002": {
+      "explanation": "Government agencies do not deactivate national ID records by SMS with a link and a 24-hour threat. The domain sibantar-datalkp.example is not sibantar.example, and the link uses http, so it is not secure.",
+      "body": "SIBANTAR: your national ID data has a problem and will be deactivated within 24 hours. Check your data immediately at http://sibantar-datalkp.example/cek or contact us. Ignore this message if you do not need our services.",
+      "teach": {
+        "tip": "Never send your national ID number by SMS or open links from unknown senders.",
+        "verify_how": "Check the service on the agency's official site that you type yourself, or visit the service office."
+      },
+      "options": {
+        "A": "Click the link now so your ID record is not deactivated",
+        "B": "Reply to the SMS with your ID number so an officer can fix the data",
+        "C": "Ignore and delete it; if unsure, check through the agency's official channel",
+        "D": "Forward it to family so they are also alert"
+      }
+    },
+    "cg-003": {
+      "subject": "Academic Calendar for the 2026/2027 Even Semester",
+      "body": "Hello Sari,\n\nThe academic calendar for the 2026/2027 even semester has been published. Course plan registration opens 12–16 January 2027 and classes begin 2 February 2027.\n\nFull calendar: https://kampusnusantara.example/kalender\n\nAcademic Office",
+      "explanation": "The sender domain and the link are both kampusnusantara.example over https. The information is administrative, addresses the recipient by name, and does not request personal data.",
+      "teach": {
+        "tip": "Official academic announcements always come from the campus domain and never ask for personal documents.",
+        "verify_how": "Open the campus academic portal yourself to confirm the important dates."
+      }
+    },
+    "cg-004": {
+      "explanation": "Official campus payments go to an institutional account, not a committee member's personal account. The threat of missing the procession and the push to avoid the app are pressure tactics to make victims rush.",
+      "body": "Hello freshers, I am on the graduation committee. Please transfer the Rp450,000 gown and photo fee today to my personal account 8820-1122-3344 under Rudi Hartono so your name enters the participant list. Anyone who has not paid by tomorrow morning cannot join the procession. The app is a hassle, just transfer directly to this account.",
+      "teach": {
+        "tip": "Campus fees are always paid through official channels with a receipt in the institution's name.",
+        "verify_how": "Confirm with student affairs or the graduation secretariat using the campus's official number."
+      }
+    },
+    "cg-005": {
+      "explanation": "The domain sibantar-pajak.example imitates the agency name, while the official channel is sibantar.example. The threat of legal referral and the 24-hour deadline are pressure patterns designed to trigger a payment.",
+      "body": "SIBANTAR: an administrative arrears of Rp1,150,000 has been detected under your name. Settle the payment within 24 hours or your file will be referred to the legal department. Pay at http://sibantar-pajak.example/bayar",
+      "teach": {
+        "tip": "Official bills can always be checked on the agency's official channel, not through an SMS link.",
+        "verify_how": "Check the bill on the agency's official site or visit the service counter before paying."
+      }
+    },
+    "cg-006": {
+      "subject": "Overdue Library Books - Please Resolve",
+      "body": "Hello Student,\n\nAccording to our records, you are 8 days late returning two books. Please open the attachment for the fine details and payment instructions.\n\nThank you,\nLibrary",
+      "explanation": "A .pdf.js filename is a script disguised as a PDF that can steal data when opened. The domain kampusnusantara-lib.example is not kampusnusantara.example, and the generic greeting indicates a mass message.",
+      "teach": {
+        "tip": "Attachments with double extensions such as .pdf.js are never safe to open.",
+        "verify_how": "Check your loan status on the campus library portal or visit the library desk in person."
+      },
+      "options": {
+        "A": "The subject mentioning an overdue bill",
+        "B": "The attachment Tagihan-Pustaka.pdf.js",
+        "C": "The number of books mentioned, two books",
+        "D": "The greeting \"Hello Student\" without a name"
+      }
+    },
+    "cg-007": {
+      "explanation": "The message only announces incoming funds, with no link and no request for data. The place to check is the official BankNusa app.",
+      "body": "The KampusNusantara scholarship of Rp6,000,000 has been deposited into your account. Check the transaction history in the BankNusa app. We never ask for your PIN or OTP code by SMS.",
+      "teach": {
+        "tip": "A legitimate incoming-funds notice does not ask you to do anything.",
+        "verify_how": "Check the transaction history in the official BankNusa app after receiving a message like this."
+      }
+    },
+    "cg-008": {
+      "subject": "New Student SSO Account Activation",
+      "body": "Hello Sari,\n\nYour student SSO account has been created. Before it can be used, it must be activated by changing the initial password. Activation can only be done through the official campus portal, not by replying to this email.\n\nPortal: https://kampusnusantara.example/aktivasi\n\nIf you did not register, ignore this message.\n\nAcademic Helpdesk",
+      "explanation": "This message uses the official campus domain and explicitly forbids sending a password by email. The best action is to open the portal yourself so you do not depend on any link.",
+      "teach": {
+        "tip": "Account activation is always done on the official portal, not by replying to email.",
+        "verify_how": "Type the campus portal address directly in your browser, then follow the official activation guide."
+      },
+      "options": {
+        "A": "Reply with your new password so the account is activated immediately",
+        "B": "Open the campus portal you type yourself, then activate the account there",
+        "C": "Ask the helpdesk to send a temporary password in the next email",
+        "D": "Forward the email to a friend so they use the link"
+      }
+    },
+    "cg-009": {
+      "subject": "Fourth-Quarter Public Service Information Update",
+      "body": "Hello Resident,\n\nWe are informing you of the fourth-quarter 2026 public service list update. There is no personal data you need to send by email. Services remain available at the nearest service office or through the portal https://sibantar.example/pengumuman.\n\nRegards,\nSIBANTAR",
+      "explanation": "The sender domain and link are both sibantar.example over https. The message is informational, with no data request and no urgent deadline.",
+      "teach": {
+        "tip": "Good official messages do not ask for personal documents by email.",
+        "verify_how": "Open the agency portal you type yourself to check the service information."
+      }
+    },
+    "cg-010": {
+      "explanation": "Official scholarships are never disbursed through a private chat that asks for an ID-card photo and national ID number. The promise of a quota for the first five people is a classic scam pressure tactic to stop victims from thinking.",
+      "body": "Congratulations! You have been selected for an additional Rp3,500,000 scholarship. To disburse it, send a photo of your ID card, your national ID number, and your bank account number to this chat right now. The quota is only for the first five people, so do not delay.",
+      "teach": {
+        "tip": "Never send an ID-card photo through chat; that document is enough to open an account in your name.",
+        "verify_how": "Ask the campus student affairs office or check the official scholarship announcement."
+      }
+    },
+    "ew-001": {
+      "subject": "⚠️ Suspicious Transaction of Rp2,400,000 - Account Will Be Blocked",
+      "body": "Dear Valued Customer,\n\nWe detected a suspicious transaction of Rp2,400,000 on your account. Verify your identity within 24 HOURS or your account will be PERMANENTLY BLOCKED and a Rp500,000 fine will be charged.\n\nVerify now: http://banknusa-secure.example/verifikasi\n\nSincerely,\nBankNusa Security Team",
+      "explanation": "BankNusa's real domain is banknusa.example, not banknusa-secure.example. The 24-hour deadline and the threat of a fine are classic pressure tactics to make victims panic. The link uses http, not https.",
+      "teach": {
+        "tip": "Emails about account problems can always wait: close the message, then open the official mobile banking app.",
+        "verify_how": "Check the sender address and the link domain letter by letter; complete transactions in the official app, not through a link in an email."
+      }
+    },
+    "ew-002": {
+      "explanation": "DompetKu never asks for an OTP code by SMS or WhatsApp; that code is the key to your account. The domain dompetku-kyc.example is not the official dompetku.example, and the link does not use https.",
+      "body": "DompetKu: a login from a new device was detected on your account. Verify within 24 hours or your balance will be temporarily frozen. Send the 6-digit OTP code to this number, or open http://dompetku-kyc.example/otp",
+      "teach": {
+        "tip": "An OTP code is only for you—no official officer may ask for it.",
+        "verify_how": "Open the DompetKu app directly and check the device history; if unsure, call the call center inside the app."
+      }
+    },
+    "ew-003": {
+      "subject": "Account Statement for October 2026",
+      "body": "Hello Sari,\n\nYour account statement for October 2026 is available. You can view the summary after signing in to the BankNusa app.\n\nOpen the app or visit https://banknusa.example/ringkasan to see transaction details and savings interest.\n\nThank you,\nBankNusa",
+      "explanation": "The sender domain and link are both banknusa.example over https. The message names the account holder and does not request any sensitive data.",
+      "teach": {
+        "tip": "Official messages may contain links—what matters is that the domain exactly matches the official domain.",
+        "verify_how": "Type the bank address yourself in the browser or open the official app; do not rely only on the email link."
+      }
+    },
+    "ew-004": {
+      "subject": "🎉 Rp1,850,000 Premium Refund Awaiting Confirmation",
+      "body": "Dear Customer,\n\nCongratulations! You have been selected to receive a Rp1,850,000 premium refund due to an overpayment last year. The funds can only be disbursed if confirmed within 24 hours; after that they will be transferred to another participant.\n\nConfirm at http://asurkita-id.example/refund/klaim\n\nAsurKita Service Team",
+      "explanation": "AsurKita's official domain is asurkita.example; asurkita-id.example merely imitates it with a hyphen. Premium refunds are never announced by a sudden email with a 24-hour limit, and the link is http.",
+      "teach": {
+        "tip": "Money that is genuinely yours will not expire in 24 hours.",
+        "verify_how": "Call AsurKita from the official site or meet an official agent, then ask whether there is a premium refund under your name."
+      }
+    },
+    "ew-005": {
+      "explanation": "This message is normal: no link, no data request, and it reminds you not to share your PIN. The safest follow-up is inside the official app.",
+      "body": "Hello Sari, your DompetKu account was just accessed from an Android device in Bandung at 08:04. If this was not you, secure the account through the DompetKu app. We never ask for your PIN or OTP code by chat.",
+      "teach": {
+        "tip": "Genuine security notifications always direct you to the app, not to a chat reply.",
+        "verify_how": "Check the active device list in the app and change your PIN if you see a device you do not recognize."
+      },
+      "options": {
+        "A": "Reply with your 6-digit PIN so an officer can block the unknown device",
+        "B": "Open the official DompetKu app, check active devices, then change the PIN there",
+        "C": "Click the link an admin will send later in chat",
+        "D": "Ignore it; a login from another device is not a problem"
+      }
+    },
+    "ew-006": {
+      "explanation": "Banks never ask for a PIN, and the sender number is not BankNusa's official number. The link uses a raw IP address over http, a hallmark of credential-stealing pages.",
+      "body": "NOTICE: a transfer of Rp7,500,000 to account 7712xxxx under ANDI is awaiting your confirmation. Cancel it now by sending your PIN, or contact 0888-1020-3344. Check status: http://103.22.14.8/btl",
+      "teach": {
+        "tip": "Your PIN is only for you; a real bank officer will never ask for it.",
+        "verify_how": "Check the transaction in the official app or call the call center number printed on your card, not the number in the message."
+      },
+      "options": {
+        "A": "Send the PIN by SMS so the transfer is cancelled",
+        "B": "Call back 0888-1020-3344 to confirm",
+        "C": "Open the official BankNusa app or call the call center on the back of your ATM card",
+        "D": "Forward the SMS to the family group so everyone is alert"
+      }
+    },
+    "ew-007": {
+      "explanation": "It only confirms a transaction, names the account holder, has no link, and asks for no data. All follow-up is directed to the official app.",
+      "body": "Hello Sari, your payment of Rp150,000 to TokoKilat succeeded. Your DompetKu balance is now Rp412,500. Transaction details are available in the History menu of the DompetKu app.",
+      "teach": {
+        "tip": "A calm transaction confirmation without a link is the pattern of an official message.",
+        "verify_how": "Compare the amount and balance in the DompetKu History menu after receiving a message like this."
+      }
+    },
+    "ew-008": {
+      "subject": "Your New Policy Has Been Issued",
+      "body": "Dear Customer,\n\nThank you for renewing your AsurKita policy. Policy number AS-2026-1188 is active from 1 November 2026 for 12 months. The e-certificate is attached; please keep it as proof of membership.\n\nRegards,\nAsurKita Customer Service",
+      "explanation": "The .pdf.exe attachment is a program file disguised as a PDF; that is the most dangerous part. The domain asurkita-polis.example is also not asurkita.example, even though the message looks polished.",
+      "teach": {
+        "tip": "A double extension such as .pdf.exe means the file will run when opened.",
+        "verify_how": "Do not open the attachment; check the policy status in the AsurKita app or call the call center you contact yourself."
+      },
+      "options": {
+        "A": "The sender address cs@asurkita-polis.example",
+        "B": "The attachment named polis-baru.pdf.exe",
+        "C": "The greeting \"Dear Customer\" without a full name",
+        "D": "The policy number AS-2026-1188"
+      }
+    },
+    "ew-009": {
+      "explanation": "The message only sends a code that belongs to the player and asks for nothing. There is no link, and the warning not to share the code is itself a sign of an official message.",
+      "body": "Your BankNusa OTP code is 482913. It is valid for 3 minutes for a Rp150,000 transaction. DO NOT share this code with anyone, including anyone claiming to be a BankNusa officer.",
+      "teach": {
+        "tip": "An official OTP SMS gives you a code; it never asks you for one.",
+        "verify_how": "Match the transaction with the one you are making; if you never made a transaction, call the call center number on your card."
+      }
+    },
+    "ew-010": {
+      "subject": "MANDATORY CUSTOMER DATA UPDATE BEFORE 30 NOVEMBER!!!",
+      "body": "Dear Valued Customer,\n\nWe from the customer verification department urge you to UPDATE your data to keep transactions running smoothly. Please send your national ID number, ATM card number, and a photo of your ID card through the available form.\n\nUpdate form: http://verifikasi-nasabah.id/form\n\nThank you for your cooperation.",
+      "explanation": "Banks never ask for your national ID number, card number, or ID-card photo by email and online form. The domain verifikasi-nasabah.id is not a BankNusa domain, and the letter is stiff with excessive capitals and an urgent deadline.",
+      "teach": {
+        "tip": "Data updates can always be done at a branch or in the official app, not through an email form.",
+        "verify_how": "Visit a branch or open the BankNusa app; never upload an ID-card photo to a link sent in a message."
+      }
+    },
+    "of-001": {
+      "subject": "YOUR PASSWORD EXPIRES TODAY - RESET NOW",
+      "body": "IMPORTANT NOTICE\n\nTo all employees, your office email password will EXPIRE today at 17:00. To avoid losing access, reset your password through the following portal before that time. Accounts that are not reset will be automatically deactivated by the system.\n\nReset password: http://portal-absensi-kantor.top/reset\n\nIT Admin",
+      "explanation": "Office IT does not use the domain portal-absensi-kantor.top and does not disable accounts just because a password was not reset. The link is http, and the tone is urgent with excessive capitals and inconsistent spelling.",
+      "teach": {
+        "tip": "Password resets always start from the internal portal you type yourself, not from an email link.",
+        "verify_how": "Confirm with the IT team through an internal office channel before changing any password."
+      }
+    },
+    "of-002": {
+      "subject": "Bank Account Change for Invoice KC-2026-8841 - Payment Delayed",
+      "body": "Hello Finance Team,\n\nPlease note that there is a change to our company's bank account. Please transfer invoice KC-2026-8841 for Rp42,500,000 to the new account: 5566-7788-9900 (BankNusa) under PT Karya Logistik Prima. Payments to the old account will be rejected by the system.\n\nPlease complete this before the weekend.\n\nBilling Department",
+      "explanation": "The domain kargocepat-tagihan.example is not the official kargocepat.example, and changing bank details by email is a classic invoice scam. Never verify by replying to the email—the scammer controls that address.",
+      "teach": {
+        "tip": "A bank account change must be confirmed by phone using the vendor number you already have on file.",
+        "verify_how": "Contact KargoCepat finance using the contract or official site, then ask for written confirmation before transferring."
+      },
+      "options": {
+        "A": "Transfer to the new account immediately because the invoice is urgent",
+        "B": "Verify the account number with the vendor using the official contact you already have",
+        "C": "Reply to the email asking whether the account really changed",
+        "D": "Forward the email to the whole finance team as information"
+      }
+    },
+    "of-003": {
+      "explanation": "The message only announces a delivery, with no link and no request for data. Follow-up is in the official TokoKilat Bisnis account.",
+      "body": "Business order TK-88213 for your office has been shipped. A KargoCepat courier will contact the recipient at the office address tomorrow morning. Order details can be viewed in your TokoKilat Bisnis account.",
+      "teach": {
+        "tip": "A calm delivery notification without a link is a normal message.",
+        "verify_how": "Match the order number in your TokoKilat Bisnis account before preparing to receive the goods."
+      }
+    },
+    "of-004": {
+      "explanation": "A gift-voucher request through a personal WhatsApp number is a classic CEO scam; voucher codes are as valuable as cash. The urgent tone, the request for secrecy, and the unknown number are three reinforcing warning signs.",
+      "body": "Hello Budi, I am out of town and cannot take calls. Please buy 10 x Rp500,000 gift vouchers for an important client today, I will reimburse you. Send the voucher codes to this number, and do not tell the other team yet. This is confidential.",
+      "teach": {
+        "tip": "Any money-related instruction from a boss must be verified through office channels, not a personal chat.",
+        "verify_how": "Call the director's office number directly or ask the secretariat before buying anything."
+      }
+    },
+    "of-005": {
+      "subject": "October 2026 Employee Payslips Are Available",
+      "body": "Hello Budi,\n\nYour office payroll for October 2026 has been processed. Payslips can be downloaded after you sign in to the payroll portal through the BankNusa app.\n\nDetails: https://banknusa.example/payroll\n\nThis message does not ask for your password, PIN, or OTP code.\n\nBankNusa",
+      "explanation": "The sender domain and link are both banknusa.example over https. The message names the recipient, does not request sensitive data, and explicitly says so.",
+      "teach": {
+        "tip": "Official payslip messages never ask for a password or OTP.",
+        "verify_how": "Download the payslip from the app or official payroll portal, not from a link in a message you do not recognize."
+      }
+    },
+    "of-006": {
+      "subject": "November Coordination Meeting Attendance List",
+      "body": "Dear Colleague,\n\nAttached is the November coordination meeting attendance list for you to review. Please open it in a browser so the table displays properly, then reply to confirm if it is correct.\n\nThank you,\nSecretariat",
+      "explanation": "An .html attachment that must be opened in a browser can run a session-stealing script; normal meeting documents are PDFs. The domain lapakria-share.example is not lapakria.example, and the message does not name the recipient.",
+      "teach": {
+        "tip": "Office documents are never .html, .js, or .exe files.",
+        "verify_how": "Request the file again through an internal office channel and open it only from official company storage."
+      },
+      "options": {
+        "A": "The greeting \"Dear Colleague\" without the recipient's name",
+        "B": "The attachment Daftar-Hadir-November.html that must be opened in a browser",
+        "C": "The subject mentioning the November coordination meeting",
+        "D": "The request to reply and confirm after checking"
+      }
+    },
+    "of-007": {
+      "subject": "2027 Employee Health Insurance Benefit Summary",
+      "body": "Hello Budi,\n\nAttached is the employee health insurance benefit summary for 2027, including hospitalization limits and dental services. There is no action you need to take now; full details are available at https://asurkita.example/klaim after you sign in with your office account.\n\nRegards,\nAsurKita Corporate",
+      "explanation": "The sender domain and link match asurkita.example, and there is no data request or urgent deadline. A message that names the recipient and states no action is needed is the pattern of official information.",
+      "teach": {
+        "tip": "Insurance benefit information does not require your personal data by email.",
+        "verify_how": "Sign in to the office corporate insurance portal to see benefit details, not through an unknown link."
+      }
+    },
+    "of-008": {
+      "explanation": "The courier only arranges a delivery time, with no link and no request for data or payment. This is a normal logistics communication pattern.",
+      "body": "Good morning, I am a KargoCepat courier. There are 2 packages for your office and I will deliver them around 11:00. Please have a recipient ready in the lobby. If that time does not work, reply to this message.",
+      "teach": {
+        "tip": "A real courier does not ask for extra fees through a personal chat.",
+        "verify_how": "Match the tracking number in the KargoCepat app if there is an unexpected payment request."
+      }
+    },
+    "of-009": {
+      "explanation": "HR does not manage attendance through a shortener link from a personal number, especially with a threat to delay salaries. The bit.ly link hides its real destination and is designed to trigger panic.",
+      "body": "Employees who have not filled in November attendance are asked to complete their attendance data through the following link before 12:00 today; otherwise this month's salary will be delayed. Enter your data at http://bit.ly/absensi-nov",
+      "teach": {
+        "tip": "A short link from an unknown number is never worth clicking for HR matters.",
+        "verify_how": "Open the official office attendance system and ask HR through the internal number you already have."
+      },
+      "options": {
+        "A": "Open the link and fill in attendance before 12:00",
+        "B": "Reply to the SMS with your employee number so the admin can update the data",
+        "C": "Ignore the link; open the attendance system you normally use and confirm with HR",
+        "D": "Forward the SMS to coworkers so they also fill it in quickly"
+      }
+    },
+    "of-010": {
+      "explanation": "Banks do not move payroll accounts by SMS with a link and a 24-hour deadline. The domain banknusa-payroll.example is not banknusa.example, and the message threatens that salaries will not be processed to make victims act fast.",
+      "body": "Dear Customer, your office payroll account will be moved to a new branch. Confirm your account data within 24 hours or employee salaries cannot be processed this month. Confirm: http://banknusa-payroll.example/ubah",
+      "teach": {
+        "tip": "A payroll account change is only valid if announced through official bank channels and the office finance department.",
+        "verify_how": "Ask the office finance department and check the transaction history in the official BankNusa app, not through an SMS link."
+      }
+    },
+    "sc-001": {
+      "explanation": "KargoCepat's official domain is kargocepat.example; kargocepat-resi.example merely imitates the name. Couriers do not charge storage fees through http links, especially with a threat that the package will be returned within 24 hours.",
+      "body": "Your package KARGO-7712 is being held at the warehouse because the address is incomplete. Confirm within 24 hours or the package will be returned to the sender. Complete your address and pay the Rp15,000 storage fee at http://kargocepat-resi.example/lacak",
+      "teach": {
+        "tip": "Always track packages from the courier's official app or site, not from an SMS link.",
+        "verify_how": "Open the KargoCepat app and enter your own order number to see the real status."
+      }
+    },
+    "sc-002": {
+      "explanation": "Import duties are paid to the state through official channels, not to a courier's personal account. Asking you to avoid the app and pressuring you to transfer quickly are signs of fraud.",
+      "body": "Hi, I am the courier delivering your package. It was charged a Rp265,000 import duty because it came from abroad. Transfer to my account 7712-3344-5566 under Andi Saputra, and I will deliver it today. Do not use the app, the process is a hassle.",
+      "teach": {
+        "tip": "Official delivery fees never go to a private individual's account.",
+        "verify_how": "Ask KargoCepat's call center about the status and fees, or check the app before paying anything."
+      }
+    },
+    "sc-003": {
+      "explanation": "The message only announces a delivery, with no link, no extra fee, and no data request. The reference is the Orders menu in the official app.",
+      "body": "Order TK-99120 has been shipped via KargoCepat. Estimated arrival 3 November 2026. Status and tracking number can be viewed in the Orders menu of the TokoKilat app.",
+      "teach": {
+        "tip": "A normal delivery notification does not ask for extra payment.",
+        "verify_how": "Match the order number and tracking number in the TokoKilat app before confirming anything."
+      }
+    },
+    "sc-004": {
+      "subject": "Your Shopping Cashback This Month Has Arrived",
+      "body": "Hello Sari,\n\nYour October shopping cashback of Rp12,000 has been added to your TokoKilat balance. The balance is valid for 90 days and is automatically used on your next purchase. There is no data you need to send.\n\nDetails are in the Balance menu of the TokoKilat app.",
+      "explanation": "The sender uses the official tokokilat.example domain and asks for no data. The safe action is to check the balance in the app, not to send personal information by email.",
+      "teach": {
+        "tip": "Legitimate cashback always appears in the app balance, not through a data request.",
+        "verify_how": "Open the TokoKilat app and check the Balance menu and transaction history, without sending any data."
+      },
+      "options": {
+        "A": "Keep the email and check the balance in the TokoKilat Balance menu",
+        "B": "Reply with your bank account number so the cashback can be disbursed",
+        "C": "Report it as phishing because it mentions a money amount",
+        "D": "Send your personal data to promo@tokokilat.example for a fast claim"
+      }
+    },
+    "sc-005": {
+      "subject": "Your Package Could Not Be Delivered - Please Confirm Address",
+      "body": "Dear Valued Customer,\n\nPackage KARGO-5521 could not be delivered because the address was not found. Please confirm your address and phone number through the following link so the package can be redelivered today.\n\nConfirm: http://kargocepat-resmi.example/konfirmasi\n\nThank you,\nCustomer Service",
+      "explanation": "KargoCepat uses kargocepat.example, not kargocepat-resmi.example, which adds the word official. The generic greeting and an http link with a today deadline indicate a mass scam message.",
+      "teach": {
+        "tip": "Extra words such as -resmi or -secure in a domain are an imitation tactic.",
+        "verify_how": "Open the KargoCepat app and check the order number; call the official call center if the status really has a problem."
+      }
+    },
+    "sc-006": {
+      "subject": "Corporate Shipping Invoice KC-2026-9911",
+      "body": "Hello Sari,\n\nHere is the corporate shipping invoice for October 2026 for Rp3,120,000. Shipping and tax details are in the attached PDF. Payment can be made through your billing account at https://kargocepat.example/invoice/KC-2026-9911.\n\nThank you,\nKargoCepat Billing Department",
+      "explanation": "All references use the official kargocepat.example domain over https, the attachment is a normal PDF, and no password is requested. A large amount alone is not a reason to accuse phishing.",
+      "teach": {
+        "tip": "Even a normal PDF attachment should be checked against the sender's domain.",
+        "verify_how": "Compare the invoice number with the shipping data in your corporate account before paying."
+      }
+    },
+    "sc-007": {
+      "subject": "Payment Receipt Successful - Order TK-99120",
+      "body": "Hi,\n\nWe have received the payment for order TK-99120 for Rp249,000. Please open the attached receipt to see the transaction details and print it as proof.\n\nThank you for shopping.",
+      "explanation": "The double extension .html.exe makes the file run as a program instead of a receipt. The domain tokokilat-payment.example is not tokokilat.example, and the nonstandard spelling adds to the oddity.",
+      "teach": {
+        "tip": "Shopping receipts are never executable files.",
+        "verify_how": "Check the order history in the TokoKilat app; official payment proof can always be downloaded there."
+      },
+      "options": {
+        "A": "The subject mentioning order number TK-99120",
+        "B": "The attachment struk-pembayaran.html.exe",
+        "C": "The Rp249,000 amount, which is normal for online shopping",
+        "D": "The greeting \"Hi\" at the start of the message"
+      }
+    },
+    "sc-008": {
+      "explanation": "The seller only confirms the order and shipping schedule, with no link and no request to pay outside the app. Payment is described as already recorded in LapakRia.",
+      "body": "Hi, I have packed your batik order. The requested color is in stock, and I will ship it tomorrow morning via KargoCepat. If you have a special request for gift packaging, let me know before 8 o'clock. Payment is already recorded in the app, thank you.",
+      "teach": {
+        "tip": "A transaction that stays inside the marketplace app is the safe pattern.",
+        "verify_how": "Make sure the order and payment status remain recorded in the LapakRia app, not only in chat."
+      }
+    },
+    "sc-009": {
+      "explanation": "An OTP code is the key to your account; no official customer service asks for it by SMS. The sender number is also not TokoKilat's official channel, so verification must happen in the app.",
+      "body": "Hello, we are TokoKilat customer service. Your order was held by the system because a duplicate payment was detected. To cancel one transaction, we need the OTP code just sent to your SMS. Please reply with that code now so the funds are not held.",
+      "teach": {
+        "tip": "An OTP is only for you; any request for an OTP is fraud.",
+        "verify_how": "Open the TokoKilat app to see the order status, then contact customer service inside the app if needed."
+      },
+      "options": {
+        "A": "Reply with the OTP so the duplicate payment is cancelled immediately",
+        "B": "Ask the officer to resend the OTP, then send the new code",
+        "C": "Do not share the code; check the order status in the TokoKilat app and contact official customer service there",
+        "D": "Ignore the message and block every TokoKilat number"
+      }
+    },
+    "sc-010": {
+      "subject": "Rp1,250,000 Refund Approved - Claim Within 24 Hours",
+      "body": "Dear Valued Customer,\n\nYour refund request for Rp1,250,000 has been APPROVED. The funds will be sent after you verify the following data: full name, bank account number, national ID number, and a photo of your ID card. The claim is valid for only 24 hours; after that the funds return to the platform's treasury.\n\nClaim now: http://lapakria-refund.example/klaim\n\nRefund Team",
+      "explanation": "Marketplaces never ask for a national ID number and ID-card photo to issue a refund; the money returns to the account already on file. The domain lapakria-refund.example is not lapakria.example, the link is http, and the 24-hour deadline is artificial pressure.",
+      "teach": {
+        "tip": "Refunds always return to the registered account, with no ID-card upload.",
+        "verify_how": "Check the refund status in the Orders menu of the LapakRia app and never upload identity documents to any link."
+      }
+    }
+  }
+}

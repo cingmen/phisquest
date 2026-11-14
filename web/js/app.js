@@ -13,6 +13,7 @@ import {
   nowIso,
   startSession,
 } from './engine.js';
+import { translateUi } from './i18n.js';
 import { makeEntry } from './leaderboard.js';
 import {
   PACK_PREFIX,
@@ -155,6 +156,7 @@ function cacheDom() {
 function showToast(message) {
   if (!dom.toast) return;
   dom.toast.textContent = message;
+  translateUi(state.settings.locale || 'id', dom.toast);
   dom.toast.classList.add('toast--visible');
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => {
@@ -289,6 +291,7 @@ function render() {
       message: state.onlineMessage,
     });
   }
+  translateUi(state.settings.locale || 'id');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -303,18 +306,25 @@ function showScreen(name) {
 async function getPack(packId) {
   const custom = state.customPacks.find((pack) => pack.pack_id === packId);
   if (custom) return custom;
-  if (packCache.has(packId)) return packCache.get(packId);
-  const pack = await loadPack(packId);
-  packCache.set(packId, pack);
+  const cacheKey = `${state.settings.locale || 'id'}:${packId}`;
+  if (packCache.has(cacheKey)) return packCache.get(cacheKey);
+  const pack = await loadPack(packId, null, state.settings.locale || 'id');
+  packCache.set(cacheKey, pack);
   return pack;
 }
 
 /** Mulai sesi baru untuk pack tertentu atau mode Campur. */
 async function playPack(packId, mode = 'classic', count = QUESTIONS_PER_SESSION) {
   try {
-    const packs = packId ? [await getPack(packId)] : await loadAllPacks();
+    const packs = packId
+      ? [await getPack(packId)]
+      : await loadAllPacks(null, state.settings.locale || 'id');
     state.lastPackId = packId;
-    state.packLabel = packId ? packs[0].name : `Campur Semua · ${count} soal`;
+    state.packLabel = packId
+      ? packs[0].name
+      : state.settings.locale === 'en'
+        ? `Mixed · ${count} questions`
+        : `Campur Semua · ${count} soal`;
     state.session = startSession(packs, {
       count,
       progress: state.progress,
@@ -1616,6 +1626,11 @@ function handleClick(event) {
     showScreen('menu');
   } else if (action === 'share-card') {
     shareScoreCard();
+  } else if (action === 'set-locale') {
+    const locale = target.dataset.locale === 'en' ? 'en' : 'id';
+    state.settings = { ...state.settings, locale };
+    saveSettings(state.settings);
+    window.location.reload();
   } else if (action === 'save-online') {
     saveOnlineSettings();
   } else if (action === 'online-refresh') {
@@ -1800,14 +1815,15 @@ async function boot() {
   state.onlineConfig = onlineConfig();
   state.onlinePlayerId = loadOnlinePlayer();
   state.settings = loadSettings();
-  if (state.settings.locale !== 'id') {
-    state.settings = { ...state.settings, locale: 'id' };
-    saveSettings(state.settings);
-  }
+  document.documentElement.lang = state.settings.locale === 'en' ? 'en' : 'id';
+  document.title =
+    state.settings.locale === 'en'
+      ? 'PhishQuest — Spot the bait before you get hooked.'
+      : 'PhishQuest — Kenali umpan sebelum kamu terhook.';
   updateStats();
   render();
   try {
-    state.manifest = await loadManifest();
+    state.manifest = await loadManifest(null, state.settings.locale || 'id');
   } catch (error) {
     handleError(error);
     dom.screens.menu.innerHTML = `<section class="card">
