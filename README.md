@@ -223,6 +223,12 @@ Endpoint: `POST /v1/scores` (HMAC + Idempotency-Key, rate limit 60/jam/IP),
 `GET /v1/stats/global`, dan `DELETE /v1/players/{id}`. Statis GitHub Pages tetap berjalan
 tanpa backend; skor lokal adalah default dan pengiriman online bersifat opt-in.
 
+Untuk mengaktifkan di web, isi `meta[name="phishquest-api"]` dengan basis API (misalnya
+`https://api.example/v1`) dan `meta[name="phishquest-hmac"]` dengan rahasia yang sama dengan
+`PQ_HMAC_SECRET`. Lalu buka **Tentang → Papan skor online**, isi nickname, dan centang pengiriman.
+Kosongkan kedua meta tag untuk mematikan fitur sepenuhnya. Rahasia HMAC ikut terlihat di browser;
+itu hanya rem anti-spam, bukan autentikasi.
+
 ## Etika & legal
 
 > PhishQuest adalah simulasi edukasi. Semua email, brand, dan domain di dalamnya fiktif.

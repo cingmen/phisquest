@@ -19,7 +19,7 @@
 | Konten skenario | File JSON statis | `content/` di repo (dibaca fetch web / filesystem CLI) | v1.0 |
 | Progres web | `localStorage` browser | Key `pq_progress_v1`, `pq_settings_v1` | v1.0 |
 | Progres CLI | File JSON | `~/.phishquest/progress.json`, `~/.phishquest/settings.json` | v1.0 |
-| Leaderboard online | SQLite (backend FastAPI) | Server v2 — **tidak ada di v1.0** | v2.0 |
+| Leaderboard online | SQLite (backend FastAPI) | `server/` — opsional, di luar Pages | v2.0 |
 
 ```mermaid
 flowchart LR
@@ -39,6 +39,7 @@ flowchart LR
 |-----|-----|----------------|
 | `pq_progress_v1` | Objek Progress (§2.2) | < 10 KB |
 | `pq_settings_v1` | Objek Settings (§2.3) | < 1 KB |
+| `pq_online_player_v1` | `{ "player_id": UUID }` setelah kirim skor online pertama | < 100 B |
 
 Aturan: prefix `pq_` + nama + `_v1` (versi major). Key baru minor tetap dipakai; key baru major memicu migrasi (§8).
 
@@ -100,6 +101,7 @@ Aturan: prefix `pq_` + nama + `_v1` (versi major). Key baru minor tetap dipakai;
 | `sound` | bool | `true` | Efek suara (v1.1 memakai; flag disiapkan) |
 | `reduced_motion` | bool | `false` | Override animasi (default mengikuti OS) |
 | `nickname` | string ≤ 16 | `""` | Dipakai leaderboard v2; boleh kosong |
+| `online_leaderboard` | bool | `false` | Opt-in mengirim skor ke server online |
 
 ### 2.4 Contoh Isi Lengkap
 

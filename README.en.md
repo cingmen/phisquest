@@ -179,6 +179,12 @@ Endpoints: `POST /v1/scores` (HMAC + Idempotency-Key, 60/hour/IP), `GET /v1/lead
 `GET /v1/stats/global`, and `DELETE /v1/players/{id}`. The GitHub Pages build still runs without a
 backend; local scores remain the default and online submission is opt-in.
 
+To enable it on the web, set `meta[name="phishquest-api"]` to the API base (for example
+`https://api.example/v1`) and `meta[name="phishquest-hmac"]` to the same `PQ_HMAC_SECRET`. Then open
+**About → Online leaderboard**, enter a nickname, and opt in. Leave both meta tags empty to disable
+the feature entirely. The HMAC secret is visible in the browser; it is a spam brake, not
+authentication.
+
 ## Ethics & legal
 
 > PhishQuest is an educational simulation. Every email, brand, and domain in it is

@@ -714,6 +714,7 @@ export function renderRecap(
   leaderboard = [],
   rank = null,
   packLabel = '',
+  online = null,
 ) {
   const accuracy = Math.round(summary.accuracy * 100);
   const badges = summary.badges_earned.length
@@ -780,6 +781,13 @@ export function renderRecap(
         ? `<section class="card"><p><strong>🏆 Peringkat #${rank}</strong> di papan skor perangkat ini.</p></section>`
         : ''
     }
+    ${
+      online && online.rank
+        ? `<section class="card"><p>🌐 <strong>Peringkat #${Number(online.rank) || 0}</strong> dari ${Number(online.total) || 0} skor di papan online.</p></section>`
+        : online && online.error
+          ? `<section class="card"><p class="pack__meta">🌐 Skor belum terkirim online: ${escapeHtml(online.error)}</p></section>`
+          : ''
+    }
     ${leaderboard.length ? renderLeaderboardTable(leaderboard, 'Papan skor lokal', summary.at || null) : ''}
     ${badges}
     ${mistakes}`;
@@ -832,10 +840,53 @@ export function renderBadges(progress) {
 }
 
 /**
- * Layar tentang: etika, privasi, dan pengelolaan data lokal.
+ * Daftar peringkat online yang sedang dimuat.
+ * @param {object[]} items - baris dari server.
+ * @returns {string} HTML daftar peringkat.
+ */
+function renderOnlineBoard(items) {
+  if (!Array.isArray(items) || !items.length) {
+    return '<p class="pack__meta">Belum ada skor online untuk pack ini.</p>';
+  }
+  return `<ol class="leaderboard">${items
+    .map(
+      (item) =>
+        `<li class="leaderboard__row"><span class="leaderboard__rank">${Number(item.rank) || 0}</span><span class="leaderboard__score">${escapeHtml(item.nickname)} · ${Number(item.score) || 0} XP</span><span class="leaderboard__meta">${Math.round((Number(item.accuracy) || 0) * 100)}% · ${Number(item.duration_s) || 0} dtk</span></li>`,
+    )
+    .join('')}</ol>`;
+}
+
+/**
+ * Layar tentang: etika, privasi, data lokal, dan papan skor online opsional.
+ * @param {object} [options] - { settings, config, playerId, board, stats, message }.
  * @returns {string} HTML layar tentang.
  */
-export function renderAbout() {
+export function renderAbout({
+  settings = {},
+  config = { base: '' },
+  playerId = '',
+  board = null,
+  stats = null,
+  message = '',
+} = {}) {
+  const configured = Boolean(config && config.base);
+  const online = configured
+    ? `<section class="card" id="online-card">
+      <h3>Papan skor online (opsional)</h3>
+      <p class="pack__meta">Hanya nickname pilihanmu dan hasil sesi yang dikirim. Tanpa akun, email, atau ID perangkat. Kosongkan nickname atau matikan centang untuk tetap bermain lokal.</p>
+      <label class="field"><span>Nickname (1–16 karakter)</span><input id="online-nickname" type="text" maxlength="16" value="${escapeHtml(settings.nickname || '')}" autocomplete="nickname" pattern="[A-Za-z0-9_.-]{1,16}"></label>
+      <label class="field field--check"><input id="online-optin" type="checkbox"${settings.online_leaderboard ? ' checked' : ''}><span>Kirim skor ke papan online setelah sesi selesai</span></label>
+      <div class="btn-row">
+        <button class="btn btn--primary" data-action="save-online">Simpan pengaturan</button>
+        <button class="btn btn--ghost" data-action="online-refresh">Muat papan</button>
+        ${playerId ? '<button class="btn btn--ghost" data-action="delete-online">Hapus data online</button>' : ''}
+      </div>
+      ${message ? `<p class="pack__meta" role="status">${escapeHtml(message)}</p>` : ''}
+      ${stats ? `<p class="pack__meta">${Number(stats.total_players) || 0} pemain · ${Number(stats.total_sessions) || 0} sesi · rata-rata akurasi ${Math.round((Number(stats.avg_accuracy) || 0) * 100)}%</p>` : ''}
+      ${renderOnlineBoard(board)}
+    </section>`
+    : `<section class="card"><h3>Papan skor online</h3><p class="pack__meta">Build ini tidak dikonfigurasi dengan server papan skor. Semua progres tetap tersimpan lokal.</p></section>`;
+
   return `<section class="card">
       <h1>Tentang PhishQuest</h1>
       <p>Game edukasi anti-phishing berbahasa Indonesia. Mainkan pesan-pesan simulasi, temukan red flag, dan latih kebiasaan verifikasi yang benar.</p>
@@ -865,5 +916,6 @@ export function renderAbout() {
     <section class="card">
       <h3>Kontribusi</h3>
       <p>Konten baru ditambahkan lewat berkas JSON di <code>content/packs/</code>. Jalankan validator dan test sebelum mengirim pull request.</p>
-    </section>`;
+    </section>
+    ${online}`;
 }

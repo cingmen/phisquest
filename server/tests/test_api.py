@@ -71,6 +71,7 @@ def test_post_score_returns_rank_and_total(client: TestClient) -> None:
     assert first.status_code == 201
     assert first.json()["rank"] == 1
     assert first.json()["total"] == 1
+    assert len(first.json()["player_id"]) == 36
 
     second = post_score(client, score_payload(nickname="sari", score=120, accuracy=1.0))
     assert second.status_code == 201

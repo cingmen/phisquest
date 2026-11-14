@@ -102,3 +102,20 @@ test('removeDraftPack dan resetAll membersihkan draft', () => {
   assert.deepEqual(storage.loadDraftPacks(), []);
   assert.deepEqual(storage.loadCustomPacks(), []);
 });
+
+test('UUID pemain online bertahan sampai resetAll', () => {
+  storage.saveOnlinePlayer('8f14e45f-0000-4000-8000-000000000000');
+  assert.equal(storage.loadOnlinePlayer(), '8f14e45f-0000-4000-8000-000000000000');
+  storage.resetAll();
+  assert.equal(storage.loadOnlinePlayer(), '');
+});
+
+test('pengaturan online default mati dan bisa disimpan', () => {
+  const defaults = storage.loadSettings();
+  assert.equal(defaults.nickname, '');
+  assert.equal(defaults.online_leaderboard, false);
+  storage.saveSettings({ ...defaults, nickname: 'budi', online_leaderboard: true });
+  const saved = storage.loadSettings();
+  assert.equal(saved.nickname, 'budi');
+  assert.equal(saved.online_leaderboard, true);
+});

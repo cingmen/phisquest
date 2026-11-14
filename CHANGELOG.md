@@ -5,6 +5,10 @@ Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan
 
 ## v2.0.0 — belum dirilis
 
+- Klien web papan skor online: layar Tentang menyediakan nickname dan opt-in, skor sesi dikirim
+  otomatis hanya bila dinyalakan, papan 10 teratas + statistik global bisa dimuat, dan tombol
+  **Hapus data online** memakai UUID pemain. `web/js/online-leaderboard.js` menandatangani payload
+  dengan HMAC-SHA256 lewat Web Crypto dan menyimpan UUID pemain di `pq_online_player_v1`.
 - Backend papan skor online opsional di `server/` (FastAPI + SQLite) mengikuti
   `api-specification.md` §7: `POST /v1/scores` dengan HMAC dan Idempotency-Key,
   `GET /v1/leaderboard` dengan periode/cursor, `GET /v1/stats/global`, dan

@@ -389,7 +389,7 @@ Leaderboard online **anonim tanpa PII**. Backend rencana: FastAPI + SQLite (`dat
   "sig": "<hex>"                 // HMAC, lihat 7.3
 }
 // 201 Created
-{ "id": 8123, "rank": 7, "total": 421 }
+{ "id": 8123, "player_id": "8f14e45f-...", "rank": 7, "total": 421 }
 ```
 
 Error: `400 VALIDATION_ERROR` · `409 DUPLICATE` (Idempotency-Key sama) · `422 SIGNATURE_INVALID` · `429 RATE_LIMITED` (header `Retry-After`).

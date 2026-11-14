@@ -199,7 +199,9 @@ def create_app(
         finally:
             connection.close()
 
-        return JSONResponse({"id": score_id, "rank": rank, "total": total}, status_code=201)
+        return JSONResponse(
+            {"id": score_id, "player_id": player_id, "rank": rank, "total": total}, status_code=201
+        )
 
     @app.get("/v1/leaderboard")
     def get_leaderboard(request: Request) -> Response:

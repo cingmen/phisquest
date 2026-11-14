@@ -44,6 +44,7 @@ import {
   addCustomPack,
   clearCustomPacks,
   clearDraftPacks,
+  clearOnlinePlayer,
   CUSTOM_PACKS_KEY,
   DRAFT_PACKS_KEY,
   exportAll,
@@ -51,6 +52,7 @@ import {
   loadCustomPacks,
   loadDraftPacks,
   loadLeaderboard,
+  loadOnlinePlayer,
   loadProgress,
   loadSettings,
   recordLeaderboardEntry,
@@ -59,9 +61,18 @@ import {
   resetAll,
   saveCustomPacks,
   saveDraftPack,
+  saveOnlinePlayer,
   saveProgress,
   saveSettings,
 } from './storage.js';
+import {
+  deleteOnlinePlayer,
+  fetchOnlineLeaderboard,
+  fetchOnlineStats,
+  onlineConfig,
+  scorePayload,
+  submitOnlineScore,
+} from './online-leaderboard.js';
 import {
   escapeHtml,
   renderAbout,
@@ -112,6 +123,14 @@ const state = {
   editorIndex: 0,
   draftSnapshot: [],
   menuNotice: '',
+  settings: {},
+  onlineConfig: { base: '', secret: '' },
+  onlinePlayerId: '',
+  onlineResult: null,
+  onlineBoard: null,
+  onlineStats: null,
+  onlineMessage: '',
+  sessionStartedAt: null,
 };
 
 const packCache = new Map();
@@ -256,11 +275,19 @@ function render() {
       state.leaderboard,
       state.rank,
       state.packLabel,
+      state.onlineResult,
     );
   } else if (state.screen === 'badges') {
     dom.screens.badges.innerHTML = renderBadges(state.progress);
   } else if (state.screen === 'about') {
-    dom.screens.about.innerHTML = renderAbout();
+    dom.screens.about.innerHTML = renderAbout({
+      settings: state.settings,
+      config: state.onlineConfig,
+      playerId: state.onlinePlayerId,
+      board: state.onlineBoard,
+      stats: state.onlineStats,
+      message: state.onlineMessage,
+    });
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -301,6 +328,8 @@ async function playPack(packId, mode = 'classic', count = QUESTIONS_PER_SESSION)
     state.lastScenario = null;
     state.summary = null;
     state.rank = null;
+    state.onlineResult = null;
+    state.sessionStartedAt = Date.now();
     showScreen('game');
     startTimer();
     announce('Sesi dimulai. Soal pertama.');
@@ -394,6 +423,9 @@ function finishSession() {
     if (state.summary.badges_earned.length) celebrate();
     showScreen('recap');
     announce('Sesi selesai. Ringkasan ditampilkan.');
+    if (state.onlineConfig.base && state.settings.online_leaderboard) {
+      submitSessionOnline();
+    }
   } catch (error) {
     handleError(error);
   }
@@ -1299,6 +1331,115 @@ function deleteCustomPacks() {
   showToast('Pack lokal dihapus.');
 }
 
+/** UUID v4 untuk Idempotency-Key, dengan fallback tanpa crypto.randomUUID. */
+function newIdempotencyKey() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  const bytes = new Uint8Array(16);
+  if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
+    throw new Error('Crypto tidak tersedia untuk membuat kunci sesi.');
+  }
+  crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+/**
+ * Kirim skor sesi terakhir ke papan online bila pemain sudah memilih ikut.
+ * Kegagalan tidak mengubah progres lokal dan hanya ditampilkan di recap.
+ * @returns {Promise<void>}
+ */
+async function submitSessionOnline() {
+  if (!state.summary || !state.onlineConfig.base || !state.settings.online_leaderboard) return;
+  const nickname = String(state.settings.nickname || '').trim();
+  if (!/^[A-Za-z0-9_.-]{1,16}$/.test(nickname)) {
+    state.onlineResult = { error: 'Isi nickname 1–16 karakter di layar Tentang.' };
+    if (state.screen === 'recap') render();
+    return;
+  }
+  try {
+    const duration = state.sessionStartedAt
+      ? Math.max(1, Math.round((Date.now() - state.sessionStartedAt) / 1000))
+      : 60;
+    const payload = scorePayload(state.summary, nickname, duration);
+    const result = await submitOnlineScore({
+      config: state.onlineConfig,
+      payload,
+      key: newIdempotencyKey(),
+    });
+    state.onlinePlayerId = result.player_id || state.onlinePlayerId;
+    if (result.player_id) saveOnlinePlayer(result.player_id);
+    state.onlineResult = { rank: result.rank, total: result.total };
+    showToast(`Skor terkirim ke papan online: peringkat #${result.rank} dari ${result.total}.`);
+    announce(`Skor online peringkat ${result.rank} dari ${result.total}.`);
+  } catch (error) {
+    state.onlineResult = { error: error.message || 'Pengiriman skor online gagal.' };
+    showToast(`Skor online tidak terkirim: ${error.message || 'coba lagi nanti.'}`);
+  }
+  if (state.screen === 'recap') render();
+}
+
+/** Simpan nickname dan pilihan ikut papan skor online. */
+function saveOnlineSettings() {
+  const nickname = fieldValue('online-nickname').trim();
+  const optInElement = document.getElementById('online-optin');
+  const optIn = Boolean(optInElement && optInElement.checked);
+  if (optIn && !/^[A-Za-z0-9_.-]{1,16}$/.test(nickname)) {
+    state.onlineMessage = 'Nickname harus 1–16 karakter: huruf, angka, titik, garis bawah, atau strip.';
+    render();
+    return;
+  }
+  state.settings = { ...state.settings, nickname, online_leaderboard: optIn };
+  saveSettings(state.settings);
+  state.onlineMessage = optIn
+    ? 'Pengaturan disimpan. Skor berikutnya akan dikirim setelah sesi selesai.'
+    : 'Pengaturan disimpan. Skor tetap lokal.';
+  render();
+  showToast('Pengaturan papan skor online disimpan.');
+  if (optIn && nickname) refreshOnlineBoard();
+}
+
+/** Muat statistik dan papan peringkat online untuk pack terakhir. */
+async function refreshOnlineBoard() {
+  if (!state.onlineConfig.base) return;
+  const packId = state.lastPackId || 'campuran';
+  try {
+    const [stats, board] = await Promise.all([
+      fetchOnlineStats(state.onlineConfig),
+      fetchOnlineLeaderboard(state.onlineConfig, { packId, period: 'all', limit: 10 }),
+    ]);
+    state.onlineStats = stats;
+    state.onlineBoard = board.items || [];
+    state.onlineMessage = `Papan online ${packId} dimuat.`;
+  } catch (error) {
+    state.onlineMessage = `Papan online gagal dimuat: ${error.message || 'coba lagi nanti.'}`;
+  }
+  if (state.screen === 'about') render();
+}
+
+/** Hapus skor online bila pemain meminta, setelah konfirmasi. */
+async function deleteOnlineData() {
+  if (!state.onlinePlayerId || !state.onlineConfig.base) return;
+  if (!window.confirm('Hapus semua skor online untuk nickname ini? Progres lokal tidak terhapus.')) {
+    return;
+  }
+  try {
+    await deleteOnlinePlayer(state.onlineConfig, state.onlinePlayerId);
+    clearOnlinePlayer();
+    state.onlinePlayerId = '';
+    state.onlineBoard = null;
+    state.onlineStats = null;
+    state.onlineMessage = 'Data online dihapus. Progres lokal tetap aman.';
+    showToast('Data online dihapus.');
+  } catch (error) {
+    state.onlineMessage = `Data online gagal dihapus: ${error.message || 'coba lagi nanti.'}`;
+  }
+  if (state.screen === 'about') render();
+}
+
 /** Unduh progres sebagai berkas JSON. */
 function downloadExport() {
   try {
@@ -1351,6 +1492,7 @@ async function handleImportFile(file) {
     const text = await file.text();
     importAll(text);
     state.progress = loadProgress() || createProgress();
+    state.settings = loadSettings();
     render();
     showToast('Progres berhasil diimpor.');
   } catch (error) {
@@ -1368,6 +1510,11 @@ function confirmReset() {
   state.progress = createProgress();
   state.session = null;
   state.summary = null;
+  state.settings = loadSettings();
+  state.onlinePlayerId = '';
+  state.onlineBoard = null;
+  state.onlineStats = null;
+  state.onlineResult = null;
   render();
   showToast('Progres dihapus. Selamat mulai dari awal!');
 }
@@ -1469,6 +1616,12 @@ function handleClick(event) {
     showScreen('menu');
   } else if (action === 'share-card') {
     shareScoreCard();
+  } else if (action === 'save-online') {
+    saveOnlineSettings();
+  } else if (action === 'online-refresh') {
+    refreshOnlineBoard();
+  } else if (action === 'delete-online') {
+    deleteOnlineData();
   } else if (action === 'export') {
     downloadExport();
   } else if (action === 'import') {
@@ -1644,8 +1797,13 @@ async function boot() {
   loadProgressSafe();
   state.leaderboard = loadLeaderboard();
   state.customPacks = loadCustomPacks();
-  const settings = loadSettings();
-  if (settings.locale !== 'id') saveSettings({ ...settings, locale: 'id' });
+  state.onlineConfig = onlineConfig();
+  state.onlinePlayerId = loadOnlinePlayer();
+  state.settings = loadSettings();
+  if (state.settings.locale !== 'id') {
+    state.settings = { ...state.settings, locale: 'id' };
+    saveSettings(state.settings);
+  }
   updateStats();
   render();
   try {

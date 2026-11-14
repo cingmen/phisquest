@@ -11,6 +11,7 @@ export const SETTINGS_KEY = 'pq_settings_v1';
 export const LEADERBOARD_KEY = 'pq_leaderboard_v1';
 export const CUSTOM_PACKS_KEY = 'pq_custom_packs_v1';
 export const DRAFT_PACKS_KEY = 'pq_editor_draft_v1';
+export const ONLINE_PLAYER_KEY = 'pq_online_player_v1';
 const DEBOUNCE_MS = 300;
 
 const memoryFallback = new Map();
@@ -283,6 +284,7 @@ export function loadSettings() {
     sound: true,
     reduced_motion: false,
     nickname: '',
+    online_leaderboard: false,
   };
   if (!raw) return defaults;
   try {
@@ -303,6 +305,47 @@ export function saveSettings(settings) {
   } catch (error) {
     window.dispatchEvent(new CustomEvent('pq:storage-error', { detail: error }));
   }
+}
+
+/**
+ * Baca UUID pemain online yang tersimpan setelah pengiriman pertama.
+ * @returns {string} UUID atau string kosong.
+ */
+export function loadOnlinePlayer() {
+  const raw = readRaw(ONLINE_PLAYER_KEY);
+  if (!raw) return '';
+  try {
+    const data = JSON.parse(raw);
+    return data && typeof data.player_id === 'string' ? data.player_id : '';
+  } catch (error) {
+    return '';
+  }
+}
+
+/**
+ * Simpan UUID pemain online agar data bisa dihapus dari layar Tentang.
+ * @param {string} playerId - UUID dari respons POST skor.
+ * @returns {void}
+ */
+export function saveOnlinePlayer(playerId) {
+  try {
+    writeRaw(ONLINE_PLAYER_KEY, JSON.stringify({ player_id: playerId }));
+  } catch (error) {
+    window.dispatchEvent(new CustomEvent('pq:storage-error', { detail: error }));
+  }
+}
+
+/**
+ * Hapus penanda pemain online dari perangkat.
+ * @returns {void}
+ */
+export function clearOnlinePlayer() {
+  try {
+    window.localStorage.removeItem(ONLINE_PLAYER_KEY);
+  } catch (error) {
+    // localStorage tidak tersedia; cukup hapus fallback memori
+  }
+  memoryFallback.delete(ONLINE_PLAYER_KEY);
 }
 
 /**
@@ -394,7 +437,14 @@ export function resetAll() {
     pendingTimer = null;
   }
   pendingProgress = null;
-  for (const key of [PROGRESS_KEY, SETTINGS_KEY, LEADERBOARD_KEY, CUSTOM_PACKS_KEY, DRAFT_PACKS_KEY]) {
+  for (const key of [
+    PROGRESS_KEY,
+    SETTINGS_KEY,
+    LEADERBOARD_KEY,
+    CUSTOM_PACKS_KEY,
+    DRAFT_PACKS_KEY,
+    ONLINE_PLAYER_KEY,
+  ]) {
     try {
       window.localStorage.removeItem(key);
     } catch (error) {
