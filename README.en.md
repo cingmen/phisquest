@@ -154,6 +154,13 @@ node --test web/test/*.test.js
   press **Apply merge**.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
+## Score card (v2.0)
+
+When a session ends, **📸 Share score card** on the recap screen renders a 1200×630 PNG with your
+score, accuracy, streak, level, pack, mode, and date. Browsers that support the Web Share API with
+files share it directly; otherwise the image downloads as `phishquest-<pack>-<score>xp.png`. The
+card never contains a nickname, address, or device data.
+
 ## Ethics & legal
 
 > PhishQuest is an educational simulation. Every email, brand, and domain in it is

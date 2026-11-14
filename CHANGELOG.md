@@ -3,6 +3,15 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v2.0.0 — belum dirilis
+
+- Kartu skor sesi dapat dibuat dari layar recap dan diunduh sebagai PNG 1200×630 atau dibagikan
+  lewat Web Share API bila peramban mendukung berkas. Kartu hanya memuat skor, akurasi, streak,
+  level, pack, mode, dan tanggal — tanpa nickname maupun data perangkat.
+- `buildShareCardModel()` dinormalkan terhadap nilai rusak (skor negatif, akurasi di luar 0–1),
+  dan nama berkas dibersihkan dari karakter yang tidak aman. Fungsi gambar dipisah dari DOM agar
+  dapat diuji dengan konteks canvas palsu.
+
 ## v1.6.11 — 2026-11-04
 
 - Perbandingan field saat menggabung draft kini mengabaikan urutan daftar: `red_flags` yang sama

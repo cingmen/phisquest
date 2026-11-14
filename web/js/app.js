@@ -4,6 +4,7 @@
  */
 
 import {
+  LEVEL_NAMES,
   PQError,
   createProgress,
   loadAllPacks,
@@ -1317,6 +1318,32 @@ function downloadExport() {
   }
 }
 
+/** Buat dan bagikan/unduh kartu skor sesi terakhir tanpa data pribadi. */
+async function shareScoreCard() {
+  if (!state.summary) return;
+  try {
+    const { buildShareCardModel, createShareCard, shareCardFilename, shareShareCard } = await import(
+      './share-card.js'
+    );
+    const model = buildShareCardModel({
+      summary: state.summary,
+      levelLabel: LEVEL_NAMES[state.summary.level_after] || 'Amatir',
+      at: state.summary.at || '',
+      packLabel: state.packLabel,
+    });
+    const canvas = createShareCard(model);
+    const filename = shareCardFilename(model);
+    const result = await shareShareCard(canvas, filename, model);
+    const text = result === 'shared'
+      ? 'Kartu skor dibagikan.'
+      : `Kartu skor diunduh sebagai ${filename}.`;
+    showToast(text);
+    announce(text);
+  } catch (error) {
+    handleError(error);
+  }
+}
+
 /** Impor progres dari berkas JSON yang dipilih pemain. */
 async function handleImportFile(file) {
   if (!file) return;
@@ -1440,6 +1467,8 @@ function handleClick(event) {
     playPack(state.lastPackId, state.mode);
   } else if (action === 'menu') {
     showScreen('menu');
+  } else if (action === 'share-card') {
+    shareScoreCard();
   } else if (action === 'export') {
     downloadExport();
   } else if (action === 'import') {

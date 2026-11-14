@@ -767,6 +767,7 @@ export function renderRecap(
       <div class="btn-row" style="margin-top:14px">
         <button class="btn btn--primary" data-action="again">🔁 Main lagi</button>
         <button class="btn btn--ghost" data-action="menu">🏠 Menu</button>
+        <button class="btn btn--accent" data-action="share-card">📸 Bagikan kartu skor</button>
       </div>
     </section>
     ${

@@ -196,6 +196,13 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   menulis setelah **Terapkan gabungan** ditekan.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
+## Kartu skor (v2.0)
+
+Selesai bermain, tombol **📸 Bagikan kartu skor** di layar recap membuat gambar PNG 1200×630 berisi
+skor, akurasi, streak, level, pack, mode, dan tanggal. Di peramban yang mendukung Web Share API
+berkas dibagikan langsung; bila tidak, gambar diunduh sebagai `phishquest-<pack>-<skor>xp.png`.
+Kartu tidak memuat nickname, alamat, atau data perangkat apa pun.
+
 ## Etika & legal
 
 > PhishQuest adalah simulasi edukasi. Semua email, brand, dan domain di dalamnya fiktif.
