@@ -27,6 +27,18 @@ jobs:
       - run: pip install -e cli/[test] pytest-cov
       - run: pytest --cov=phishquest.engine --cov=phishquest.badges --cov-fail-under=90 tests/
 
+  test-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e server/[test]
+      - run: ruff check --config server/pyproject.toml server/
+      - run: ruff format --check --config server/pyproject.toml server/
+      - run: PQ_SKIP_DEFAULT_APP=1 pytest server/tests -q
+
   test-js:
     runs-on: ubuntu-latest
     steps:

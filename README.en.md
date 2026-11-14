@@ -161,6 +161,24 @@ score, accuracy, streak, level, pack, mode, and date. Browsers that support the 
 files share it directly; otherwise the image downloads as `phishquest-<pack>-<score>xp.png`. The
 card never contains a nickname, address, or device data.
 
+## Optional online leaderboard (v2.0)
+
+The leaderboard backend lives separately in `server/` and is not required to play. It is anonymous:
+only a player-chosen nickname and session results, with no accounts, email, or device IDs. See
+`docs/api-specification.md` §7 for the full contract.
+
+```bash
+pip install -e server/
+PQ_HMAC_SECRET="replace-with-a-long-secret" \
+PQ_ALLOWED_ORIGIN="https://cingmen.github.io" \
+PQ_DB_PATH="$HOME/.phishquest/leaderboard.sqlite3" \
+phishquest-server                       # http://127.0.0.1:8081/healthz
+```
+
+Endpoints: `POST /v1/scores` (HMAC + Idempotency-Key, 60/hour/IP), `GET /v1/leaderboard`,
+`GET /v1/stats/global`, and `DELETE /v1/players/{id}`. The GitHub Pages build still runs without a
+backend; local scores remain the default and online submission is opt-in.
+
 ## Ethics & legal
 
 > PhishQuest is an educational simulation. Every email, brand, and domain in it is

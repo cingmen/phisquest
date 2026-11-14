@@ -96,6 +96,7 @@ web/         aplikasi statis: index.html, css/, js/, test/, assets/
 cli/         paket Python `phishquest` (pyproject.toml, src/phishquest/)
 tests/       test pytest + fixtures/golden.json (kontrak web ↔ CLI)
 scripts/     validate_content.py (dijalankan CI)
+server/      backend leaderboard online opsional (FastAPI + SQLite)
 docs/        PRD, API, skema database, rencana implementasi, aturan kode
 ```
 
@@ -202,6 +203,25 @@ Selesai bermain, tombol **📸 Bagikan kartu skor** di layar recap membuat gamba
 skor, akurasi, streak, level, pack, mode, dan tanggal. Di peramban yang mendukung Web Share API
 berkas dibagikan langsung; bila tidak, gambar diunduh sebagai `phishquest-<pack>-<skor>xp.png`.
 Kartu tidak memuat nickname, alamat, atau data perangkat apa pun.
+
+## Papan skor online (opsional, v2.0)
+
+Backend papan skor tersedia terpisah di `server/` dan tidak diperlukan untuk memainkan game.
+API-nya anonim: hanya nickname pilihan pemain dan hasil sesi, tanpa akun, email, atau ID perangkat.
+Kontrak lengkap ada di `docs/api-specification.md` §7.
+
+```bash
+pip install -e server/
+PQ_HMAC_SECRET="ganti-dengan-rahasia-panjang" \
+PQ_ALLOWED_ORIGIN="https://cingmen.github.io" \
+PQ_DB_PATH="$HOME/.phishquest/leaderboard.sqlite3" \
+phishquest-server                       # http://127.0.0.1:8081/healthz
+```
+
+Endpoint: `POST /v1/scores` (HMAC + Idempotency-Key, rate limit 60/jam/IP),
+`GET /v1/leaderboard?pack_id=…&period=day|week|all&limit=…&cursor=…`,
+`GET /v1/stats/global`, dan `DELETE /v1/players/{id}`. Statis GitHub Pages tetap berjalan
+tanpa backend; skor lokal adalah default dan pengiriman online bersifat opt-in.
 
 ## Etika & legal
 

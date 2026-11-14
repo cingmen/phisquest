@@ -5,6 +5,12 @@ Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan
 
 ## v2.0.0 — belum dirilis
 
+- Backend papan skor online opsional di `server/` (FastAPI + SQLite) mengikuti
+  `api-specification.md` §7: `POST /v1/scores` dengan HMAC dan Idempotency-Key,
+  `GET /v1/leaderboard` dengan periode/cursor, `GET /v1/stats/global`, dan
+  `DELETE /v1/players/{id}` untuk penghapusan data. Skema SQLite memakai WAL dan
+  tabel `idempotency_keys`; 11 test API mencakup validasi, peringkat, paginasi,
+  CORS, rate limit, dan penghapusan.
 - Kartu skor sesi dapat dibuat dari layar recap dan diunduh sebagai PNG 1200×630 atau dibagikan
   lewat Web Share API bila peramban mendukung berkas. Kartu hanya memuat skor, akurasi, streak,
   level, pack, mode, dan tanggal — tanpa nickname maupun data perangkat.

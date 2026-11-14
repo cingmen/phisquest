@@ -63,6 +63,13 @@ phishquest/
 │       ├── storage.py
 │       ├── ui.py                   # komponen Rich
 │       └── models.py               # dataclass + konstanta
+├── server/                         # leaderboard online opsional (v2)
+│   ├── pyproject.toml
+│   ├── src/phishquest_server/
+│   │   ├── app.py                  # FastAPI + kontrak REST §7
+│   │   ├── db.py                   # SQLite + query papan skor
+│   │   └── security.py             # validasi payload + HMAC
+│   └── tests/                      # pytest API
 ├── tests/                          # test Python (pytest)
 │   ├── test_engine.py
 │   ├── test_badges.py

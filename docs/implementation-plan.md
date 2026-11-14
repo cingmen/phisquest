@@ -157,7 +157,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v1.6.9** | `mergeDraftPack()` menggabungkan draft antar-tab tiga arah per field (termasuk penghapusan skenario), dengan tombol **Gabungkan dengan versi tab ini** di banner konflik dan laporan field yang bentrok | 1 hari | Dirilis (v1.6.9) |
 | **v1.6.10** | `draftMergePreview()` menampilkan field yang akan berubah beserta nilai kedua tab dan menandai bentrok; **Terapkan gabungan** baru menulis draft setelah pengguna memeriksa | 1 hari | Dirilis (v1.6.10) |
 | **v1.6.11** | `sameFieldValue()` membandingkan daftar tanpa memperhatikan urutan, sehingga `red_flags` yang hanya berbeda urutan tidak dianggap perubahan atau bentrok | 1 hari | Dirilis (v1.6.11) |
-| **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Sedang dikerjakan — kartu skor selesai |
+| **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (UI + terjemahan skenario) | 1–2 minggu | Sedang dikerjakan — kartu skor dan backend selesai; klien web & i18n menyusul |
 
 ## 10. Strategi Pengujian
 
@@ -170,6 +170,7 @@ fondasi  konten  engine  CLI    web    rilis
 | Storage CLI | `pytest` (tmp dir) | Save/load atomik, korup, migrasi minor |
 | Web | `node --test` untuk engine; sisanya checklist manual | Checklist: main sampai recap, refresh di tengah sesi (progres bertahan), keyboard-only, 360 px, offline (konten ter-cache) |
 | CLI manual | checklist | Menu, semua subcommand, `reset` tanpa `--yes` harus konfirmasi |
+| Server leaderboard | `pytest` | Kontrak REST §7, HMAC, idempotensi, paginasi, CORS, rate limit, penghapusan pemain |
 
 ## 11. Checklist Rilis v1.0.0
 

@@ -253,6 +253,12 @@ CREATE TABLE badges (
   PRIMARY KEY (player_id, badge_id)
 );
 
+CREATE TABLE idempotency_keys (
+  key        TEXT PRIMARY KEY,              -- UUID dari header Idempotency-Key
+  score_id   INTEGER NOT NULL,
+  created_at TEXT NOT NULL
+);
+
 CREATE TABLE schema_migrations (
   version    TEXT PRIMARY KEY,
   applied_at TEXT NOT NULL
@@ -282,7 +288,7 @@ FROM scores;
 |--------|-------|
 | Retensi skor | Skor lebih tua dari 365 hari boleh dihapus job berkala (opsional) |
 | Backup | `sqlite3 .backup` harian ke object storage (jika di-host) |
-| Right to be forgotten | Endpoint `DELETE /v1/players/{id}` di v2: hapus player + skor + lencana — selaras semangat UU PDP |
+| Right to be forgotten | Endpoint `DELETE /v1/players/{id}` sudah diimplementasikan di `server/` dan menghapus player + skor + lencana — selaras semangat UU PDP |
 | Migrasi | Semua DDL perubahan lewat `schema_migrations` (ada tool `alembic` bila perlu; tabel kecil cukup skrip SQL bernomor) |
 
 ## 6. Privasi & Perlindungan Data

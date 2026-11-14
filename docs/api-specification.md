@@ -356,7 +356,7 @@ Exit codes: `0` valid · `1` error validasi · `2` argumen/path salah.
 
 **Exit codes:** `0` sukses · `1` runtime error (`PhishQuestError`) · `2` argumen tidak valid · `3` konten tidak valid (`ContentError`).
 
-## 7. REST API v2 — Desain ke Depan (Opsional, TIDAK di v1.0)
+## 7. REST API v2 — Leaderboard Online (Opsional, diimplementasikan di `server/`)
 
 Leaderboard online **anonim tanpa PII**. Backend rencana: FastAPI + SQLite (`database-schema.md` §6), di-host terpisah dari Pages. Bagian ini difinalkan sekarang supaya implementasi v2 tidak mengubah kontrak web.
 
@@ -367,7 +367,7 @@ Leaderboard online **anonim tanpa PII**. Backend rencana: FastAPI + SQLite (`dat
 | Base URL | `https://api.<domain>/v1` (versi di path) |
 | Format | JSON; waktu ISO-8601 UTC |
 | Autentikasi | **Tidak ada akun.** Pemain memakai nickname lokal; anti-abuse via HMAC (7.3) + rate limit |
-| CORS | `GET` terbuka; `POST` dari origin Pages saja |
+| CORS | `GET` terbuka; `POST`/`DELETE` dari origin yang diizinkan (`PQ_ALLOWED_ORIGIN`) |
 | Idempotensi | `POST /v1/scores` menerima header `Idempotency-Key` (UUID dari klien) |
 
 ### 7.2 Endpoint
