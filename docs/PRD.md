@@ -10,7 +10,7 @@
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
-| Target rilis | v1.6.11 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Target rilis | v2.0.0 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
 | Terakhir diperbarui | 2026-11-04 |
 | Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
 
@@ -442,7 +442,7 @@ stateDiagram-v2
 | **v1.6.9** | Konflik draft antar-tab bisa digabung per field lewat **Gabungkan dengan versi tab ini**; perubahan yang tidak bertabrakan diambil keduanya, penghapusan skenario dihormati, dan field yang bentrok dilaporkan | Dirilis (v1.6.9) |
 | **v1.6.10** | **Pratinjau gabungan** menampilkan field yang akan berubah beserta nilai dari kedua tab dan menandai bentrok sebelum apa pun ditulis | Dirilis (v1.6.10) |
 | **v1.6.11** | Perbandingan field mengabaikan urutan daftar (`red_flags`) agar urutan centang berbeda tidak dilaporkan sebagai perubahan atau bentrok | Dirilis (v1.6.11) |
-| **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII — desain sudah ada di `api-specification.md` §8 dan `database-schema.md` §6), kartu bagikan skor (gambar), i18n Inggris | Ide, belum dikomit |
+| **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII), kartu bagikan skor (gambar), dan i18n Inggris untuk 40 skenario serta UI inti; editor lanjutan tetap Indonesia | Dirilis (v2.0.0) |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
 

@@ -3,7 +3,7 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
-## v2.0.0 — belum dirilis
+## v2.0.0 — 2026-11-14
 
 - Klien web papan skor online: layar Tentang menyediakan nickname dan opt-in, skor sesi dikirim
   otomatis hanya bila dinyalakan, papan 10 teratas + statistik global bisa dimuat, dan tombol
@@ -21,6 +21,16 @@ Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan
 - `buildShareCardModel()` dinormalkan terhadap nilai rusak (skor negatif, akurasi di luar 0–1),
   dan nama berkas dibersihkan dari karakter yang tidak aman. Fungsi gambar dipisah dari DOM agar
   dapat diuji dengan konteks canvas palsu.
+
+- i18n Inggris: seluruh 40 skenario punya terjemahan di `content/i18n/en.json` (subjek, isi,
+  penjelasan, tip, cara verifikasi, dan opsi). Pemilih **Bahasa / Language** di Tentang menyimpan
+  locale di pengaturan dan memuat konten sesuai bahasa tanpa menghapus progres.
+- UI inti berbahasa Inggris lewat lapisan `web/js/i18n.js`: navigasi, menu, permainan, umpan balik,
+  recap, lencana, level, red flag, dan Tentang. Atribut `aria-label`/`placeholder` ikut diterjemahkan;
+  editor skenario lanjutan tetap berbahasa Indonesia dan ditandai beta.
+- Test paritas `tests/test_i18n.py` memastikan setiap pack, skenario, field wajib, dan opsi punya
+  terjemahan dan bukan salinan teks Indonesia; `web/test/i18n.test.js` menguji label statis dan pola
+  dinamis.
 
 ## v1.6.11 — 2026-11-04
 

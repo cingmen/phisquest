@@ -1,6 +1,6 @@
 {
   "name": "phishquest-web",
-  "version": "1.6.11",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "Versi web PhishQuest: ES Modules murni tanpa build step dan tanpa dependensi.",

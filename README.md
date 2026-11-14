@@ -197,6 +197,13 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   menulis setelah **Terapkan gabungan** ditekan.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
+## Bahasa Inggris (v2.0)
+
+Pemilih **🇬🇧 English** di layar Tentang memuat terjemahan Inggris untuk seluruh 40 skenario
+(`content/i18n/en.json`) dan UI inti: navigasi, menu, permainan, umpan balik, recap, lencana, level,
+red flag, serta Tentang. Pilihan bahasa disimpan di perangkat dan bisa diganti kapan saja tanpa
+kehilangan progres. Editor skenario lanjutan masih berbahasa Indonesia dan ditandai beta.
+
 ## Kartu skor (v2.0)
 
 Selesai bermain, tombol **📸 Bagikan kartu skor** di layar recap membuat gambar PNG 1200×630 berisi
