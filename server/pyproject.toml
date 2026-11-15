@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phishquest-server"
-version = "2.2.0"
+version = "2.2.1"
 description = "Backend papan skor online anonim untuk PhishQuest (opsional)."
 requires-python = ">=3.10"
 license = { text = "MIT" }

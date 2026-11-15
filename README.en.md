@@ -3,7 +3,7 @@
 > **Spot the bait before you get hooked.**
 
 ![CI](https://github.com/cingmen/phisquest/actions/workflows/ci.yml/badge.svg)
-[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.2.0)
+[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.2.1)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)

@@ -3,10 +3,10 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
-## Belum dirilis
+## v2.2.1 — 2026-11-15
 
 - Pengumuman pembaca layar dan dialog konfirmasi kini memakai bahasa Indonesia saat locale `id`;
-  sebelumnya keduanya selalu diterjemahkan ke Inggris.
+  sebelumnya keduanya selalu diterjemahkan ke Inggris. Perilaku ini dicakup test locale baru.
 
 ## v2.2.0 — 2026-11-15
 
