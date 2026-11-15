@@ -11,8 +11,9 @@
 | Versi dokumen | 1.0.0 |
 | Status | Terkunci untuk pengembangan v1.0 |
 | Target rilis | v2.0.0 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
-| Terakhir diperbarui | 2026-11-04 |
-| Bahasa konten | Indonesia (UI & skenario); README dwibahasa (ID/EN) |
+| Rilis terbaru | [v2.0.0](https://github.com/cingmen/phisquest/releases/tag/v2.0.0) — 15 November 2026 |
+| Terakhir diperbarui | 2026-11-15 |
+| Bahasa konten | Indonesia + Inggris (skenario dan UI inti); README dwibahasa (ID/EN) |
 
 ---
 

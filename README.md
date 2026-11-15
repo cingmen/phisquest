@@ -3,6 +3,7 @@
 > **Kenali umpan sebelum kamu terhook.**
 
 ![CI](https://github.com/cingmen/phisquest/actions/workflows/ci.yml/badge.svg)
+[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.0.0)
 ![License: MIT](https://img.shields.io/badge/lisensi-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)
