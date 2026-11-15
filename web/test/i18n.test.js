@@ -53,6 +53,10 @@ test('translateString menerjemahkan teks game, recap, dan kartu skor', () => {
   assert.equal(translateString('of-007 · jawabanmu Phishing 🎣'), 'of-007 · your answer Phishing 🎣');
   assert.equal(translateString('🏆 Peringkat #1'), '🏆 Rank #1');
   assert.equal(translateString('🎣 Campur · 30%'), '🎣 Mixed · 30%');
+  assert.equal(translateString('⏱️ campur · 80%'), '⏱️ Mixed · 80%');
+  assert.equal(translateString('campur'), 'Mixed');
+  assert.equal(translateString('dari 10 skor di papan online.'), 'of 10 scores on the online leaderboard.');
+  assert.equal(translateString('🌐 Skor belum terkirim online: Network unavailable'), '🌐 Online score not sent: Network unavailable');
   assert.equal(translateString('Sesi selesai. Ringkasan ditampilkan.'), 'Session complete. Showing the recap.');
   assert.equal(translateString('Kartu skor diunduh sebagai phishquest-x.png.'), 'Score card downloaded as phishquest-x.png.');
 });
