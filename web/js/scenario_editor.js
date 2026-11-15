@@ -100,6 +100,7 @@ const LEGIT_TARGET = 4;
 const MIN_RED_FLAG_COVERAGE = 7;
 /** Deskripsi bawaan saat pack lokal tidak menyebutkannya. */
 const DEFAULT_PACK_DESCRIPTION = 'Pack buatan sendiri dari editor PhishQuest.';
+const DEFAULT_PACK_DESCRIPTION_EN = 'A custom pack from the PhishQuest editor.';
 /** Emoji bawaan untuk pack lokal. */
 const DEFAULT_PACK_EMOJI = '🛠️';
 
@@ -346,7 +347,7 @@ export function validateScenario(scenario, index = 0) {
  * @param {string} [name] - nama pack bila input tidak menyebutkan.
  * @returns {{pack: object|null, errors: string[]}} hasil parsing.
  */
-export function parsePackText(text, name = 'Pack lokal') {
+export function parsePackText(text, name = null, locale = 'id') {
   let data;
   try {
     data = JSON.parse(String(text));
@@ -355,7 +356,7 @@ export function parsePackText(text, name = 'Pack lokal') {
   }
 
   let scenarios;
-  let packName = name;
+  let packName = name || (locale === 'en' ? 'Local pack' : 'Pack lokal');
   let packId = 'kustom';
   let description = '';
   let emoji = '';
@@ -505,11 +506,13 @@ export function validatePackShape(pack) {
  * @param {object} pack - pack lokal.
  * @returns {object} pack dengan schema_version, description, dan emoji.
  */
-export function toContentPack(pack) {
+export function toContentPack(pack, locale = 'id') {
   const description =
     typeof pack.description === 'string' && pack.description.trim()
       ? pack.description.trim()
-      : DEFAULT_PACK_DESCRIPTION;
+      : locale === 'en'
+        ? DEFAULT_PACK_DESCRIPTION_EN
+        : DEFAULT_PACK_DESCRIPTION;
   return {
     schema_version: SCHEMA_VERSION,
     pack_id: pack.pack_id,
@@ -1023,7 +1026,7 @@ export function isTextEntryTarget(tagName, isContentEditable = false) {
  * @param {string} [prefix] - prefix id pack (ew/of/sc/cg).
  * @returns {object[]} daftar baru berisi salinan; tidak berubah bila indeks di luar jangkauan.
  */
-export function duplicateScenario(scenarios, index, prefix = 'ew') {
+export function duplicateScenario(scenarios, index, prefix = 'ew', locale = 'id') {
   const list = [...(scenarios || [])];
   const source = list[index];
   if (!source || typeof source !== 'object') return list;
@@ -1031,7 +1034,7 @@ export function duplicateScenario(scenarios, index, prefix = 'ew') {
   const copy = {
     ...source,
     id: nextScenarioId(ids, prefix),
-    label: `${String(source.label || source.id || 'Skenario')} (salinan)`,
+    label: `${String(source.label || source.id || 'Skenario')} ${locale === 'en' ? '(copy)' : '(salinan)'}`,
     sender: { ...(source.sender || {}) },
     link: source.link ? { ...source.link } : null,
     attachment: source.attachment ? { ...source.attachment } : null,
@@ -1049,31 +1052,44 @@ export function duplicateScenario(scenarios, index, prefix = 'ew') {
  * @param {string} [prefix] - prefix id pack.
  * @returns {object} skenario siap edit.
  */
-export function createScenarioTemplate(existingIds = [], prefix = 'ew') {
+export function createScenarioTemplate(existingIds = [], prefix = 'ew', locale = 'id') {
+  const english = locale === 'en';
   return {
-    label: 'Skenario baru',
+    label: english ? 'New scenario' : 'Skenario baru',
     id: nextScenarioId(existingIds, prefix),
     type: 'phish_or_legit',
     difficulty: 'mudah',
     channel: 'email',
-    sender: { name: 'DompetKu', address: 'keamanan@dompetku-verifikasi.example' },
-    subject: 'Verifikasi akun Anda',
+    sender: {
+      name: 'DompetKu',
+      address: english ? 'security@dompetku-verification.example' : 'keamanan@dompetku-verifikasi.example',
+    },
+    subject: english ? 'Verify your account' : 'Verifikasi akun Anda',
     datetime: nowJakartaIso(),
-    body: 'Halo, akun Anda dibatasi. Buka tautan berikut dalam 1x24 jam untuk verifikasi dan kirim kode OTP Anda.',
+    body: english
+      ? 'Hi, your account has been restricted. Open the link below within 24 hours to verify and send your OTP code.'
+      : 'Halo, akun Anda dibatasi. Buka tautan berikut dalam 1x24 jam untuk verifikasi dan kirim kode OTP Anda.',
     link: {
-      text: 'dompetku-verifikasi.example/aktifkan',
-      href: 'http://dompetku-verifikasi.example/aktifkan',
+      text: english ? 'dompetku-verification.example/activate' : 'dompetku-verifikasi.example/aktifkan',
+      href: english
+        ? 'http://dompetku-verification.example/activate'
+        : 'http://dompetku-verifikasi.example/aktifkan',
     },
     attachment: null,
     options: null,
     is_phish: true,
     correct_option: null,
     red_flags: ['DOMAIN_PALSU', 'MEMINTA_DATA_SENSITIF', 'TEKANAN_WAKTU'],
-    explanation:
-      'Domain dompetku-verifikasi.example bukan dompetku.example, dan OTP tidak pernah diminta lewat email.',
+    explanation: english
+      ? 'The domain dompetku-verification.example is not dompetku.example, and OTP codes are never requested by email.'
+      : 'Domain dompetku-verifikasi.example bukan dompetku.example, dan OTP tidak pernah diminta lewat email.',
     teach: {
-      tip: 'Kode OTP tidak boleh dibagikan kepada siapa pun.',
-      verify_how: 'Buka aplikasi DompetKu langsung dan cek notifikasi di sana.',
+      tip: english
+        ? 'OTP codes must never be shared with anyone.'
+        : 'Kode OTP tidak boleh dibagikan kepada siapa pun.',
+      verify_how: english
+        ? 'Open the DompetKu app directly and check its notifications.'
+        : 'Buka aplikasi DompetKu langsung dan cek notifikasi di sana.',
     },
   };
 }
@@ -1150,6 +1166,74 @@ export function findPackIdConflict(pack, packs, editingId = null) {
     name: String(other.name || packId),
     scenarios: Array.isArray(other.scenarios) ? other.scenarios.length : 0,
   };
+}
+
+/** Contoh pack berbahasa Inggris untuk tombol "Load sample into the box". */
+export const SAMPLE_PACK_EN = JSON.stringify(
+  {
+    pack_id: 'kustom',
+    name: 'My local pack',
+    scenarios: [
+      {
+        id: 'ew-201',
+        type: 'phish_or_legit',
+        difficulty: 'sedang',
+        channel: 'email',
+        sender: { name: 'DompetKu', address: 'security@dompetku-verification.example' },
+        subject: 'Verify your account',
+        datetime: '2026-11-03T09:00:00+07:00',
+        body: 'Hi, your account has been restricted. Open the link below within 24 hours to verify and send your OTP code.',
+        link: {
+          text: 'dompetku-verification.example/activate',
+          href: 'http://dompetku-verification.example/activate',
+        },
+        attachment: null,
+        options: null,
+        is_phish: true,
+        correct_option: null,
+        red_flags: ['DOMAIN_PALSU', 'MEMINTA_DATA_SENSITIF', 'TEKANAN_WAKTU'],
+        explanation:
+          'The domain dompetku-verification.example is not dompetku.example, and OTP codes are never requested by email.',
+        teach: {
+          tip: 'OTP codes must never be shared with anyone.',
+          verify_how: 'Open the DompetKu app directly and check its notifications.',
+        },
+      },
+      {
+        id: 'of-201',
+        type: 'best_action',
+        difficulty: 'mudah',
+        channel: 'sms',
+        sender: { name: 'Corporate HR', address: '0811-2000-3000' },
+        subject: null,
+        datetime: '2026-11-03T10:00:00+07:00',
+        body: 'Your November payslip is ready in the office payroll portal. No data needs to be sent.',
+        link: null,
+        attachment: null,
+        options: [
+          { id: 'A', text: 'Reply with your salary PIN' },
+          { id: 'B', text: 'Open the official office payroll portal' },
+          { id: 'C', text: 'Send the OTP code by SMS' },
+          { id: 'D', text: 'Ignore the salary information' },
+        ],
+        is_phish: false,
+        correct_option: 'B',
+        red_flags: [],
+        explanation: 'The message only announces a payslip and does not ask for any sensitive data.',
+        teach: {
+          tip: "Access the portal through the office's official address.",
+          verify_how: 'Open the office payroll app directly.',
+        },
+      },
+    ],
+  },
+  null,
+  2,
+);
+
+/** Pilih contoh pack sesuai locale editor. */
+export function samplePack(locale = 'id') {
+  return locale === 'en' ? SAMPLE_PACK_EN : SAMPLE_PACK;
 }
 
 /** Contoh pack yang lolos validator, dipakai tombol "Muat contoh". */

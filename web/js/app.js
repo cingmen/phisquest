@@ -13,11 +13,11 @@ import {
   nowIso,
   startSession,
 } from './engine.js';
-import { translateUi } from './i18n.js';
+import { translateString, translateUi } from './i18n.js';
 import { makeEntry } from './leaderboard.js';
 import {
   PACK_PREFIX,
-  SAMPLE_PACK,
+  samplePack,
   alignScenarioPrefixes,
   createScenarioTemplate,
   deleteScenarioShortcut,
@@ -167,10 +167,16 @@ function showToast(message) {
 /** Umumkan teks ke pembaca layar. */
 function announce(message) {
   if (!dom.live) return;
+  const text = translateString(message);
   dom.live.textContent = '';
   window.setTimeout(() => {
-    dom.live.textContent = message;
+    dom.live.textContent = text;
   }, 30);
+}
+
+/** Konfirmasi browser dengan pesan yang mengikuti locale aktif. */
+function confirmMessage(message) {
+  return window.confirm(translateString(message));
 }
 
 /** Terjemahkan error menjadi pesan ramah. */
@@ -839,7 +845,7 @@ function reloadDraftFromStorage() {
 /** Timpa draft yang lebih baru dengan isi tab ini setelah konfirmasi. */
 function overwriteDraftFromTab() {
   if (!state.editorPack) return;
-  if (!window.confirm('Timpa draft yang lebih baru dari tab lain dengan isi tab ini?')) return;
+  if (!confirmMessage('Timpa draft yang lebih baru dari tab lain dengan isi tab ini?')) return;
   const result = persistEditorDraft({ force: true });
   state.editorMessage = result.stored
     ? 'Draft ditimpa dengan isi tab ini dan pack ikut diperbarui.'
@@ -943,7 +949,7 @@ function discardDraftById(packId) {
     render();
     return;
   }
-  if (!window.confirm(`Buang draft "${draft.name || packId}"? Isian di draft ini akan hilang.`)) return;
+  if (!confirmMessage(`Buang draft "${draft.name || packId}"? Isian di draft ini akan hilang.`)) return;
   try {
     removeDraftPack(packId);
   } catch (error) {
@@ -1001,10 +1007,13 @@ function resumeDraft(packId) {
 function createEditorPack() {
   state.editorPack = {
     pack_id: uniquePackId('kustom'),
-    name: `Pack lokal ${state.customPacks.length + 1}`,
+    name:
+      state.settings.locale === 'en'
+        ? `Local pack ${state.customPacks.length + 1}`
+        : `Pack lokal ${state.customPacks.length + 1}`,
     description: '',
     emoji: '🛠️',
-    scenarios: [createScenarioTemplate([], 'ew')],
+    scenarios: [createScenarioTemplate([], 'ew', state.settings.locale)],
   };
   state.editorSavedId = null;
   state.editorDraftId = null;
@@ -1028,7 +1037,7 @@ function editorAddScenario() {
   if (!pack) return;
   const prefix = PACK_PREFIX[pack.pack_id] || 'ew';
   const ids = pack.scenarios.map((scenario) => scenario.id);
-  pack.scenarios.push(createScenarioTemplate(ids, prefix));
+  pack.scenarios.push(createScenarioTemplate(ids, prefix, state.settings.locale));
   state.editorIndex = pack.scenarios.length - 1;
   const result = persistEditorDraft();
   state.editorMessage = result.stored
@@ -1044,7 +1053,7 @@ function editorDuplicateScenario(index) {
   if (!pack || !pack.scenarios[index]) return;
   const prefix = PACK_PREFIX[pack.pack_id] || 'ew';
   const before = pack.scenarios.length;
-  pack.scenarios = duplicateScenario(pack.scenarios, index, prefix);
+  pack.scenarios = duplicateScenario(pack.scenarios, index, prefix, state.settings.locale);
   if (pack.scenarios.length === before) return;
   state.editorIndex = index + 1;
   const copy = pack.scenarios[state.editorIndex];
@@ -1103,7 +1112,7 @@ function editorDeleteScenario(index) {
   const pack = state.editorPack;
   if (!pack || !pack.scenarios[index]) return;
   const label = pack.scenarios[index].label || pack.scenarios[index].id;
-  if (!window.confirm(`Hapus skenario "${label}" dari pack ini?`)) return;
+  if (!confirmMessage(`Hapus skenario "${label}" dari pack ini?`)) return;
   pack.scenarios.splice(index, 1);
   // Pilihan tidak berpindah bila yang dihapus ada di bawahnya; kalau di atasnya, indeks bergeser.
   if (index < state.editorIndex) state.editorIndex -= 1;
@@ -1152,7 +1161,7 @@ function editorSaveScenario() {
 function editorImportJson() {
   const input = document.getElementById('editor-input');
   state.editorText = input ? input.value : state.editorText;
-  const { pack: parsed, errors } = parsePackText(state.editorText);
+  const { pack: parsed, errors } = parsePackText(state.editorText, null, state.settings.locale);
   if (!parsed) {
     state.editorErrors = errors;
     state.editorMessage = 'Perbaiki masalah berikut sebelum mengimpor.';
@@ -1203,7 +1212,7 @@ function editorAlignPrefix() {
     return;
   }
   const lastId = `${prefix}-${String(pack.scenarios.length).padStart(3, '0')}`;
-  if (!window.confirm(`Ubah id skenario menjadi ${prefix}-001 … ${lastId}?`)) return;
+  if (!confirmMessage(`Ubah id skenario menjadi ${prefix}-001 … ${lastId}?`)) return;
   pack.scenarios = alignScenarioPrefixes(pack.scenarios, prefix);
   const result = persistEditorDraft();
   state.editorMessage = result.stored
@@ -1216,7 +1225,7 @@ function editorAlignPrefix() {
 function discardEditorDraft() {
   const pack = state.editorPack;
   if (!pack) return;
-  if (!window.confirm('Buang draft yang belum valid dan kembali ke versi tersimpan?')) return;
+  if (!confirmMessage('Buang draft yang belum valid dan kembali ke versi tersimpan?')) return;
   removeDraftPack(pack.pack_id);
   const stored =
     state.customPacks.find((item) => item.pack_id === pack.pack_id) || state.customPacks[0] || null;
@@ -1247,7 +1256,7 @@ function exportCustomPack() {
     return;
   }
   const readiness = validatePackShape(pack);
-  const payload = toContentPack(pack);
+  const payload = toContentPack(pack, state.settings.locale);
   try {
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1281,21 +1290,33 @@ function deletePack(packId) {
   }
   const draft = loadDraftPacks().find((item) => item.pack_id === packId);
   const active = state.editorPack && state.editorPack.pack_id === packId;
+  const english = state.settings.locale === 'en';
   const notes = [];
   if (active || (draft && state.editorDraftId === packId)) {
-    notes.push('Draft yang sedang diedit tetap tersimpan di perangkat.');
-    notes.push('Menyimpan draft itu lagi akan membuat pack baru, bukan mengembalikan pack diam-diam.');
+    notes.push(
+      english
+        ? 'The draft being edited is still saved on this device.'
+        : 'Draft yang sedang diedit tetap tersimpan di perangkat.',
+    );
+    notes.push(
+      english
+        ? 'Saving that draft again will create a new pack instead of restoring this one silently.'
+        : 'Menyimpan draft itu lagi akan membuat pack baru, bukan mengembalikan pack diam-diam.',
+    );
   }
   const sourceDrafts = loadDraftPacks().filter(
     (item) => item.source_pack_id === packId && item.pack_id !== packId,
   );
   if (sourceDrafts.length) {
+    const ids = sourceDrafts.map((item) => `'${item.pack_id}'`).join(', ');
     notes.push(
-      `Draft ${sourceDrafts.map((item) => `'${item.pack_id}'`).join(', ')} berasal dari pack ini dan tetap tersimpan.`,
+      english
+        ? `Draft ${ids} came from this pack and is still saved.`
+        : `Draft ${ids} berasal dari pack ini dan tetap tersimpan.`,
     );
   }
   const question = `Hapus pack "${pack.name}" (${pack.scenarios.length} skenario)?${notes.length ? ` ${notes.join(' ')}` : ''}`;
-  if (!window.confirm(question)) return;
+  if (!confirmMessage(question)) return;
   try {
     state.customPacks = removeCustomPack(packId);
   } catch (error) {
@@ -1323,7 +1344,7 @@ function deleteCustomPacks() {
     showToast('Tidak ada pack lokal.');
     return;
   }
-  if (!window.confirm('Hapus semua pack buatanmu di perangkat ini?')) return;
+  if (!confirmMessage('Hapus semua pack buatanmu di perangkat ini?')) return;
   clearCustomPacks();
   clearDraftPacks();
   state.customPacks = [];    state.editorPack = null;
@@ -1433,7 +1454,7 @@ async function refreshOnlineBoard() {
 /** Hapus skor online bila pemain meminta, setelah konfirmasi. */
 async function deleteOnlineData() {
   if (!state.onlinePlayerId || !state.onlineConfig.base) return;
-  if (!window.confirm('Hapus semua skor online untuk nickname ini? Progres lokal tidak terhapus.')) {
+  if (!confirmMessage('Hapus semua skor online untuk nickname ini? Progres lokal tidak terhapus.')) {
     return;
   }
   try {
@@ -1512,7 +1533,7 @@ async function handleImportFile(file) {
 
 /** Hapus progres setelah konfirmasi pemain. */
 function confirmReset() {
-  const confirmed = window.confirm(
+  const confirmed = confirmMessage(
     'Hapus seluruh progres, lencana, dan pengaturan di perangkat ini?',
   );
   if (!confirmed) return;
@@ -1604,7 +1625,7 @@ function handleClick(event) {
   } else if (action === 'editor-import') {
     editorImportJson();
   } else if (action === 'editor-sample') {
-    state.editorText = SAMPLE_PACK;
+    state.editorText = samplePack(state.settings.locale);
     state.editorErrors = [];
     state.editorMessage = 'Contoh dimuat. Tekan "Impor ke pack aktif" untuk menambahkannya.';
     render();

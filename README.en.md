@@ -160,8 +160,9 @@ node --test web/test/*.test.js
 
 The **🇬🇧 English** option on the About screen loads English translations for all 40 scenarios
 (`content/i18n/en.json`) and the core UI: navigation, menu, game, feedback, recap, badges, levels,
-red flags, and About. The choice is saved on the device and can be changed at any time without
-losing progress. The advanced scenario editor remains in Indonesian and is marked beta.
+red flags, About, and the advanced scenario editor (forms, validation, drafts, export, and
+confirmation dialogs). The choice is saved on the device and can be changed at any time without
+losing progress.
 
 ## Score card (v2.0)
 

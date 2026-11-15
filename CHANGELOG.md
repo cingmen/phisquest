@@ -3,6 +3,13 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## Belum dirilis
+
+- Editor skenario lanjutan kini sepenuhnya berbahasa Inggris: label form, pesan validasi, status
+  kesiapan pack, pengelolaan draft, ekspor/impor, pintasan, `aria-label`, dialog konfirmasi, dan
+  template skenario baru. Label **English (beta)** dihapus karena tidak ada lagi bagian UI yang
+  tertinggal dalam bahasa Indonesia.
+
 ## v2.0.0 — 2026-11-14
 
 - Klien web papan skor online: layar Tentang menyediakan nickname dan opt-in, skor sesi dikirim
@@ -27,7 +34,7 @@ Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan
   locale di pengaturan dan memuat konten sesuai bahasa tanpa menghapus progres.
 - UI inti berbahasa Inggris lewat lapisan `web/js/i18n.js`: navigasi, menu, permainan, umpan balik,
   recap, lencana, level, red flag, dan Tentang. Atribut `aria-label`/`placeholder` ikut diterjemahkan;
-  editor skenario lanjutan tetap berbahasa Indonesia dan ditandai beta.
+  editor skenario lanjutan ikut diterjemahkan penuh dan tidak lagi ditandai beta.
 - Test paritas `tests/test_i18n.py` memastikan setiap pack, skenario, field wajib, dan opsi punya
   terjemahan dan bukan salinan teks Indonesia; `web/test/i18n.test.js` menguji label statis dan pola
   dinamis.

@@ -894,9 +894,9 @@ export function renderAbout({
       <h3>Bahasa / Language</h3>
       <div class="btn-row">
         <button class="btn ${locale === 'id' ? 'btn--primary' : 'btn--ghost'}" data-action="set-locale" data-locale="id"${locale === 'id' ? ' aria-pressed="true"' : ''}>🇮🇩 Indonesia</button>
-        <button class="btn ${locale === 'en' ? 'btn--primary' : 'btn--ghost'}" data-action="set-locale" data-locale="en"${locale === 'en' ? ' aria-pressed="true"' : ''}>🇬🇧 English (beta)</button>
+        <button class="btn ${locale === 'en' ? 'btn--primary' : 'btn--ghost'}" data-action="set-locale" data-locale="en"${locale === 'en' ? ' aria-pressed="true"' : ''}>🇬🇧 English</button>
       </div>
-      <p class="pack__meta">English memakai terjemahan skenario dan label utama. Ganti bahasa kapan saja; progres tetap tersimpan.</p>
+      <p class="pack__meta">English mencakup seluruh skenario dan antarmuka, termasuk editor skenario. Ganti bahasa kapan saja; progres tetap tersimpan.</p>
       <h3>Etika &amp; legal</h3>
       <ul class="about-list">
         <li>Semua email, brand, dan domain di sini <strong>fiktif</strong>.</li>

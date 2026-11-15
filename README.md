@@ -203,8 +203,9 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
 
 Pemilih **🇬🇧 English** di layar Tentang memuat terjemahan Inggris untuk seluruh 40 skenario
 (`content/i18n/en.json`) dan UI inti: navigasi, menu, permainan, umpan balik, recap, lencana, level,
-red flag, serta Tentang. Pilihan bahasa disimpan di perangkat dan bisa diganti kapan saja tanpa
-kehilangan progres. Editor skenario lanjutan masih berbahasa Indonesia dan ditandai beta.
+red flag, Tentang, dan editor skenario lanjutan (form, validasi, draft, ekspor, serta dialog
+konfirmasi). Pilihan bahasa disimpan di perangkat dan bisa diganti kapan saja tanpa kehilangan
+progres.
 
 ## Kartu skor (v2.0)
 

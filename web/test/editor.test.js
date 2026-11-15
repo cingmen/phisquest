@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   SAMPLE_PACK,
+  samplePack,
   alignScenarioPrefixes,
   createScenarioTemplate,
   deleteScenarioShortcut,
@@ -760,4 +761,22 @@ test('pack_id tak dikenal ditolak saat ekspor dengan alasan jelas', () => {
   assert.ok(blocker.includes('ewallet-bank'));
   assert.equal(exportBlocker(readyPack), null);
   assert.ok((exportBlocker(null) || '').includes('Belum ada pack'));
+});
+
+test('template dan contoh editor mengikuti locale Inggris', () => {
+  const scenario = createScenarioTemplate([], 'ew', 'en');
+  assert.equal(scenario.label, 'New scenario');
+  assert.match(scenario.body, /^Hi, your account/);
+  assert.deepEqual(validateScenario(scenario), []);
+
+  const [copy] = duplicateScenario([scenario], 0, 'ew', 'en').slice(1);
+  assert.match(copy.label, /\(copy\)$/);
+
+  const exported = toContentPack({ ...scenario, pack_id: 'ewallet-bank' }, 'en');
+  assert.equal(exported.description, 'A custom pack from the PhishQuest editor.');
+
+  const sample = parsePackText(samplePack('en'), null, 'en');
+  assert.deepEqual(sample.errors, []);
+  assert.equal(sample.pack.name, 'My local pack');
+  assert.equal(sample.pack.scenarios[0].subject, 'Verify your account');
 });
