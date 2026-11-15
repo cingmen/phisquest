@@ -3,6 +3,11 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## Belum dirilis
+
+- `og:locale:alternate` kini menunjuk locale yang tidak aktif: `en_US` saat UI Indonesia dan
+  `id_ID` saat UI Inggris.
+
 ## v2.1.3 — 2026-11-15
 
 - Metadata halaman (judul tab, description, OG, dan Twitter) dipindahkan ke modul murni dan diuji

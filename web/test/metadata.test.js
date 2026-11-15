@@ -19,6 +19,7 @@ for (const tag of head.match(/<meta\b[^>]*>/gi) || []) {
 
 const META_KEYS = [
   'og:locale',
+  'og:locale:alternate',
   'og:title',
   'og:description',
   'og:image:alt',
@@ -58,6 +59,7 @@ test('metadata Indonesia di index.html sama dengan sumber locale id', () => {
   const metadata = documentMetadata('id');
   assert.equal(metadata.lang, 'id');
   assert.equal(metadata.meta['og:locale'], 'id_ID');
+  assert.equal(metadata.meta['og:locale:alternate'], 'en_US');
   assert.equal(metadata.title, indexTitle);
   assert.equal(metadata.description, indexMeta.description);
   for (const key of META_KEYS) {
@@ -71,6 +73,7 @@ test('metadata Inggris lengkap, berbeda, dan bebas teks Indonesia', () => {
   const en = documentMetadata('en');
   assert.equal(en.lang, 'en');
   assert.equal(en.meta['og:locale'], 'en_US');
+  assert.equal(en.meta['og:locale:alternate'], 'id_ID');
   assert.match(en.title, /Spot the bait before you get hooked/);
   assert.match(en.description, /Anti-phishing educational game/);
   assert.notEqual(en.title, id.title);

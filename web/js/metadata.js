@@ -11,6 +11,7 @@ const COPY = {
       'Game edukasi anti-phishing berbahasa Indonesia. Kenali red flag email, SMS, dan WhatsApp penipuan dalam kuis arcade yang seru.',
     meta: {
       'og:locale': 'id_ID',
+      'og:locale:alternate': 'en_US',
       'og:title': 'PhishQuest — Kenali umpan sebelum kamu terhook.',
       'og:description':
         'Game edukasi anti-phishing berbahasa Indonesia. 40 skenario email, SMS, dan WhatsApp untuk melatih instingmu.',
@@ -26,6 +27,7 @@ const COPY = {
       'Anti-phishing educational game with 40 realistic email, SMS, and WhatsApp scenarios. Spot red flags and build safer verification habits.',
     meta: {
       'og:locale': 'en_US',
+      'og:locale:alternate': 'id_ID',
       'og:title': 'PhishQuest — Spot the bait before you get hooked.',
       'og:description':
         'Anti-phishing educational game with 40 email, SMS, and WhatsApp scenarios to train your instincts.',
