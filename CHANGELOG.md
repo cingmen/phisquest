@@ -3,7 +3,7 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
-## Belum dirilis
+## v2.1.2 — 2026-11-15
 
 - Uji regresi locale Inggris memindai shell serta seluruh layar hasil render (menu, lencana, editor,
   permainan, umpan balik, recap, papan skor, dan Tentang) untuk memastikan tidak ada teks UI Indonesia

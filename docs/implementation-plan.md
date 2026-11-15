@@ -8,7 +8,7 @@
 |---|---|
 | Versi dokumen | 1.0.0 |
 | Terakhir diperbarui | 2026-11-15 |
-| Rilis terbaru | [v2.1.1](https://github.com/cingmen/phisquest/releases/tag/v2.1.1) |
+| Rilis terbaru | [v2.1.2](https://github.com/cingmen/phisquest/releases/tag/v2.1.2) |
 | Estimasi total | **±8,5 hari kerja paruh waktu** (≈ 3 minggu bila 2–3 jam/hari) |
 | Prasyarat | Baca `PRD.md` penuh + `coding-rules.md` §1–2 sebelum M0 |
 
@@ -161,6 +161,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, spesifikasi `api-specification.md` §7 + `database-schema.md` §5); kartu bagikan skor (gambar via canvas); i18n Inggris (terjemahan 40 skenario + UI inti; editor lanjutan tetap Indonesia) | 1–2 minggu | [Dirilis (v2.0.0)](https://github.com/cingmen/phisquest/releases/tag/v2.0.0) |
 | **v2.1.0** | Terjemahan penuh editor skenario lanjutan (form, validasi, draft, ekspor/impor, pintasan, dialog konfirmasi) dan penghapusan label beta | 1 hari | [Dirilis (v2.1.0)](https://github.com/cingmen/phisquest/releases/tag/v2.1.0) |
 | **v2.1.1** | Audit locale Inggris untuk seluruh layar, kartu skor, metadata halaman, dan pesan error | 1 hari | [Dirilis (v2.1.1)](https://github.com/cingmen/phisquest/releases/tag/v2.1.1) |
+| **v2.1.2** | Uji regresi locale Inggris memindai shell dan seluruh layar hasil render, plus melengkapi terjemahan label campur, peringkat online, pesan skor gagal terkirim, dan `noscript` | 1 hari | [Dirilis (v2.1.2)](https://github.com/cingmen/phisquest/releases/tag/v2.1.2) |
 
 ## 10. Strategi Pengujian
 
