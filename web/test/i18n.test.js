@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { translateString } from '../js/i18n.js';
+import { translateForLocale, translateString } from '../js/i18n.js';
 
 test('translateString menerjemahkan label statis', () => {
   assert.equal(translateString('Pilih pack'), 'Choose a pack');
@@ -38,6 +38,13 @@ test('translateString menerjemahkan editor skenario dan dialog konfirmasi', () =
     'Delete all packs you created on this device?');
   assert.equal(translateString('Menu tetap memainkan versi tersimpan (1 skenario) sampai draft ini lolos validasi.'),
     'The menu keeps playing the saved version (1 scenario) until this draft passes validation.');
+});
+
+test('translateForLocale hanya menerjemahkan saat locale Inggris', () => {
+  assert.equal(translateForLocale('en', 'Sesi dimulai. Soal pertama.'), 'Session started. First question.');
+  assert.equal(translateForLocale('id', 'Sesi dimulai. Soal pertama.'), 'Sesi dimulai. Soal pertama.');
+  assert.equal(translateForLocale('fr', 'Waktu habis.'), 'Waktu habis.');
+  assert.equal(translateForLocale('', 'Hapus pack ini?'), 'Hapus pack ini?');
 });
 
 test('translateString mempertahankan spasi di sekitar teks inline', () => {

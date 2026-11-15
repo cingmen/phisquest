@@ -13,7 +13,7 @@ import {
   nowIso,
   startSession,
 } from './engine.js';
-import { translateString, translateUi } from './i18n.js';
+import { translateForLocale, translateString, translateUi } from './i18n.js';
 import { makeEntry } from './leaderboard.js';
 import { applyDocumentMetadata } from './metadata.js';
 import {
@@ -168,7 +168,7 @@ function showToast(message) {
 /** Umumkan teks ke pembaca layar. */
 function announce(message) {
   if (!dom.live) return;
-  const text = translateString(message);
+  const text = translateForLocale(state.settings.locale || 'id', message);
   dom.live.textContent = '';
   window.setTimeout(() => {
     dom.live.textContent = text;
@@ -177,7 +177,7 @@ function announce(message) {
 
 /** Konfirmasi browser dengan pesan yang mengikuti locale aktif. */
 function confirmMessage(message) {
-  return window.confirm(translateString(message));
+  return window.confirm(translateForLocale(state.settings.locale || 'id', message));
 }
 
 /** Terjemahkan error menjadi pesan ramah. */

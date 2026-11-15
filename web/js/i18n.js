@@ -664,6 +664,16 @@ export function translateString(input) {
 }
 
 /**
+ * Terjemahkan pesan hanya saat locale Inggris; locale lain memakai teks asli.
+ * @param {string} locale - locale aktif.
+ * @param {string} input - pesan asli berbahasa Indonesia.
+ * @returns {string} pesan sesuai locale.
+ */
+export function translateForLocale(locale, input) {
+  return locale === 'en' ? translateString(input) : input;
+}
+
+/**
  * Terjemahkan teks dan atribut di dalam root secara in-place.
  * @param {string} locale - locale aktif.
  * @param {ParentNode} [root] - akar DOM; default document.body.
