@@ -43,3 +43,16 @@ test('translateString menerjemahkan editor skenario dan dialog konfirmasi', () =
 test('translateString mempertahankan spasi di sekitar teks inline', () => {
   assert.equal(translateString('  Pilih pack  '), '  Choose a pack  ');
 });
+
+test('translateString menerjemahkan teks game, recap, dan kartu skor', () => {
+  assert.equal(translateString('Sesi dimulai. Soal pertama.'), 'Session started. First question.');
+  assert.equal(translateString('Benar. 10 XP.'), 'Correct. 10 XP.');
+  assert.equal(translateString('Sesi selesai! 🎣'), 'Session complete! 🎣');
+  assert.equal(translateString('🚩 Tekanan waktu'), '🚩 Time pressure');
+  assert.equal(translateString('🎣 Tangkapan Pertama'), '🎣 First Catch');
+  assert.equal(translateString('of-007 · jawabanmu Phishing 🎣'), 'of-007 · your answer Phishing 🎣');
+  assert.equal(translateString('🏆 Peringkat #1'), '🏆 Rank #1');
+  assert.equal(translateString('🎣 Campur · 30%'), '🎣 Mixed · 30%');
+  assert.equal(translateString('Sesi selesai. Ringkasan ditampilkan.'), 'Session complete. Showing the recap.');
+  assert.equal(translateString('Kartu skor diunduh sebagai phishquest-x.png.'), 'Score card downloaded as phishquest-x.png.');
+});

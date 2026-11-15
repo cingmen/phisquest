@@ -108,3 +108,26 @@ test('kartu digambar pada 1200×630 dengan skor dan label utama', () => {
   assert.ok(ctx.texts.includes('Analis Muda'));
   assert.ok(ctx.texts.every((text) => !text.includes('undefined') && !text.includes('NaN')));
 });
+
+test('kartu skor mengikuti locale Inggris', () => {
+  const model = buildShareCardModel({
+    summary: { score: 80, max_score: 100, accuracy: 0.8, mode: 'classic', best_streak_in_session: 2 },
+    locale: 'en',
+    levelLabel: 'Detective',
+    packLabel: 'Office',
+  });
+  assert.equal(model.tagline, 'Spot the bait before you get hooked');
+  assert.equal(model.mode, 'Classic');
+  assert.equal(model.level, 'Detective');
+  assert.equal(model.scoreOf, 'of 100 maximum XP');
+  assert.equal(model.footer, 'Educational simulation · no personal data');
+  assert.deepEqual(model.labels, { accuracy: 'Accuracy', streak: 'Streak', level: 'Level' });
+  assert.match(model.shareText, /^PhishQuest score: 80\/100 XP · accuracy 80%$/);
+
+  const ctx = fakeContext();
+  drawShareCard(ctx, model);
+  assert.ok(ctx.texts.includes('Accuracy'));
+  assert.ok(ctx.texts.includes('of 100 maximum XP'));
+  assert.ok(ctx.texts.includes('Educational simulation · no personal data'));
+  assert.ok(ctx.texts.includes('Classic'));
+});

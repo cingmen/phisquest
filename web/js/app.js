@@ -1497,11 +1497,13 @@ async function shareScoreCard() {
     const { buildShareCardModel, createShareCard, shareCardFilename, shareShareCard } = await import(
       './share-card.js'
     );
+    const levelName = LEVEL_NAMES[state.summary.level_after] || 'Amatir';
     const model = buildShareCardModel({
       summary: state.summary,
-      levelLabel: LEVEL_NAMES[state.summary.level_after] || 'Amatir',
+      levelLabel: state.settings.locale === 'en' ? translateString(levelName) : levelName,
       at: state.summary.at || '',
       packLabel: state.packLabel,
+      locale: state.settings.locale,
     });
     const canvas = createShareCard(model);
     const filename = shareCardFilename(model);
@@ -1826,6 +1828,45 @@ function loadProgressSafe() {
   }
 }
 
+/** Selaraskan bahasa dokumen, judul tab, dan metadata bagikan dengan locale aktif. */
+function applyDocumentLocale() {
+  const english = state.settings.locale === 'en';
+  document.documentElement.lang = english ? 'en' : 'id';
+  document.title = english
+    ? 'PhishQuest — Spot the bait before you get hooked.'
+    : 'PhishQuest — Kenali umpan sebelum kamu terhook.';
+  const values = english
+    ? {
+        description:
+          'Anti-phishing educational game with 40 realistic email, SMS, and WhatsApp scenarios. Spot red flags and build safer verification habits.',
+        'og:title': 'PhishQuest — Spot the bait before you get hooked.',
+        'og:description':
+          'Anti-phishing educational game with 40 email, SMS, and WhatsApp scenarios to train your instincts.',
+        'og:image:alt': 'PhishQuest — an anti-phishing educational game.',
+        'twitter:title': 'PhishQuest — Spot the bait before you get hooked.',
+        'twitter:description':
+          '40 Indonesian phishing scenarios in an arcade quiz: play on the web or CLI.',
+      }
+    : {
+        description:
+          'Game edukasi anti-phishing berbahasa Indonesia. Kenali red flag email, SMS, dan WhatsApp penipuan dalam kuis arcade yang seru.',
+        'og:title': 'PhishQuest — Kenali umpan sebelum kamu terhook.',
+        'og:description':
+          'Game edukasi anti-phishing berbahasa Indonesia. 40 skenario email, SMS, dan WhatsApp untuk melatih instingmu.',
+        'og:image:alt': 'PhishQuest — game edukasi anti-phishing berbahasa Indonesia.',
+        'twitter:title': 'PhishQuest — Kenali umpan sebelum kamu terhook.',
+        'twitter:description':
+          '40 skenario phishing Indonesia dalam kuis arcade: main di web atau CLI.',
+      };
+  const description = document.querySelector('meta[name="description"]');
+  if (description) description.setAttribute('content', values.description);
+  for (const [property, content] of Object.entries(values)) {
+    if (property === 'description') continue;
+    const meta = document.querySelector(`meta[property="${property}"], meta[name="${property}"]`);
+    if (meta) meta.setAttribute('content', content);
+  }
+}
+
 /** Titik masuk aplikasi. */
 async function boot() {
   cacheDom();
@@ -1836,11 +1877,7 @@ async function boot() {
   state.onlineConfig = onlineConfig();
   state.onlinePlayerId = loadOnlinePlayer();
   state.settings = loadSettings();
-  document.documentElement.lang = state.settings.locale === 'en' ? 'en' : 'id';
-  document.title =
-    state.settings.locale === 'en'
-      ? 'PhishQuest — Spot the bait before you get hooked.'
-      : 'PhishQuest — Kenali umpan sebelum kamu terhook.';
+  applyDocumentLocale();
   updateStats();
   render();
   try {

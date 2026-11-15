@@ -13,10 +13,10 @@ const MAX_ACCURACY = 1;
  * @param {string} packLabel - label pack aktif.
  * @returns {string} nama pack atau "Campur Semua".
  */
-function packName(summary, packLabel) {
+function packName(summary, packLabel, locale = 'id') {
   const label = String(packLabel || '').trim();
   if (label) return label;
-  return summary && summary.pack_id ? String(summary.pack_id) : 'Campur Semua';
+  return summary && summary.pack_id ? String(summary.pack_id) : locale === 'en' ? 'Mixed' : 'Campur Semua';
 }
 
 /**
@@ -24,7 +24,14 @@ function packName(summary, packLabel) {
  * @param {object} options - { summary, levelLabel, at, packLabel }.
  * @returns {object} model kartu yang siap digambar.
  */
-export function buildShareCardModel({ summary, levelLabel = 'Amatir', at = '', packLabel = '' }) {
+export function buildShareCardModel({
+  summary,
+  levelLabel = '',
+  at = '',
+  packLabel = '',
+  locale = 'id',
+}) {
+  const english = locale === 'en';
   const score = Math.max(0, Number(summary && summary.score) || 0);
   const maxScore = Math.max(1, Number(summary && summary.max_score) || 1);
   const accuracy = Math.min(
@@ -33,17 +40,31 @@ export function buildShareCardModel({ summary, levelLabel = 'Amatir', at = '', p
   );
   return {
     title: 'PhishQuest',
-    tagline: 'Kenali umpan sebelum kamu terhook',
-    pack: packName(summary, packLabel),
+    tagline: english ? 'Spot the bait before you get hooked' : 'Kenali umpan sebelum kamu terhook',
+    pack: packName(summary, packLabel, locale),
     score,
     maxScore,
     accuracy,
     accuracyText: `${Math.round(accuracy * 100)}%`,
-    mode: summary && summary.mode === 'time_attack' ? 'Time Attack' : 'Klasik',
+    mode:
+      summary && summary.mode === 'time_attack'
+        ? 'Time Attack'
+        : english
+          ? 'Classic'
+          : 'Klasik',
     streak: Math.max(0, Number(summary && summary.best_streak_in_session) || 0),
-    level: String(levelLabel || 'Amatir'),
+    level: String(levelLabel || (english ? 'Amateur' : 'Amatir')),
     at: String(at || ''),
-    footer: 'Simulasi edukasi · tanpa data pribadi',
+    footer: english
+      ? 'Educational simulation · no personal data'
+      : 'Simulasi edukasi · tanpa data pribadi',
+    scoreOf: english ? `of ${maxScore} maximum XP` : `dari ${maxScore} XP maksimum`,
+    labels: english
+      ? { accuracy: 'Accuracy', streak: 'Streak', level: 'Level' }
+      : { accuracy: 'Akurasi', streak: 'Streak', level: 'Level' },
+    shareText: english
+      ? `PhishQuest score: ${score}/${maxScore} XP · accuracy ${Math.round(accuracy * 100)}%`
+      : `Skor PhishQuest: ${score}/${maxScore} XP · akurasi ${Math.round(accuracy * 100)}%`,
   };
 }
 
@@ -114,12 +135,13 @@ export function drawShareCard(ctx, model, options = {}) {
   ctx.fillText('XP', pad + 40 + ctx.measureText(String(model.score)).width + 18, scoreBoxTop + 124);
   ctx.fillStyle = 'rgba(255,255,255,0.78)';
   ctx.font = '400 24px Nunito, "Segoe UI", sans-serif';
-  ctx.fillText(`dari ${model.maxScore} XP maksimum`, pad + 36, scoreBoxTop + 162);
+  ctx.fillText(model.scoreOf || `dari ${model.maxScore} XP maksimum`, pad + 36, scoreBoxTop + 162);
 
+  const labels = model.labels || { accuracy: 'Akurasi', streak: 'Streak', level: 'Level' };
   const stats = [
-    ['Akurasi', model.accuracyText],
-    ['Streak', `${model.streak}`],
-    ['Level', model.level],
+    [labels.accuracy, model.accuracyText],
+    [labels.streak, `${model.streak}`],
+    [labels.level, model.level],
   ];
   const statLeft = pad + 500;
   stats.forEach(([label, value], index) => {
@@ -202,7 +224,9 @@ export async function shareShareCard(canvas, filename, model) {
     const data = {
       files: [file],
       title: 'PhishQuest',
-      text: `Skor PhishQuest: ${model.score}/${model.maxScore} XP · akurasi ${model.accuracyText}`,
+      text:
+        model.shareText ||
+        `Skor PhishQuest: ${model.score}/${model.maxScore} XP · akurasi ${model.accuracyText}`,
     };
     if (typeof navigator.canShare !== 'function' || navigator.canShare({ files: [file] })) {
       try {

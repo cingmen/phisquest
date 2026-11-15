@@ -67,6 +67,33 @@ const EXACT = {
   '✅ Tidak ada red flag — pesan ini wajar.': '✅ No red flags — this message is normal.',
   'Progres soal': 'Question progress',
   'Progres level': 'Level progress',
+  'Memuat konten…': 'Loading content…',
+  'Konten gagal dimuat': 'Content failed to load',
+  'Periksa koneksi lalu muat ulang halaman.': 'Check your connection and reload the page.',
+  'Coba lagi': 'Try again',
+  'Isi nickname 1–16 karakter di layar Tentang.':
+    'Enter a nickname of 1–16 characters on the About screen.',
+  'Pengiriman skor online gagal.': 'Online score submission failed.',
+  'Pengaturan disimpan. Skor berikutnya akan dikirim setelah sesi selesai.':
+    'Settings saved. Your next score will be sent after the session ends.',
+  'Pengaturan disimpan. Skor tetap lokal.': 'Settings saved. Scores stay local.',
+  'Pengaturan papan skor online disimpan.': 'Online leaderboard settings saved.',
+  'Data online dihapus. Progres lokal tetap aman.':
+    'Online data deleted. Local progress is still safe.',
+  'Data online dihapus.': 'Online data deleted.',
+  'Kartu skor dibagikan.': 'Score card shared.',
+  'Progres berhasil diimpor.': 'Progress imported successfully.',
+  'Progres dihapus. Selamat mulai dari awal!': 'Progress deleted. Have a fresh start!',
+  'Progres lama tidak terbaca. Mulai sesi baru, atau reset dari menu Tentang.':
+    'Old progress could not be read. Start a new session, or reset it from the About screen.',
+  'coba lagi nanti.': 'try again later.',
+  'Sesi dimulai. Soal pertama.': 'Session started. First question.',
+  'Waktu habis.': 'Time is up.',
+  'Sesi selesai. Ringkasan ditampilkan.': 'Session complete. Showing the recap.',
+  'di papan skor perangkat ini.': 'on this device’s leaderboard.',
+  Campur: 'Mixed',
+  'Impor JSON gagal.': 'JSON import failed.',
+  'Ekspor ditolak.': 'Export rejected.',
 
   // Recap.
   'Sesi selesai!': 'Session complete!',
@@ -165,6 +192,7 @@ const EXACT = {
     'Run the validator and tests before sending a pull request.',
   'Papan skor online': 'Online leaderboard',
   'Papan skor online (opsional)': 'Online leaderboard (optional)',
+  'Nickname (1–16 karakter)': 'Nickname (1–16 characters)',
   'Hanya nickname pilihanmu dan hasil sesi yang dikirim. Tanpa akun, email, atau ID perangkat. Kosongkan nickname atau matikan centang untuk tetap bermain lokal.':
     'Only your chosen nickname and session results are sent. No account, email, or device ID. Leave the nickname empty or untick the box to keep playing locally.',
   'Kirim skor ke papan online setelah sesi selesai':
@@ -380,6 +408,32 @@ const EXACT = {
     'Sample loaded. Press "Import into active pack" to add it.',
   'Terjadi kesalahan tak terduga. Coba muat ulang halaman.':
     'An unexpected error occurred. Try reloading the page.',
+  'Jawaban untuk soal ini harus PHISH atau LEGIT.':
+    'The answer to this question must be PHISH or LEGIT.',
+  'Sesi ini sudah selesai.': 'This session is already complete.',
+  'Tidak ada soal aktif; sesi sudah habis.': 'No active question; the session is over.',
+  'Soal ini sudah dijawab.': 'This question has already been answered.',
+  'Sesi belum selesai; masih ada soal yang belum dijawab.':
+    'The session is not complete; some questions are still unanswered.',
+  'Batas waktu harus lebih dari 0 milidetik.': 'The time limit must be greater than 0 milliseconds.',
+  'Jumlah soal minimal 1.': 'The question count must be at least 1.',
+  'Tidak ada skenario yang cocok dengan filter yang dipilih.':
+    'No scenarios match the selected filter.',
+  'Penyimpanan penuh atau diblokir. Progres tetap jalan selama tab ini terbuka.':
+    'Storage is full or blocked. Progress continues while this tab stays open.',
+  'Data progres tidak dapat dibaca.': 'Progress data could not be read.',
+  'Berkas impor bukan JSON yang valid.': 'The imported file is not valid JSON.',
+  'Berkas impor tidak memuat objek progress.': 'The imported file does not contain a progress object.',
+  'Manifest konten gagal dimuat.': 'The content manifest failed to load.',
+  'Versi skema konten tidak didukung.': 'This content schema version is not supported.',
+  'Manifest tidak memuat pack.': 'The manifest does not contain any packs.',
+  'Konten tidak dapat dimuat. Periksa koneksi lalu muat ulang.':
+    'Content could not be loaded. Check your connection and reload.',
+  'Web Crypto tidak tersedia; skor online tidak dikirim.':
+    'Web Crypto is unavailable; the online score was not sent.',
+  'Canvas 2D tidak tersedia.': 'Canvas 2D is unavailable.',
+  'Kartu skor gagal dibuat.': 'The score card could not be created.',
+  'Papan skor online tidak aktif.': 'The online leaderboard is not active.',
 };
 
 const PATTERNS = [
@@ -520,6 +574,32 @@ const PATTERNS = [
   [/^Belum ada versi tersimpan yang bisa dimainkan\.$/, 'There is no saved version to play yet.'],
   [/^Masalah pertama: (.+)$/, (match, problem) => `First issue: ${translateString(problem)}`],
   [/^📝 Draft tersimpan di perangkat, tetapi belum lolos validasi\. (.+)$/, (match, rest) => `📝 Draft saved on this device, but it has not passed validation. ${translateString(rest)}`],
+  [/^Benar\. (\d+) XP\.$/, 'Correct. $1 XP.'],
+  [/^Belum tepat\. (\d+) XP\.$/, 'Not quite. $1 XP.'],
+  [/^Skor online peringkat (\d+) dari (\d+)\.$/, 'Online score rank $1 of $2.'],
+  [/^Peringkat #(\d+)$/, 'Rank #$1'],
+  [/^Campur · (\d+)%$/, 'Mixed · $1%'],
+  [/^(\d+)% · (\d+) dtk$/, '$1% · $2s'],
+  [/^Jawaban '(.+)' bukan opsi yang tersedia\.$/, "Answer '$1' is not an available option."],
+  [/^Mode '(.+)' tidak dikenal\.$/, "Unknown mode '$1'."],
+  [/^Versi berkas impor (.+) tidak didukung\.$/, 'Import file version $1 is not supported.'],
+  [/^Pack '(.+)' tidak ada di manifest\.$/, "Pack '$1' is not in the manifest."],
+  [/^Pack '(.+)' gagal dimuat\.$/, "Pack '$1' failed to load."],
+  [/^Versi skema pack '(.+)' tidak didukung\.$/, "Schema version for pack '$1' is not supported."],
+  [/^Pack '(.+)' tidak berisi skenario\.$/, "Pack '$1' contains no scenarios."],
+  [/^Terjemahan konten '(.+)' gagal dimuat\.$/, "Content translation '$1' failed to load."],
+  [/^Permintaan online gagal \(HTTP (\d+)\)\.$/, 'Online request failed (HTTP $1).'],
+  [/^Penghapusan gagal \(HTTP (\d+)\)\.$/, 'Deletion failed (HTTP $1).'],
+  [/^Peringkat #(\d+) dari (\d+) skor di papan online\.$/, 'Rank #$1 of $2 scores on the online leaderboard.'],
+  [/^(.+) · jawabanmu (.+)$/, (match, id, answer) => `${id} · your answer ${translateString(answer)}`],
+  [/^(\p{Extended_Pictographic}\uFE0F*) (.+)$/u, (match, icon, text) => `${icon} ${translateString(text)}`],
+  [/^(.+) (\p{Extended_Pictographic}\uFE0F*)$/u, (match, text, icon) => `${translateString(text)} ${icon}`],
+  [/^Skor terkirim ke papan online: peringkat #(\d+) dari (\d+)\.$/, 'Score sent to the online leaderboard: rank #$1 of $2.'],
+  [/^Skor online tidak terkirim: (.+)$/, (match, reason) => `Online score not sent: ${translateString(reason)}`],
+  [/^Papan online (.+) dimuat\.$/, 'Online leaderboard for $1 loaded.'],
+  [/^Papan online gagal dimuat: (.+)$/, (match, reason) => `Online leaderboard failed to load: ${translateString(reason)}`],
+  [/^Data online gagal dihapus: (.+)$/, (match, reason) => `Failed to delete online data: ${translateString(reason)}`],
+  [/^Kartu skor diunduh sebagai (.+)\.$/, 'Score card downloaded as $1.'],
 ];
 
 const NAME_FRAGMENTS = [
