@@ -9,7 +9,7 @@
 | Nama produk | **PhishQuest** |
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
-| Status | Terkunci untuk pengembangan v1.0 |
+| Status | Dirilis v2.0.0; dokumen menjadi sumber kebenaran produk |
 | Target rilis | v2.0.0 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
 | Rilis terbaru | [v2.0.0](https://github.com/cingmen/phisquest/releases/tag/v2.0.0) — 15 November 2026 |
 | Terakhir diperbarui | 2026-11-15 |

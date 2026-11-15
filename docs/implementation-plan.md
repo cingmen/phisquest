@@ -1,6 +1,6 @@
 # 🗺️ Implementation Plan — PhishQuest
 
-> Rencana pengerjaan bertahap v1.0. Dibagi menjadi milestone kecil dengan *Definition of Done*
+> Rencana pengerjaan bertahap v1.0–v2.0. Dibagi menjadi milestone kecil dengan *Definition of Done*
 > (DoD) agar pengerjaan — oleh manusia maupun AI — berjalan rapi, hemat token, dan setiap tahap
 > meninggalkan repo dalam kondisi bisa dijalankan.
 

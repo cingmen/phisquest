@@ -358,7 +358,7 @@ Exit codes: `0` valid · `1` error validasi · `2` argumen/path salah.
 
 ## 7. REST API v2 — Leaderboard Online (Opsional, diimplementasikan di `server/`)
 
-Leaderboard online **anonim tanpa PII**. Backend rencana: FastAPI + SQLite (`database-schema.md` §6), di-host terpisah dari Pages. Bagian ini difinalkan sekarang supaya implementasi v2 tidak mengubah kontrak web.
+Leaderboard online **anonim tanpa PII**. Backend FastAPI + SQLite tersedia di `server/` (`database-schema.md` §5) dan di-host terpisah dari Pages. Kontrak ini dipakai oleh klien web `web/js/online-leaderboard.js` dan test server di `server/tests/test_api.py`.
 
 ### 7.1 Prinsip
 

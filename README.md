@@ -9,7 +9,8 @@
 ![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)
 ![PRs welcome](https://img.shields.io/badge/PR-welcome-brightgreen.svg)
 
-PhishQuest adalah game edukasi anti-phishing berbahasa Indonesia. Pemain membaca pesan
+PhishQuest adalah game edukasi anti-phishing berbahasa Indonesia dengan terjemahan
+Inggris. Pemain membaca pesan
 yang meniru email, SMS, dan WhatsApp — transaksi bank mencurigakan, paket tertahan,
 undangan beasiswa — lalu memutuskan apakah pesan itu **phishing atau legit**, memilih
 **tindakan terbaik**, atau menunjuk **red flag** yang paling mencurigakan.
