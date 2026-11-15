@@ -3,6 +3,12 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## Belum dirilis
+
+- Metadata halaman (judul tab, description, OG, dan Twitter) dipindahkan ke modul murni dan diuji
+  untuk locale Indonesia dan Inggris, termasuk sinkronisasi nilai dasar dengan `index.html` serta
+  penerapannya ke dokumen.
+
 ## v2.1.2 — 2026-11-15
 
 - Uji regresi locale Inggris memindai shell serta seluruh layar hasil render (menu, lencana, editor,
