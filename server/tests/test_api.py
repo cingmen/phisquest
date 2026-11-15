@@ -25,7 +25,7 @@ def score_payload(**overrides: object) -> dict[str, object]:
         "max_score": 100,
         "accuracy": 0.9,
         "duration_s": 300,
-        "client_version": "2.1.2",
+        "client_version": "2.1.3",
     }
     payload.update(overrides)
     payload["sig"] = sign_payload(payload, SECRET)
@@ -58,7 +58,7 @@ def post_score(client: TestClient, payload: dict[str, object], key: str | None =
 def test_health_and_empty_stats(client: TestClient) -> None:
     response = client.get("/healthz")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "version": "2.1.2"}
+    assert response.json() == {"status": "ok", "version": "2.1.3"}
     assert client.get("/v1/stats/global").json() == {
         "total_players": 0,
         "total_sessions": 0,

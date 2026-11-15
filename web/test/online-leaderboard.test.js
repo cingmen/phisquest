@@ -51,7 +51,7 @@ test('payload skor dinormalkan ke batas server', () => {
     max_score: 1,
     accuracy: 1,
     duration_s: 7200,
-    client_version: '2.1.2',
+    client_version: '2.1.3',
   });
 });
 

@@ -9,9 +9,9 @@
 | Nama produk | **PhishQuest** |
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
-| Status | Dirilis v2.1.2; dokumen menjadi sumber kebenaran produk |
-| Target rilis | v2.1.2 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
-| Rilis terbaru | [v2.1.2](https://github.com/cingmen/phisquest/releases/tag/v2.1.2) — 15 November 2026 |
+| Status | Dirilis v2.1.3; dokumen menjadi sumber kebenaran produk |
+| Target rilis | v2.1.3 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Rilis terbaru | [v2.1.3](https://github.com/cingmen/phisquest/releases/tag/v2.1.3) — 15 November 2026 |
 | Terakhir diperbarui | 2026-11-15 |
 | Bahasa konten | Indonesia + Inggris (skenario dan seluruh UI, termasuk editor); README dwibahasa (ID/EN) |
 
@@ -447,6 +447,7 @@ stateDiagram-v2
 | **v2.1.0** | Editor skenario lanjutan sepenuhnya berbahasa Inggris, termasuk validasi, draft, ekspor/impor, pintasan, dan dialog konfirmasi; label beta dihapus | [Dirilis (v2.1.0)](https://github.com/cingmen/phisquest/releases/tag/v2.1.0) |
 | **v2.1.1** | Audit locale Inggris menutup sisa teks Indonesia di pengumuman sesi, label red flag, nama lencana recap, peringkat, kartu skor, metadata halaman, serta pesan error dan papan skor online | [Dirilis (v2.1.1)](https://github.com/cingmen/phisquest/releases/tag/v2.1.1) |
 | **v2.1.2** | Uji regresi memindai shell dan seluruh layar agar teks UI Indonesia tidak lolos pada locale Inggris; melengkapi label campur, ringkasan peringkat online, pesan skor gagal terkirim, dan `noscript` | [Dirilis (v2.1.2)](https://github.com/cingmen/phisquest/releases/tag/v2.1.2) |
+| **v2.1.3** | Metadata halaman dipisahkan ke modul murni dan diuji untuk locale Indonesia/Inggris; `og:locale` mengikuti locale (`id_ID`/`en_US`) dan seluruh tag title, description, OG, serta Twitter tersinkron dengan `index.html` | [Dirilis (v2.1.3)](https://github.com/cingmen/phisquest/releases/tag/v2.1.3) |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
 
