@@ -3,10 +3,11 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
-## Belum dirilis
+## v2.2.0 — 2026-11-15
 
 - `og:locale:alternate` kini menunjuk locale yang tidak aktif: `en_US` saat UI Indonesia dan
-  `id_ID` saat UI Inggris.
+  `id_ID` saat UI Inggris. Tag default di `index.html`, nilai locale, dan penerapannya ke dokumen
+  dicakup regresi metadata.
 
 ## v2.1.3 — 2026-11-15
 

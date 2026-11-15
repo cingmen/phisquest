@@ -4,7 +4,7 @@
  */
 
 export const ONLINE_PLAYER_KEY = 'pq_online_player_v1';
-export const CLIENT_VERSION = '2.1.3';
+export const CLIENT_VERSION = '2.2.0';
 
 /**
  * Baca konfigurasi dari meta tag; kosong berarti fitur online tidak ditawarkan.

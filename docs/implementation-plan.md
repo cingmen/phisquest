@@ -8,7 +8,7 @@
 |---|---|
 | Versi dokumen | 1.0.0 |
 | Terakhir diperbarui | 2026-11-15 |
-| Rilis terbaru | [v2.1.3](https://github.com/cingmen/phisquest/releases/tag/v2.1.3) |
+| Rilis terbaru | [v2.2.0](https://github.com/cingmen/phisquest/releases/tag/v2.2.0) |
 | Estimasi total | **±8,5 hari kerja paruh waktu** (≈ 3 minggu bila 2–3 jam/hari) |
 | Prasyarat | Baca `PRD.md` penuh + `coding-rules.md` §1–2 sebelum M0 |
 
@@ -163,6 +163,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v2.1.1** | Audit locale Inggris untuk seluruh layar, kartu skor, metadata halaman, dan pesan error | 1 hari | [Dirilis (v2.1.1)](https://github.com/cingmen/phisquest/releases/tag/v2.1.1) |
 | **v2.1.2** | Uji regresi locale Inggris memindai shell dan seluruh layar hasil render, plus melengkapi terjemahan label campur, peringkat online, pesan skor gagal terkirim, dan `noscript` | 1 hari | [Dirilis (v2.1.2)](https://github.com/cingmen/phisquest/releases/tag/v2.1.2) |
 | **v2.1.3** | `web/js/metadata.js` menjadi sumber murni metadata dokumen; `og:locale` mengikuti locale (`id_ID`/`en_US`) dan regresi memeriksa title, description, OG, Twitter, sinkronisasi `index.html`, serta penerapannya ke dokumen | 1 hari | [Dirilis (v2.1.3)](https://github.com/cingmen/phisquest/releases/tag/v2.1.3) |
+| **v2.2.0** | `og:locale:alternate` mengikuti locale yang tidak aktif (`en_US`/`id_ID`); tag default di `index.html`, nilai kedua locale, dan penerapannya ke dokumen dicakup regresi metadata | 1 hari | [Dirilis (v2.2.0)](https://github.com/cingmen/phisquest/releases/tag/v2.2.0) |
 
 ## 10. Strategi Pengujian
 
