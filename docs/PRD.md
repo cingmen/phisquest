@@ -9,9 +9,9 @@
 | Nama produk | **PhishQuest** |
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
-| Status | Dirilis v2.2.1; dokumen menjadi sumber kebenaran produk |
-| Target rilis | v2.2.1 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
-| Rilis terbaru | [v2.2.1](https://github.com/cingmen/phisquest/releases/tag/v2.2.1) — 15 November 2026 |
+| Status | Dirilis v2.2.2; dokumen menjadi sumber kebenaran produk |
+| Target rilis | v2.2.2 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Rilis terbaru | [v2.2.2](https://github.com/cingmen/phisquest/releases/tag/v2.2.2) — 15 November 2026 |
 | Terakhir diperbarui | 2026-11-15 |
 | Bahasa konten | Indonesia + Inggris (skenario dan seluruh UI, termasuk editor); README dwibahasa (ID/EN) |
 
@@ -450,6 +450,7 @@ stateDiagram-v2
 | **v2.1.3** | Metadata halaman dipisahkan ke modul murni dan diuji untuk locale Indonesia/Inggris; `og:locale` mengikuti locale (`id_ID`/`en_US`) dan seluruh tag title, description, OG, serta Twitter tersinkron dengan `index.html` | [Dirilis (v2.1.3)](https://github.com/cingmen/phisquest/releases/tag/v2.1.3) |
 | **v2.2.0** | `og:locale:alternate` menunjuk locale yang tidak aktif (`en_US` saat UI Indonesia, `id_ID` saat UI Inggris), dengan tag default, nilai locale, dan penerapan ke dokumen yang diuji | [Dirilis (v2.2.0)](https://github.com/cingmen/phisquest/releases/tag/v2.2.0) |
 | **v2.2.1** | Pengumuman pembaca layar dan dialog konfirmasi mengikuti locale aktif, sehingga locale Indonesia tidak lagi memunculkan teks Inggris | [Dirilis (v2.2.1)](https://github.com/cingmen/phisquest/releases/tag/v2.2.1) |
+| **v2.2.2** | Recap Time Attack memakai bentuk tunggal yang benar untuk satu soal timeout (`1 timed-out question`) | [Dirilis (v2.2.2)](https://github.com/cingmen/phisquest/releases/tag/v2.2.2) |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
 

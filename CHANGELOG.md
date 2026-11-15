@@ -3,6 +3,11 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
+## v2.2.2 — 2026-11-15
+
+- Recap mode Time Attack memakai bentuk tunggal yang benar saat hanya satu soal timeout
+  (`1 timed-out question`).
+
 ## v2.2.1 — 2026-11-15
 
 - Pengumuman pembaca layar dan dialog konfirmasi kini memakai bahasa Indonesia saat locale `id`;

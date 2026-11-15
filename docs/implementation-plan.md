@@ -8,7 +8,7 @@
 |---|---|
 | Versi dokumen | 1.0.0 |
 | Terakhir diperbarui | 2026-11-15 |
-| Rilis terbaru | [v2.2.1](https://github.com/cingmen/phisquest/releases/tag/v2.2.1) |
+| Rilis terbaru | [v2.2.2](https://github.com/cingmen/phisquest/releases/tag/v2.2.2) |
 | Estimasi total | **±8,5 hari kerja paruh waktu** (≈ 3 minggu bila 2–3 jam/hari) |
 | Prasyarat | Baca `PRD.md` penuh + `coding-rules.md` §1–2 sebelum M0 |
 
@@ -165,6 +165,7 @@ fondasi  konten  engine  CLI    web    rilis
 | **v2.1.3** | `web/js/metadata.js` menjadi sumber murni metadata dokumen; `og:locale` mengikuti locale (`id_ID`/`en_US`) dan regresi memeriksa title, description, OG, Twitter, sinkronisasi `index.html`, serta penerapannya ke dokumen | 1 hari | [Dirilis (v2.1.3)](https://github.com/cingmen/phisquest/releases/tag/v2.1.3) |
 | **v2.2.0** | `og:locale:alternate` mengikuti locale yang tidak aktif (`en_US`/`id_ID`); tag default di `index.html`, nilai kedua locale, dan penerapannya ke dokumen dicakup regresi metadata | 1 hari | [Dirilis (v2.2.0)](https://github.com/cingmen/phisquest/releases/tag/v2.2.0) |
 | **v2.2.1** | `translateForLocale()` menjaga pengumuman pembaca layar dan dialog konfirmasi tetap berbahasa Indonesia pada locale `id`, dengan regresi locale dan verifikasi browser | 1 hari | [Dirilis (v2.2.1)](https://github.com/cingmen/phisquest/releases/tag/v2.2.1) |
+| **v2.2.2** | Pola recap Time Attack memilih `question`/`questions` sesuai jumlah soal timeout, dengan regresi bentuk tunggal dan jamak | 1 hari | [Dirilis (v2.2.2)](https://github.com/cingmen/phisquest/releases/tag/v2.2.2) |
 
 ## 10. Strategi Pengujian
 

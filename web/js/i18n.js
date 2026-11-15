@@ -453,7 +453,7 @@ const PATTERNS = [
   [/^(\d+) pemain · (\d+) sesi · rata-rata akurasi (\d+)%$/, '$1 players · $2 sessions · $3% average accuracy'],
   [/^(\d+) dtk$/, '$1 s'],
   [/^⏱️ Mode Time Attack · bonus kecepatan (\d+) XP · (\d+) soal timeout$/,
-    '⏱️ Time Attack mode · $1 XP speed bonus · $2 timed-out questions'],
+    (match, bonus, count) => `⏱️ Time Attack mode · ${bonus} XP speed bonus · ${count} timed-out ${count === '1' ? 'question' : 'questions'}`],
   [/^⚡ (.+)$/, '⚡ $1'],
   [/^⬆️ Naik level: (.+)$/, '⬆️ Level up: $1'],
   [/^🏅 Lencana baru: (.+)$/, '🏅 New badge: $1'],

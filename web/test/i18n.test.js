@@ -60,6 +60,8 @@ test('translateString menerjemahkan teks game, recap, dan kartu skor', () => {
   assert.equal(translateString('of-007 · jawabanmu Phishing 🎣'), 'of-007 · your answer Phishing 🎣');
   assert.equal(translateString('🏆 Peringkat #1'), '🏆 Rank #1');
   assert.equal(translateString('🎣 Campur · 30%'), '🎣 Mixed · 30%');
+  assert.equal(translateString('⏱️ Mode Time Attack · bonus kecepatan 16 XP · 1 soal timeout'), '⏱️ Time Attack mode · 16 XP speed bonus · 1 timed-out question');
+  assert.equal(translateString('⏱️ Mode Time Attack · bonus kecepatan 16 XP · 2 soal timeout'), '⏱️ Time Attack mode · 16 XP speed bonus · 2 timed-out questions');
   assert.equal(translateString('⏱️ campur · 80%'), '⏱️ Mixed · 80%');
   assert.equal(translateString('campur'), 'Mixed');
   assert.equal(translateString('dari 10 skor di papan online.'), 'of 10 scores on the online leaderboard.');
