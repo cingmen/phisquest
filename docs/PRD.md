@@ -9,9 +9,9 @@
 | Nama produk | **PhishQuest** |
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
-| Status | Dirilis v2.0.0; dokumen menjadi sumber kebenaran produk |
-| Target rilis | v2.0.0 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
-| Rilis terbaru | [v2.0.0](https://github.com/cingmen/phisquest/releases/tag/v2.0.0) — 15 November 2026 |
+| Status | Dirilis v2.1.0; dokumen menjadi sumber kebenaran produk |
+| Target rilis | v2.1.0 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Rilis terbaru | [v2.1.0](https://github.com/cingmen/phisquest/releases/tag/v2.1.0) — 15 November 2026 |
 | Terakhir diperbarui | 2026-11-15 |
 | Bahasa konten | Indonesia + Inggris (skenario dan seluruh UI, termasuk editor); README dwibahasa (ID/EN) |
 
@@ -444,7 +444,7 @@ stateDiagram-v2
 | **v1.6.10** | **Pratinjau gabungan** menampilkan field yang akan berubah beserta nilai dari kedua tab dan menandai bentrok sebelum apa pun ditulis | Dirilis (v1.6.10) |
 | **v1.6.11** | Perbandingan field mengabaikan urutan daftar (`red_flags`) agar urutan centang berbeda tidak dilaporkan sebagai perubahan atau bentrok | Dirilis (v1.6.11) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII), kartu bagikan skor (gambar), dan i18n Inggris untuk 40 skenario serta UI inti; editor lanjutan tetap Indonesia | Dirilis (v2.0.0) |
-| **v2.1.0** | Editor skenario lanjutan sepenuhnya berbahasa Inggris, termasuk validasi, draft, ekspor/impor, pintasan, dan dialog konfirmasi; label beta dihapus | Belum dirilis |
+| **v2.1.0** | Editor skenario lanjutan sepenuhnya berbahasa Inggris, termasuk validasi, draft, ekspor/impor, pintasan, dan dialog konfirmasi; label beta dihapus | [Dirilis (v2.1.0)](https://github.com/cingmen/phisquest/releases/tag/v2.1.0) |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
 

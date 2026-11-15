@@ -372,7 +372,7 @@ Leaderboard online **anonim tanpa PII**. Backend FastAPI + SQLite tersedia di `s
 
 ### 7.2 Endpoint
 
-**`GET /healthz`** → `200 { "status": "ok", "version": "2.0.0" }`
+**`GET /healthz`** → `200 { "status": "ok", "version": "2.1.0" }`
 
 **`POST /v1/scores`** — kirim hasil sesi.
 
@@ -385,7 +385,7 @@ Leaderboard online **anonim tanpa PII**. Backend FastAPI + SQLite tersedia di `s
   "max_score": 100,
   "accuracy": 0.9,               // 0.0–1.0
   "duration_s": 312,
-  "client_version": "2.0.0",
+  "client_version": "2.1.0",
   "sig": "<hex>"                 // HMAC, lihat 7.3
 }
 // 201 Created

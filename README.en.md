@@ -3,7 +3,7 @@
 > **Spot the bait before you get hooked.**
 
 ![CI](https://github.com/cingmen/phisquest/actions/workflows/ci.yml/badge.svg)
-[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.0.0)
+[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.1.0)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)
@@ -156,7 +156,7 @@ node --test web/test/*.test.js
   press **Apply merge**.
 - CLI: `phishquest play --jumlah 20` (mixed, 5–40) or `--pack ID --jumlah N` (5–10).
 
-## English (v2.0)
+## English (v2.0–v2.1)
 
 The **🇬🇧 English** option on the About screen loads English translations for all 40 scenarios
 (`content/i18n/en.json`) and the core UI: navigation, menu, game, feedback, recap, badges, levels,

@@ -3,7 +3,7 @@
 > **Kenali umpan sebelum kamu terhook.**
 
 ![CI](https://github.com/cingmen/phisquest/actions/workflows/ci.yml/badge.svg)
-[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.0.0)
+[![Release](https://img.shields.io/github/v/release/cingmen/phisquest?label=release&color=7C3AED)](https://github.com/cingmen/phisquest/releases/tag/v2.1.0)
 ![License: MIT](https://img.shields.io/badge/lisensi-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)
@@ -199,7 +199,7 @@ Setiap pack target: ≥7 `phish_or_legit`, ≥2 `best_action`, ≥1 `spot_redfla
   menulis setelah **Terapkan gabungan** ditekan.
 - CLI: `phishquest play --jumlah 20` (Campur, 5–40) atau `--pack ID --jumlah N` (5–10).
 
-## Bahasa Inggris (v2.0)
+## Bahasa Inggris (v2.0–v2.1)
 
 Pemilih **🇬🇧 English** di layar Tentang memuat terjemahan Inggris untuk seluruh 40 skenario
 (`content/i18n/en.json`) dan UI inti: navigasi, menu, permainan, umpan balik, recap, lencana, level,
