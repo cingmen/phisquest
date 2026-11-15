@@ -3,7 +3,7 @@
 Semua perubahan penting proyek ini dicatat di sini. Riwayat versi lama (v1.1 dan sebelumnya) ada di
 `docs/implementation-plan.md`; rincian perilaku ada di `docs/PRD.md`.
 
-## Belum dirilis
+## v2.1.1 — 2026-11-15
 
 - Audit locale Inggris menutup sisa teks Indonesia di pengumuman sesi, label red flag pada umpan
   balik, nama lencana di recap, ringkasan peringkat, label pack campur, metadata halaman, kartu

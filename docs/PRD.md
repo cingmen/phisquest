@@ -9,9 +9,9 @@
 | Nama produk | **PhishQuest** |
 | Tagline | "Kenali umpan sebelum kamu terhook." 🎣 |
 | Versi dokumen | 1.0.0 |
-| Status | Dirilis v2.1.0; dokumen menjadi sumber kebenaran produk |
-| Target rilis | v2.1.0 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
-| Rilis terbaru | [v2.1.0](https://github.com/cingmen/phisquest/releases/tag/v2.1.0) — 15 November 2026 |
+| Status | Dirilis v2.1.1; dokumen menjadi sumber kebenaran produk |
+| Target rilis | v2.1.1 (dirilis; riwayat di `implementation-plan.md` dan `CHANGELOG.md`) |
+| Rilis terbaru | [v2.1.1](https://github.com/cingmen/phisquest/releases/tag/v2.1.1) — 15 November 2026 |
 | Terakhir diperbarui | 2026-11-15 |
 | Bahasa konten | Indonesia + Inggris (skenario dan seluruh UI, termasuk editor); README dwibahasa (ID/EN) |
 
@@ -445,6 +445,7 @@ stateDiagram-v2
 | **v1.6.11** | Perbandingan field mengabaikan urutan daftar (`red_flags`) agar urutan centang berbeda tidak dilaporkan sebagai perubahan atau bentrok | Dirilis (v1.6.11) |
 | **v2.0.0** | Leaderboard online opsional (FastAPI + SQLite, anonim tanpa PII), kartu bagikan skor (gambar), dan i18n Inggris untuk 40 skenario serta UI inti; editor lanjutan tetap Indonesia | Dirilis (v2.0.0) |
 | **v2.1.0** | Editor skenario lanjutan sepenuhnya berbahasa Inggris, termasuk validasi, draft, ekspor/impor, pintasan, dan dialog konfirmasi; label beta dihapus | [Dirilis (v2.1.0)](https://github.com/cingmen/phisquest/releases/tag/v2.1.0) |
+| **v2.1.1** | Audit locale Inggris menutup sisa teks Indonesia di pengumuman sesi, label red flag, nama lencana recap, peringkat, kartu skor, metadata halaman, serta pesan error dan papan skor online | [Dirilis (v2.1.1)](https://github.com/cingmen/phisquest/releases/tag/v2.1.1) |
 
 ## 16. Metrik Keberhasilan (Checklist v1.0)
 
